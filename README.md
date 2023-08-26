@@ -1,1 +1,5 @@
-# CSC481
+# CSC481: Game Engine Foundations
+
+COMPILE & RUN INSTRUCTIONS: 
+
+- make 
