@@ -2,4 +2,8 @@
 
 COMPILE & RUN INSTRUCTIONS: 
 
-- make 
+* from the CSC481 directory run `make game`
+
+USAGE:
+
+* player movement is input using the arrow keys
