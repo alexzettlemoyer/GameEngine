@@ -11,24 +11,26 @@ sf::Vector2f originalPositionLR;        // original position for the left/right 
 const float CHANGE_DIFF_CW = 100.f;     // movement amount for clockwise
 const float CHANGE_DIFF_LR = 200.f;     // movement amount for left/right
 
+const float MOVE_DIST = 2.0f;
+
 bool moveLeft(GraphicsObject& obj)
 {
-    obj.move(-2.f, 0.f);
+    obj.move(-MOVE_DIST, 0.f);
     return true;
 }
 bool moveUp(GraphicsObject& obj)
 {
-    obj.move(0.f, -2.f);     // move up
+    obj.move(0.f, -MOVE_DIST);     // move up
     return true;
 }
 bool moveRight(GraphicsObject& obj)
 {
-    obj.move(2.f, 0.f);     // move right
+    obj.move(MOVE_DIST, 0.f);     // move right
     return true;
 }
 bool moveDown(GraphicsObject& obj)
 {
-    obj.move(0.f, 2.f);     // move down
+    obj.move(0.f, MOVE_DIST);     // move down
     return true;
 }
 
@@ -82,8 +84,7 @@ bool movementClockwise(GraphicsObject& obj)
             mvmntDirCW = 0;
     }
 
-    checkCollision(*character, obj, 0.0f);
-
+    checkCollision(*character, obj, 1.0f);
     return true;
 }
 
@@ -113,5 +114,7 @@ bool movementLeftRight(GraphicsObject& obj)
         if ( xDiff <= 0 )
             mvmntDirLR = 0;
     }
+
+    checkCollision(*character, obj, 1.0f);
     return true;
 }

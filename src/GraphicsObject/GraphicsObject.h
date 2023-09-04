@@ -13,7 +13,7 @@ class GraphicsObject : public sf::RectangleShape
         void move(float x, float y);
 
     private:
-
+//        sf::Vector2f velocity;
 };
 
 #endif

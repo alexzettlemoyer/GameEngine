@@ -1,10 +1,14 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include "GraphicsObject.h"
 #include "Character.h"
 #include "../graphics/draw.hpp"
 #include "../Movement/Collider.hpp"
+#include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
+const float movementSpeed = 300.f;
+// sf::Vector2f velocity;
 
 // Constructor
 Character::Character()
@@ -14,7 +18,9 @@ Character::Character()
     this -> setTexture(characterTexture);
 
     sf::Sprite::setScale(sf::Vector2f(0.45f, 0.5f));
-    sf::Sprite::setPosition(100.f, 173.f);
+    sf::Sprite::setPosition(100.f, 180.f);
+    velocity.x = 0.f;
+    velocity.y = 0.f;
 }
 
 bool Character::loadTexture(sf::Texture& texture, const std::string& image)
@@ -24,17 +30,19 @@ bool Character::loadTexture(sf::Texture& texture, const std::string& image)
     return true;
 }
 
+sf::Vector2f Character::getVelocity()
+{    
+    return sf::Vector2f(velocity.x, velocity.y);
+}
 sf::Vector2f Character::getPosition()
 {
     return sf::Sprite::getPosition();
 }
-
 sf::Vector2f Character::getSize()
 {
     sf::FloatRect bounds = sf::Sprite::getGlobalBounds();
     return sf::Vector2f(bounds.width, bounds.height);
 }
-
 void Character::move(float x, float y)
 {
     sf::Sprite::move(x, y);
@@ -49,11 +57,11 @@ bool Character::checkBounds(int dir, sf::RenderWindow* window)
     switch ( dir )
     {
         case 0:     // check left
-            if ( position.x - 1 <= 0 )
+            if ( position.x < 0.f )
                 return false;
             break;
         case 1:     // check up
-            if ( position.y - 1 <= 0 )
+            if ( position.y < 0.f )
                 return false;
             break;
         case 2:     // check right
@@ -65,35 +73,61 @@ bool Character::checkBounds(int dir, sf::RenderWindow* window)
                 return false;
             break;
         default:
-            return true;
-        break;
+            return false;
+            break;
     }
 
-    checkCollision(*character, *platform1, 0.0f);
-    checkCollision(*character, *platform2, 0.0f);
-    checkCollision(*character, *item1, 0.0f);
-
+    //  if any of the objects collide
+    for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
+        if (checkCollision(*character, *i, 0.0f))
+            return false;
+    }
 
     return true;
 }
 
-void Character::left(sf::RenderWindow* window)
+void Character::left(sf::RenderWindow* window, float dt)
 {
+    velocity.x += -movementSpeed * dt;
     if ((*this).checkBounds(0, window))
-        sf::Sprite::move(-3.f, 0.f);
+        updateMovement();
+    else
+        blockMove();
 }
-void Character::up(sf::RenderWindow* window)
+void Character::up(sf::RenderWindow* window, float dt)
 {
-    if (checkBounds(1, window))
-        sf::Sprite::move(0.f, -3.f);
+    velocity.y += -movementSpeed * dt;
+    if ((*this).checkBounds(1, window))
+        updateMovement();
+    else
+        blockMove();
 }
-void Character::right(sf::RenderWindow* window)
+void Character::right(sf::RenderWindow* window, float dt)
 {
-    if (checkBounds(2, window))
-        sf::Sprite::move(3.f, 0.f);
+    velocity.x += movementSpeed * dt;
+    if ((*this).checkBounds(2, window))
+        updateMovement();
+    else
+        blockMove();
 }
-void Character::down(sf::RenderWindow* window)
+void Character::down(sf::RenderWindow* window, float dt)
 {
-    if (checkBounds(3, window))
-        sf::Sprite::move(0.f, 3.f);
+    velocity.y += movementSpeed * dt;
+    if ((*this).checkBounds(3, window))
+        updateMovement();
+    else
+        blockMove();
+}
+
+void Character::blockMove()
+{
+    velocity.x = 0.f;
+    velocity.y = 0.f;    
+}
+
+void Character::updateMovement()
+{
+    this -> move(velocity.x, velocity.y);
+    velocity.x = 0.f;
+    velocity.y = 0.f;
 }

@@ -8,7 +8,7 @@ class Item : public GraphicsObject
     private:
         sf::Texture moneyTexture;
     public:
-        Item(const sf::Vector2f& position);
+        Item(const sf::Vector2f& size, const sf::Vector2f& position);
 };
 
 #endif

@@ -9,20 +9,20 @@ ioHandler::ioHandler(std::shared_ptr<Character> c)
     characterRef = c;
 }
 
-void ioHandler::handle(sf::RenderWindow* window)
+void ioHandler::handle(sf::RenderWindow* window, float dt)
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        characterRef->up(window);
+        characterRef->up(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        characterRef->up(window);
+        characterRef->up(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        characterRef->down(window);
+        characterRef->down(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        characterRef->right(window);
+        characterRef->right(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        characterRef->left(window);
+        characterRef->left(window, dt);
 }
