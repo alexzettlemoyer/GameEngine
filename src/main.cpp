@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "graphics/draw.hpp"
 #include "io/ioHandler.h"
+#include <iostream>
 
 int main()
 {
@@ -26,9 +27,13 @@ int main()
         }
 
         io->handle(&window, dt);
+       // std::cout << "1" << std::endl;
 
         drawGraphics(&window);
+       // std::cout << "2" << std::endl;
+
         startMovements();
+        // std::cout << "3" << std::endl;
     }
 
     delete io;

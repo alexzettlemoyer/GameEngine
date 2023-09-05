@@ -12,17 +12,17 @@ ioHandler::ioHandler(std::shared_ptr<Character> c)
 void ioHandler::handle(sf::RenderWindow* window, float dt)
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        characterRef->up(window, dt);
+        (*characterRef).GraphicsObject::up(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        characterRef->up(window, dt);
+        (*characterRef).GraphicsObject::up(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        characterRef->down(window, dt);
+        (*characterRef).GraphicsObject::down(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        characterRef->right(window, dt);
+        (*characterRef).GraphicsObject::right(window, dt);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        characterRef->left(window, dt);
+        (*characterRef).GraphicsObject::left(window, dt);
 }

@@ -11,7 +11,7 @@ sf::Vector2f originalPositionLR;        // original position for the left/right 
 const float CHANGE_DIFF_CW = 100.f;     // movement amount for clockwise
 const float CHANGE_DIFF_LR = 200.f;     // movement amount for left/right
 
-const float MOVE_DIST = 2.0f;
+const float MOVE_DIST = 2.0f;           // movement amount for individual steps
 
 bool moveLeft(GraphicsObject& obj)
 {
@@ -33,7 +33,6 @@ bool moveDown(GraphicsObject& obj)
     obj.move(0.f, MOVE_DIST);     // move down
     return true;
 }
-
 
 /**
  * Clockwise movement
@@ -84,14 +83,14 @@ bool movementClockwise(GraphicsObject& obj)
             mvmntDirCW = 0;
     }
 
-    checkCollision(*character, obj, 1.0f);
+    checkCollision(*character, obj, 1.0f, mvmntDirCW);
     return true;
 }
 
 
 // Movement pattern:
 // - left   0
-// - right  1
+// - right  2
 bool movementLeftRight(GraphicsObject& obj)
 {
     // if the first time, get the original position
@@ -105,9 +104,9 @@ bool movementLeftRight(GraphicsObject& obj)
         if (!moveLeft(obj))
             return false;
         if ( xDiff >= CHANGE_DIFF_LR )
-            mvmntDirLR = 1;
+            mvmntDirLR = 2;
     }
-    if ( mvmntDirLR == 1 && xDiff >= 0 )            // right movement
+    if ( mvmntDirLR == 2 && xDiff >= 0 )            // right movement
     {
         if (!moveRight(obj))
             return false;
@@ -115,6 +114,6 @@ bool movementLeftRight(GraphicsObject& obj)
             mvmntDirLR = 0;
     }
 
-    checkCollision(*character, obj, 1.0f);
+    checkCollision(*character, obj, 1.0f, mvmntDirLR);
     return true;
 }

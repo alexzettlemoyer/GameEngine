@@ -7,7 +7,7 @@
 #include "../GraphicsObject/Item.h"
 #include "../Movement/Mover.hpp"
 
-std::shared_ptr<Character> character = std::make_shared<Character>();
+std::shared_ptr<Character> character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f));
 
 std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
 std::shared_ptr<Platform> platform1 = std::make_shared<Platform>(sf::Vector2f(100.f, 520.f));
