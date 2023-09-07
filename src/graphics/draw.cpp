@@ -47,10 +47,10 @@ bool drawGraphics(sf::RenderWindow* window)
 
 }
 
-void startMovements()
+void startMovements(float dt)
 {
-    movementClockwise(*item1);
-    movementLeftRight(*platform2);
+    movementClockwise(*item1, dt);
+    movementLeftRight(*platform2, dt);
 }
 
 bool finalize()

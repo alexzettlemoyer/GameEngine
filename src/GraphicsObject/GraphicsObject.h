@@ -6,22 +6,29 @@
 class GraphicsObject : public sf::RectangleShape
 {
     private:
-        sf::Vector2f velocity;
-        bool checkBounds(int dir, sf::RenderWindow* window);
-        void updateMovement();
-        void blockMove();
 
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position);
-        bool loadTexture(sf::Texture& texture, const std::string& image);
+        enum CollisionType { STOP_MOVEMENT, ERASE, PUSH };
+        CollisionType collisionType;
+        // void blockMove();
+        sf::Vector2f velocity;
         sf::Vector2f getPosition();
         sf::Vector2f getSize();
         sf::Vector2f getVelocity();
-        void left(sf::RenderWindow* window, float dt);
-        void up(sf::RenderWindow* window, float dt);
-        void right(sf::RenderWindow* window, float dt);
-        void down(sf::RenderWindow* window, float dt);
+        void left(float dt);
+        void up(float dt);
+        void right(float dt);
+        void down(float dt);
         void move(float x, float y);
+
+    protected:
+        // CollisionType collisionType;
+        // sf::Vector2f velocity;
+        bool checkBounds(int dir);
+        void updateMovement();
+        void blockMove();
+        bool loadTexture(sf::Texture& texture, const std::string& image);
 };
 
 #endif

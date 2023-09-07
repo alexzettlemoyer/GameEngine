@@ -19,3 +19,73 @@ Character::Character(sf::Vector2f position)
         {}          // TODO: handle error
     this -> setTexture(&characterTexture);
 }
+
+void Character::left(sf::RenderWindow* window, float dt)
+{
+    velocity.x += -movementSpeed * dt;
+    if ((*this).checkBounds(0, window))
+        updateMovement();
+    else
+        blockMove();
+}
+void Character::up(sf::RenderWindow* window, float dt)
+{
+    velocity.y += -movementSpeed * dt;
+    if ((*this).checkBounds(1, window))
+        updateMovement();
+    else
+        blockMove();
+}
+void Character::right(sf::RenderWindow* window, float dt)
+{
+    velocity.x += movementSpeed * dt;
+    if ((*this).checkBounds(2, window))
+        updateMovement();
+    else
+        blockMove();
+}
+void Character::down(sf::RenderWindow* window, float dt)
+{
+    velocity.y += movementSpeed * dt;
+    if ((*this).checkBounds(3, window))
+        updateMovement();
+    else
+        blockMove();
+}
+
+bool Character::checkBounds(int dir, sf::RenderWindow* window)
+{
+    sf::Vector2u wSize = (*window).getSize();
+    sf::Vector2f position = sf::RectangleShape::getPosition();
+    sf::Rect<float> thisRect = (*this).getGlobalBounds();
+            
+    switch ( dir )
+    {
+        case 0:     // check left
+            if ( position.x < 0.f )
+                return false;
+            break;
+        case 1:     // check up
+            if ( position.y < 0.f )
+                return false;
+            break;
+        case 2:     // check right
+            if ( position.x + thisRect.width + 1 >= wSize.x )
+                return false;
+            break;
+        case 3:     // check down
+            if ( position.y + thisRect.height + 1 >= wSize.y )
+                return false;
+            break;
+        default:
+            return false;
+            break;
+    }
+
+    //  if any of the objects collide
+    for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
+        if (checkCollision(*this, *i, 0.0f))
+            return false;
+    }
+    return true;
+}

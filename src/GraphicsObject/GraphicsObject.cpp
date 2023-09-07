@@ -4,7 +4,7 @@
 #include "../Movement/Collider.hpp"
 #include <iostream>
 
-const float movementSpeed = 300.f;
+const float movementSpeed = 200.f;
 
 GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position)
 {
@@ -42,87 +42,65 @@ sf::Vector2f GraphicsObject::getVelocity()
     return sf::Vector2f(velocity.x, velocity.y);
 }
 
-void GraphicsObject::left(sf::RenderWindow* window, float dt)
+void GraphicsObject::left(float dt)
 {
     velocity.x += -movementSpeed * dt;
-    if ((*this).checkBounds(0, window))
+    if ((*this).checkBounds(0))
         updateMovement();
+    else if (!collisionResponse(*this))
+        {} // TODO: handle error
     else
-        blockMove();
+        {} // TODO: handle error
 }
-void GraphicsObject::up(sf::RenderWindow* window, float dt)
+void GraphicsObject::up(float dt)
 {
     velocity.y += -movementSpeed * dt;
-    if ((*this).checkBounds(1, window))
+    if ((*this).checkBounds(1))
         updateMovement();
+    else if (!collisionResponse(*this))
+        {} // TODO: handle error
     else
-        blockMove();
+        {} // TODO: handle error
 }
-void GraphicsObject::right(sf::RenderWindow* window, float dt)
+void GraphicsObject::right(float dt)
 {
     velocity.x += movementSpeed * dt;
-    if ((*this).checkBounds(2, window))
+    if ((*this).checkBounds(2))
         updateMovement();
+    else if (!collisionResponse(*this))
+        {} // TODO: handle error
     else
-        blockMove();
+        {} // handle error
 }
-void GraphicsObject::down(sf::RenderWindow* window, float dt)
+void GraphicsObject::down(float dt)
 {
-    velocity.y += movementSpeed * dt;
-    if ((*this).checkBounds(3, window))
+    this -> velocity.y += movementSpeed * dt;
+    if ((*this).checkBounds(3))
         updateMovement();
+    else if (!collisionResponse(*this))
+        {
+            std::cout << "Error with Collision" << std::endl;
+        } // TODO: handle error
     else
-        blockMove();
+        {} // handle error
 }
 
 void GraphicsObject::blockMove()
 {
     velocity.x = 0.f;
-    velocity.y = 0.f;    
+    velocity.y = 0.f;  
 }
 
 void GraphicsObject::updateMovement()
 {
     this -> move(velocity.x, velocity.y);
-    velocity.x = 0.f;
-    velocity.y = 0.f;
+    this -> blockMove();
 }
 
-bool GraphicsObject::checkBounds(int dir, sf::RenderWindow* window)
+bool GraphicsObject::checkBounds(int dir)
 {
-    sf::Vector2u wSize = (*window).getSize();
-    sf::Vector2f position = sf::RectangleShape::getPosition();
-    sf::Rect<float> thisRect = (*this).getGlobalBounds();
-            
-    switch ( dir )
-    {
-        case 0:     // check left
-            if ( position.x < 0.f )
-                return false;
-            break;
-        case 1:     // check up
-            if ( position.y < 0.f )
-                return false;
-            break;
-        case 2:     // check right
-            if ( position.x + thisRect.width + 1 >= wSize.x )
-                return false;
-            break;
-        case 3:     // check down
-            if ( position.y + thisRect.height + 1 >= wSize.y )
-                return false;
-            break;
-        default:
-            return false;
-            break;
-    }
-
-    //  if any of the objects collide
-    for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
-        if (checkCollision(*this, *i, 0.0f))
-            return false;
-    }
-
+    if (checkCollision(*this, *character, 0.0f))
+        return false;
     return true;
 }
 

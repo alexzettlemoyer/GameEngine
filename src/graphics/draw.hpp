@@ -11,14 +11,10 @@
 
     extern std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
 
-    // std::shared_ptr<Platform> platform1;
-    // std::shared_ptr<Platform> platform2;
-    // std::shared_ptr<Item> item1;
-
     extern std::shared_ptr<Character> character;
 
     bool setupGraphics();
     bool drawGraphics(sf::RenderWindow* window);
-    void startMovements();
+    void startMovements(float dt);
 
 #endif

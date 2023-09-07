@@ -6,6 +6,31 @@
 
 sf::FloatRect nextPosition;
 
+// STOP_MOVEMENT, ERASE, PUSH
+void stopMovement(GraphicsObject &obj)
+{
+    obj.velocity.x = 0.f;
+    obj.velocity.y = 0.f;  
+}
+
+bool collisionResponse(GraphicsObject &obj)
+{
+    switch (obj.collisionType)
+    {
+        case GraphicsObject::STOP_MOVEMENT:
+            stopMovement(obj);
+            break;
+        case GraphicsObject::ERASE:
+            break;
+        case GraphicsObject::PUSH:
+            break;
+        default:
+            stopMovement(obj);
+            break;
+    }
+    return true;
+}
+
 /**
  * Check Collision
  * https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection
@@ -28,7 +53,6 @@ sf::FloatRect nextPosition;
  */
 bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, float mvmntDir = -1.f)
 {
-
     sf::FloatRect characterBounds = obj.getGlobalBounds();
     sf::FloatRect otherBounds = other.getGlobalBounds();
 
@@ -39,7 +63,6 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
 
     if (otherBounds.intersects(nextPosition))
     {
-        // std::cout << "colliding" << std::endl;
     //     // push the character away from the moving object
     //     if ( push == 1.0f )
     //     {
@@ -80,53 +103,53 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
         return true;
     }
 
-//     sf::Vector2f thisPosition = obj.getPosition();
-//     sf::Vector2f thisHalfSize = obj.getSize() / 2.0f;
+    // sf::Vector2f thisPosition = obj.getPosition();
+    // sf::Vector2f thisHalfSize = obj.getSize() / 2.0f;
 
-//     sf::Vector2f otherPosition = other.getPosition();
-//     sf::Vector2f otherHalfSize = other.getSize() / 2.0f;
+    // sf::Vector2f otherPosition = other.getPosition();
+    // sf::Vector2f otherHalfSize = other.getSize() / 2.0f;
 
-//     float deltaX = otherPosition.x - thisPosition.x;
-//     float deltaY = otherPosition.y - thisPosition.y;
-//     float intersectX = abs(deltaX) - (otherHalfSize.x + thisHalfSize.x);
-//     float intersectY = abs(deltaY) - (otherHalfSize.y + thisHalfSize.y);
+    // float deltaX = otherPosition.x - thisPosition.x;
+    // float deltaY = otherPosition.y - thisPosition.y;
+    // float intersectX = abs(deltaX) - (otherHalfSize.x + thisHalfSize.x);
+    // float intersectY = abs(deltaY) - (otherHalfSize.y + thisHalfSize.y);
 
 //    //  std::cout << intersectX << ", " << collisionDirection.y << std::endl;
 
 
-//     // collision
-//     if (intersectX < 0.0f && intersectY < 0.0f)
-//     {
-        // push = std::min(std::max(push, 0.0f), 1.0f)
-        // if ( push == 1.0f )
-        // {
-        //     if ( intersectX > intersectY )
-        //     {
-        //         if ( deltaX > 0.0f )
-        //         {
-        //             obj.move(intersectX * (1.0f - push), 0.0f);
-        //             other.move(-intersectX * push, 0.0f);
-        //         }
-        //         else
-        //         {
-        //             obj.move(-intersectX * (1.0f - push), 0.0f);
-        //             other.move(intersectX * push, 0.0f);
-        //         }
-        //     }
-        //     else
-        //     {
-        //         if ( deltaY > 0.0f )
-        //         {
-        //             obj.move(0.0f, intersectY * (1.0f - push));
-        //             other.move(0.0f, -intersectY * push);
-        //         }
-        //         else
-        //         {
-        //             obj.move(0.0f, -intersectY * (1.0f - push));
-        //             other.move(0.0f, intersectY * push);
-        //         }
-        //     }
-        // }
+    // // collision
+    // if (intersectX < 0.0f && intersectY < 0.0f)
+    // {
+    //     push = std::min(std::max(push, 0.0f), 1.0f);
+    //     if ( push == 1.0f )
+    //     {
+    //         if ( intersectX > intersectY )
+    //         {
+    //             if ( deltaX > 0.0f )
+    //             {
+    //                 obj.move(intersectX * (1.0f - push), 0.0f);
+    //                 other.move(-intersectX * push, 0.0f);
+    //             }
+    //             else
+    //             {
+    //                 obj.move(-intersectX * (1.0f - push), 0.0f);
+    //                 other.move(intersectX * push, 0.0f);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             if ( deltaY > 0.0f )
+    //             {
+    //                 obj.move(0.0f, intersectY * (1.0f - push));
+    //                 other.move(0.0f, -intersectY * push);
+    //             }
+    //             else
+    //             {
+    //                 obj.move(0.0f, -intersectY * (1.0f - push));
+    //                 other.move(0.0f, intersectY * push);
+    //             }
+    //         }
+    //     }
     //     return true;
     // }
     // std::cout << thisPosition.x << ", " << thisPosition.y << std::endl;

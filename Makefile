@@ -52,7 +52,8 @@ clean:
 	rm -f $(BIN)/graphicsObject.o 
 	rm -f $(BIN)/item.o 
 	rm -f $(BIN)/character.o 
-	rm -f $(BIN)/platform.o 
+	rm -f $(BIN)/platform.o
+	rm -f $(BIN)/collider.o 
 
 	rm -f ./game
 
