@@ -8,8 +8,12 @@ $(BIN)/main.o: $(SRC)/main.cpp
 	g++ -c "$(SRC)/main.cpp" -o $(BIN)/main.o
 
 # draw compilation
-$(BIN)/draw.o: $(SRC)/graphics/draw.cpp
-	g++ -c "$(SRC)/graphics/draw.cpp" -o $(BIN)/draw.o
+$(BIN)/draw.o: $(SRC)/Draw/draw.cpp
+	g++ -c "$(SRC)/Draw/draw.cpp" -o $(BIN)/draw.o
+
+# time
+$(BIN)/time.o: $(SRC)/Time/TimeHandler.cpp
+	g++ -c "$(SRC)/Time/TimeHandler.cpp" -o $(BIN)/time.o
 
 # collider
 $(BIN)/collider.o: $(SRC)/Movement/Collider.cpp
@@ -40,8 +44,8 @@ $(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
 	g++ -c "$(SRC)/io/ioHandler.cpp" -o $(BIN)/ioHandler.o
 
 # Link all object files to create the executable
-game: 	$(BIN)/collider.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o
-	g++ -g $(BIN)/collider.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o -o game $(LIBS)
+game: 	$(BIN)/time.o $(BIN)/collider.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o
+	g++ -g $(BIN)/time.o $(BIN)/collider.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o -o game $(LIBS)
 
 
 clean:
@@ -54,6 +58,7 @@ clean:
 	rm -f $(BIN)/character.o 
 	rm -f $(BIN)/platform.o
 	rm -f $(BIN)/collider.o 
+	rm -f $(BIN)/time.o
 
 	rm -f ./game
 

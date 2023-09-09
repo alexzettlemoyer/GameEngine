@@ -8,7 +8,7 @@ class ioHandler
 {
     public:
         ioHandler(std::shared_ptr<Character> c);
-        void handle(sf::RenderWindow* window, float dt);
+        void handle();
 };
 
 #endif

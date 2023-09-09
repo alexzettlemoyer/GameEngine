@@ -10,16 +10,21 @@
 std::shared_ptr<Character> character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f));
 
 std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
-std::shared_ptr<Platform> platform1 = std::make_shared<Platform>(sf::Vector2f(100.f, 520.f));
+std::list<std::shared_ptr<Platform>> platforms;
+std::shared_ptr<Platform> platform1 = std::make_shared<Platform>(sf::Vector2f(25.f, 520.f));
 std::shared_ptr<Platform> platform2 = std::make_shared<Platform>(sf::Vector2f(525.f, 650.f));
 std::shared_ptr<Item> item1 = std::make_shared<Item>(sf::Vector2f(100.2f, 64.6f), sf::Vector2f(800.f, 150.f));
 
 
-bool setupGraphics()
+bool setupGraphics(sf::RenderWindow* window)
 {
+    character.get() -> addWindowReference(window);
     graphicsObjects.push_back(platform1);
     graphicsObjects.push_back(platform2);
     graphicsObjects.push_back(item1);
+
+    platforms.push_back(platform1);
+    platforms.push_back(platform2);
     return true;
 }
 
@@ -47,10 +52,11 @@ bool drawGraphics(sf::RenderWindow* window)
 
 }
 
-void startMovements(float dt)
+void startMovements()
 {
-    movementClockwise(*item1, dt);
-    movementLeftRight(*platform2, dt);
+    characterMovement(*character);
+    movementClockwise(*item1);
+    movementLeftRight(*platform2);
 }
 
 bool finalize()

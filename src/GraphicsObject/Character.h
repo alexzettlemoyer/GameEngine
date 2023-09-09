@@ -7,14 +7,17 @@ class Character : public GraphicsObject
 {
     private:
         sf::Texture characterTexture;
-        bool checkBounds(int dir, sf::RenderWindow* window);
+        bool isGrounded();
+        bool checkBounds();
 
     public:
         Character(sf::Vector2f position);
-        void left(sf::RenderWindow* window, float dt);
-        void up(sf::RenderWindow* window, float dt);
-        void right(sf::RenderWindow* window, float dt);
-        void down(sf::RenderWindow* window, float dt);
+        void updateMovement();
+        void left();
+        void up();
+        void right();
+        void down();
+        void addWindowReference(sf::RenderWindow* window);
         sf::Vector2f getVelocity();
 };
 

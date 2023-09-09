@@ -1,10 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "GraphicsObject.h"
-#include "../graphics/draw.hpp"
+#include "../Draw/draw.hpp"
 #include "../Movement/Collider.hpp"
+#include "../Time/TimeHandler.h"
 #include <iostream>
 
-const float movementSpeed = 200.f;
+const float displacement = .015f;
 
 GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position)
 {
@@ -42,29 +43,33 @@ sf::Vector2f GraphicsObject::getVelocity()
     return sf::Vector2f(velocity.x, velocity.y);
 }
 
-void GraphicsObject::left(float dt)
+void GraphicsObject::left()
 {
-    velocity.x += -movementSpeed * dt;
-    if ((*this).checkBounds(0))
+    if (TimeHandler::getInstance() -> dt != 0)
+        velocity.x += -displacement / TimeHandler::getInstance() -> dt;
+    // std::cout << velocity.x << std::endl;
+    // if ((*this).checkBounds(0))
         updateMovement();
-    else if (!collisionResponse(*this))
-        {} // TODO: handle error
-    else
-        {} // TODO: handle error
+    // else if (!collisionResponse(*this))
+    //     {} // TODO: handle error
+    // else
+    //     {} // TODO: handle error
 }
-void GraphicsObject::up(float dt)
+void GraphicsObject::up()
 {
-    velocity.y += -movementSpeed * dt;
-    if ((*this).checkBounds(1))
+    if (TimeHandler::getInstance() -> dt != 0)
+        velocity.y += -displacement / TimeHandler::getInstance() -> dt;
+    // if ((*this).checkBounds(1))
         updateMovement();
-    else if (!collisionResponse(*this))
-        {} // TODO: handle error
-    else
-        {} // TODO: handle error
+    // else if (!collisionResponse(*this))
+    //     {} // TODO: handle error
+    // else
+    //     {} // TODO: handle error
 }
-void GraphicsObject::right(float dt)
+void GraphicsObject::right()
 {
-    velocity.x += movementSpeed * dt;
+    if (TimeHandler::getInstance() -> dt != 0)
+        velocity.x += displacement / TimeHandler::getInstance() -> dt;
     if ((*this).checkBounds(2))
         updateMovement();
     else if (!collisionResponse(*this))
@@ -72,17 +77,18 @@ void GraphicsObject::right(float dt)
     else
         {} // handle error
 }
-void GraphicsObject::down(float dt)
+void GraphicsObject::down()
 {
-    this -> velocity.y += movementSpeed * dt;
-    if ((*this).checkBounds(3))
+    if (TimeHandler::getInstance() -> dt != 0)
+        velocity.y += displacement / TimeHandler::getInstance() -> dt;
+    // if ((*this).checkBounds(3))
         updateMovement();
-    else if (!collisionResponse(*this))
-        {
-            std::cout << "Error with Collision" << std::endl;
-        } // TODO: handle error
-    else
-        {} // handle error
+    // else if (!collisionResponse(*this))
+    //     {
+    //         std::cout << "Error with Collision" << std::endl;
+    //     } // TODO: handle error
+    // else
+    //     {} // handle error
 }
 
 void GraphicsObject::blockMove()

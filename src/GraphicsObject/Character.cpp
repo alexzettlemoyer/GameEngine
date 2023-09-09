@@ -2,14 +2,20 @@
 #include <SFML/System.hpp>
 #include "GraphicsObject.h"
 #include "Character.h"
-#include "../graphics/draw.hpp"
+#include "../Draw/draw.hpp"
 #include "../Movement/Collider.hpp"
+#include "../Time/TimeHandler.h"
 #include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
+static sf::RenderWindow* window;
 
-const float movementSpeed = 300.f;
+static const float displacement = .065f;
+static const float acceleration = -1750.f;       // m/s * s
+static const float GRAVITY = 500.f;            // m/s * s
+
+sf::Vector2f initialPosition;
 
 // Constructor
 Character::Character(sf::Vector2f position)
@@ -18,74 +24,89 @@ Character::Character(sf::Vector2f position)
     if (!loadTexture(characterTexture, IMG_CHARACTER.c_str()))
         {}          // TODO: handle error
     this -> setTexture(&characterTexture);
+    this -> collisionType = CHAR;
 }
 
-void Character::left(sf::RenderWindow* window, float dt)
+void Character::addWindowReference(sf::RenderWindow* windowRef)
 {
-    velocity.x += -movementSpeed * dt;
-    if ((*this).checkBounds(0, window))
-        updateMovement();
-    else
-        blockMove();
-}
-void Character::up(sf::RenderWindow* window, float dt)
-{
-    velocity.y += -movementSpeed * dt;
-    if ((*this).checkBounds(1, window))
-        updateMovement();
-    else
-        blockMove();
-}
-void Character::right(sf::RenderWindow* window, float dt)
-{
-    velocity.x += movementSpeed * dt;
-    if ((*this).checkBounds(2, window))
-        updateMovement();
-    else
-        blockMove();
-}
-void Character::down(sf::RenderWindow* window, float dt)
-{
-    velocity.y += movementSpeed * dt;
-    if ((*this).checkBounds(3, window))
-        updateMovement();
-    else
-        blockMove();
+    window = windowRef;
 }
 
-bool Character::checkBounds(int dir, sf::RenderWindow* window)
+void Character::left()
+{
+    velocity.x += -displacement / TimeHandler::getInstance() -> dt;
+    updateMovement();
+}
+void Character::up()
+{
+    // if (initialPosition == sf::Vector2f(0.f, 0.f))
+    //     initialPosition = getPosition();
+
+    velocity.y = acceleration * TimeHandler::getInstance() -> dt;
+    updateMovement();
+}
+void Character::right()
+{
+    velocity.x += displacement / TimeHandler::getInstance() -> dt;
+    updateMovement();
+}
+void Character::down()
+{
+    velocity.y += displacement / TimeHandler::getInstance() -> dt;
+    updateMovement();
+}
+
+bool Character::isGrounded()
+{
+    //  if the character is on top of any of the platforms
+    for (std::shared_ptr<Platform> const& i : platforms) {
+        // std::cout << i.get() -> getPosition().x << std::endl; 
+        if (isCharacterGrounded(*this, *i))
+            return true;
+    }
+    return false;
+}
+
+void Character::updateMovement()
+{
+    sf::Vector2f currentPosition = getPosition();
+
+    if (!isGrounded())
+        velocity.y += GRAVITY * TimeHandler::getInstance()->dt;
+
+    if (!checkBounds())
+        move(velocity.x, velocity.y);
+    this -> blockMove();
+}
+
+bool Character::checkBounds()
 {
     sf::Vector2u wSize = (*window).getSize();
     sf::Vector2f position = sf::RectangleShape::getPosition();
     sf::Rect<float> thisRect = (*this).getGlobalBounds();
             
-    switch ( dir )
-    {
-        case 0:     // check left
-            if ( position.x < 0.f )
-                return false;
-            break;
-        case 1:     // check up
-            if ( position.y < 0.f )
-                return false;
-            break;
-        case 2:     // check right
-            if ( position.x + thisRect.width + 1 >= wSize.x )
-                return false;
-            break;
-        case 3:     // check down
-            if ( position.y + thisRect.height + 1 >= wSize.y )
-                return false;
-            break;
-        default:
-            return false;
-            break;
-    }
+    // check left
+    if ( thisRect.left < 0.f )
+        this -> setPosition(0.1f, position.y);
+    // check up
+    if ( thisRect.top < 0.f )
+        this -> setPosition(position.x, 0.1f);
+    // check right
+    if ( thisRect.left + thisRect.width + 1 >= wSize.x )
+        this -> setPosition(wSize.x - thisRect.width - 1, position.y);
+    // check down
+    if ( thisRect.top + thisRect.height + 1 >= wSize.y )
+        this -> setPosition(position.x, wSize.y - thisRect.height - 1);
 
     //  if any of the objects collide
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
         if (checkCollision(*this, *i, 0.0f))
-            return false;
+        {
+            // std::cout << "c" <<  position.y +thisRect.height << " - " << i.get() -> getPosition().y << std::endl;
+            return true;
+        }
     }
-    return true;
+
+    // std::cout << "not colliding" << position.y << std::endl;
+    return false;
 }

@@ -1,16 +1,61 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Time.hpp>
+#include <chrono>
 #include <iostream>
 #include <cmath>
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
+#include "../GraphicsObject/Platform.h"
+#include "../Draw/draw.hpp"
+#include "../Time/TimeHandler.h"
 
 sf::FloatRect nextPosition;
+
+bool isCharacterGrounded(Character &character, Platform &platform)
+{
+    sf::FloatRect characterBounds = character.getGlobalBounds();
+    sf::FloatRect otherBounds = platform.getGlobalBounds();
+
+    // if bottom x coordinate of character is below top x coordinate of platform
+    // and the character is within the x coordinates of the platform ( on top )
+    if (characterBounds.top + characterBounds.height >= otherBounds.top &&
+        characterBounds.left + characterBounds.width >= otherBounds.left &&
+        characterBounds.left <= otherBounds.left + otherBounds.width)
+        {
+            // std::cout << "ground" << std::endl;
+            return true;
+        }
+
+    // std::cout << "not" << std::endl;
+    return false;
+}
 
 // STOP_MOVEMENT, ERASE, PUSH
 void stopMovement(GraphicsObject &obj)
 {
     obj.velocity.x = 0.f;
     obj.velocity.y = 0.f;  
+}
+
+// dir = 0: x axis
+// dir = 1: y axis
+void stopDirMovement(GraphicsObject &obj, int dir)
+{
+    // std::cout << dir << std::endl;
+    if ( dir == 0 )
+        obj.velocity.x = 0;
+    if ( dir == 1 )
+        obj.velocity.y = 0;
+}
+
+void eraseObj(GraphicsObject &obj)
+{   
+    // remove drawn pointer from list
+    graphicsObjects.remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
+        return ptr.get() == &obj;
+    });
+
+    // after 20s reappear ?
 }
 
 bool collisionResponse(GraphicsObject &obj)
@@ -21,6 +66,7 @@ bool collisionResponse(GraphicsObject &obj)
             stopMovement(obj);
             break;
         case GraphicsObject::ERASE:
+            eraseObj(obj);
             break;
         case GraphicsObject::PUSH:
             break;
@@ -56,104 +102,37 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
     sf::FloatRect characterBounds = obj.getGlobalBounds();
     sf::FloatRect otherBounds = other.getGlobalBounds();
 
+    characterBounds.height -= 5.f;
+
     nextPosition = characterBounds;
     sf::Vector2f velocity = obj.getVelocity();
     nextPosition.left += velocity.x;
     nextPosition.top += velocity.y;
 
-    if (otherBounds.intersects(nextPosition))
+    sf::FloatRect intersection;
+
+    // add nextPosition offset
+    if (otherBounds.intersects(nextPosition, intersection))
     {
-    //     // push the character away from the moving object
-    //     if ( push == 1.0f )
-    //     {
-    //         std:: cout << "collision" << std::endl;
-    //         // calculate the center of both objects
-    //         // bounds.left give current x position of the obj + width = top length / 2 = center x
-    //         // bounds.top give current y position of the obj + height = side length / 2 = center y
+        float width = intersection.width;
+        float height = intersection.height;
 
-    //         // sf::Vector2f characterCenter(
-    //         //     characterBounds.left + characterBounds.width / 2.0f,
-    //         //     characterBounds.top + characterBounds.height / 2.0f
-    //         // );
-
-    //         // sf::Vector2f otherCenter(
-    //         //     otherBounds.left + otherBounds.width / 2.0f,
-    //         //     otherBounds.top + otherBounds.height / 2.0f
-    //         // );       
-
-    //         // // get the direction of the collision
-    //         // sf::Vector2f collisionDirection = characterCenter - otherCenter;
-    //         // std::cout << collisionDirection.x << ", " << collisionDirection.y << std::endl;
-    //         // // -117.467, 41.5513
-
-    //         // // calculate magnitude of collision
-    //         // float collisionLength = sqrt(collisionDirection.x * collisionDirection.x + collisionDirection.y * collisionDirection.y);
-
-    //         // if (collisionLength != 0.0f)
-    //         // {
-    //         //     collisionDirection /= collisionLength;  // get Unit vector
-                
-    //         //     // collision depth: how far objs intersect
-    //         //     float collisionDepth = characterBounds.width / 2.0f + otherBounds.width / 2.0f - collisionLength;
-                
-    //         //     sf::Vector2f pushVector = collisionDirection * collisionDepth;
-    //         //     obj.move(pushVector.x, pushVector.y);
-    //         // }
-    //     }
+        // std::cout << width << ", " << height << std::endl;
+        if (obj.collisionType != GraphicsObject::CHAR )
+            collisionResponse(obj);
+        if (other.collisionType != GraphicsObject::CHAR )
+            collisionResponse(other);
+    
+        if ( width < height )
+        {
+            // collision on x axis
+            stopDirMovement(obj, 0);
+        }
+        else
+        {
+            // return true;
+        }   // collision on Y axis (due to gravity). Do nothing for now
         return true;
     }
-
-    // sf::Vector2f thisPosition = obj.getPosition();
-    // sf::Vector2f thisHalfSize = obj.getSize() / 2.0f;
-
-    // sf::Vector2f otherPosition = other.getPosition();
-    // sf::Vector2f otherHalfSize = other.getSize() / 2.0f;
-
-    // float deltaX = otherPosition.x - thisPosition.x;
-    // float deltaY = otherPosition.y - thisPosition.y;
-    // float intersectX = abs(deltaX) - (otherHalfSize.x + thisHalfSize.x);
-    // float intersectY = abs(deltaY) - (otherHalfSize.y + thisHalfSize.y);
-
-//    //  std::cout << intersectX << ", " << collisionDirection.y << std::endl;
-
-
-    // // collision
-    // if (intersectX < 0.0f && intersectY < 0.0f)
-    // {
-    //     push = std::min(std::max(push, 0.0f), 1.0f);
-    //     if ( push == 1.0f )
-    //     {
-    //         if ( intersectX > intersectY )
-    //         {
-    //             if ( deltaX > 0.0f )
-    //             {
-    //                 obj.move(intersectX * (1.0f - push), 0.0f);
-    //                 other.move(-intersectX * push, 0.0f);
-    //             }
-    //             else
-    //             {
-    //                 obj.move(-intersectX * (1.0f - push), 0.0f);
-    //                 other.move(intersectX * push, 0.0f);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             if ( deltaY > 0.0f )
-    //             {
-    //                 obj.move(0.0f, intersectY * (1.0f - push));
-    //                 other.move(0.0f, -intersectY * push);
-    //             }
-    //             else
-    //             {
-    //                 obj.move(0.0f, -intersectY * (1.0f - push));
-    //                 other.move(0.0f, intersectY * push);
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // }
-    // std::cout << thisPosition.x << ", " << thisPosition.y << std::endl;
-    // std::cout << otherPosition.x << ", " << otherPosition.y << std::endl;
-
     return false;
 }

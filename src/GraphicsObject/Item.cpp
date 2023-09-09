@@ -11,6 +11,6 @@ Item::Item(const sf::Vector2f& size, const sf::Vector2f& position)
     if (!loadTexture(moneyTexture, IMG_MONEY.c_str()))
     {}                              // TODO: handle error
     this -> setTexture(&moneyTexture);
-    // collisionType = ERASE
-    collisionType = STOP_MOVEMENT;
+    collisionType = ERASE;
+    //collisionType = STOP_MOVEMENT;
 }
