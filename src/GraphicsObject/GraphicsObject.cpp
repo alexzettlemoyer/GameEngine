@@ -47,48 +47,29 @@ void GraphicsObject::left()
 {
     if (TimeHandler::getInstance() -> dt != 0)
         velocity.x += -displacement / TimeHandler::getInstance() -> dt;
-    // std::cout << velocity.x << std::endl;
-    // if ((*this).checkBounds(0))
-        updateMovement();
-    // else if (!collisionResponse(*this))
-    //     {} // TODO: handle error
-    // else
-    //     {} // TODO: handle error
+    (*this).checkBounds();
+    updateMovement();
 }
 void GraphicsObject::up()
 {
     if (TimeHandler::getInstance() -> dt != 0)
         velocity.y += -displacement / TimeHandler::getInstance() -> dt;
-    // if ((*this).checkBounds(1))
-        updateMovement();
-    // else if (!collisionResponse(*this))
-    //     {} // TODO: handle error
-    // else
-    //     {} // TODO: handle error
+    (*this).checkBounds();
+    updateMovement();
 }
 void GraphicsObject::right()
 {
     if (TimeHandler::getInstance() -> dt != 0)
         velocity.x += displacement / TimeHandler::getInstance() -> dt;
-    if ((*this).checkBounds(2))
-        updateMovement();
-    else if (!collisionResponse(*this))
-        {} // TODO: handle error
-    else
-        {} // handle error
+    (*this).checkBounds();
+    updateMovement();
 }
 void GraphicsObject::down()
 {
     if (TimeHandler::getInstance() -> dt != 0)
         velocity.y += displacement / TimeHandler::getInstance() -> dt;
-    // if ((*this).checkBounds(3))
-        updateMovement();
-    // else if (!collisionResponse(*this))
-    //     {
-    //         std::cout << "Error with Collision" << std::endl;
-    //     } // TODO: handle error
-    // else
-    //     {} // handle error
+    (*this).checkBounds();
+     updateMovement();
 }
 
 void GraphicsObject::blockMove()
@@ -103,7 +84,7 @@ void GraphicsObject::updateMovement()
     this -> blockMove();
 }
 
-bool GraphicsObject::checkBounds(int dir)
+bool GraphicsObject::checkBounds()
 {
     if (checkCollision(*this, *character, 0.0f))
         return false;

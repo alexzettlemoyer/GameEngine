@@ -31,21 +31,14 @@ bool isCharacterGrounded(Character &character, Platform &platform)
 }
 
 // STOP_MOVEMENT, ERASE, PUSH
-void stopMovement(GraphicsObject &obj)
-{
-    obj.velocity.x = 0.f;
-    obj.velocity.y = 0.f;  
-}
-
 // dir = 0: x axis
-// dir = 1: y axis
-void stopDirMovement(GraphicsObject &obj, int dir)
+// // dir = 1: y axis
+void stopMovement(GraphicsObject &obj, int dir = -1)
 {
-    // std::cout << dir << std::endl;
-    if ( dir == 0 )
-        obj.velocity.x = 0;
-    if ( dir == 1 )
-        obj.velocity.y = 0;
+    if ( dir == 0 || dir == -1 )
+        obj.velocity.x = 0.f;
+    if ( dir == 1 || dir == -1 )
+        obj.velocity.y = 0.f;  
 }
 
 void eraseObj(GraphicsObject &obj)
@@ -58,21 +51,45 @@ void eraseObj(GraphicsObject &obj)
     // after 20s reappear ?
 }
 
-bool collisionResponse(GraphicsObject &obj)
+// x: 0
+// y: 0
+bool collisionResponse(GraphicsObject &obj, int dir)
 {
-    switch (obj.collisionType)
+    if ( dir == 0 )
     {
-        case GraphicsObject::STOP_MOVEMENT:
-            stopMovement(obj);
-            break;
-        case GraphicsObject::ERASE:
-            eraseObj(obj);
-            break;
-        case GraphicsObject::PUSH:
-            break;
-        default:
-            stopMovement(obj);
-            break;
+        switch (obj.collisionTypeX)
+        {
+            case GraphicsObject::STOP_MOVEMENT:
+                stopMovement(obj, 0);
+                break;
+            case GraphicsObject::ERASE:
+                eraseObj(obj);
+                break;
+            case GraphicsObject::PUSH:
+                break;
+            case GraphicsObject::NONE: 
+                break;
+            default:
+                stopMovement(obj, 1);
+                break;
+        }
+    }
+    else if ( dir == 1 )
+    {
+        switch (obj.collisionTypeY)
+        {
+            case GraphicsObject::STOP_MOVEMENT:
+                stopMovement(obj, 1);
+                break;
+            case GraphicsObject::ERASE:
+                eraseObj(obj);
+                break;
+            case GraphicsObject::PUSH:
+                break;
+            default:
+                stopMovement(obj, 1);
+                break;
+        }
     }
     return true;
 }
@@ -102,6 +119,9 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
     sf::FloatRect characterBounds = obj.getGlobalBounds();
     sf::FloatRect otherBounds = other.getGlobalBounds();
 
+    // reduce character height by 5.f
+    // this is so that the character is not detected colliding with a platform
+    // when it is visually not on the platform
     characterBounds.height -= 5.f;
 
     nextPosition = characterBounds;
@@ -109,29 +129,54 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
     nextPosition.left += velocity.x;
     nextPosition.top += velocity.y;
 
+    // intersection rectangle between the 2 objects
     sf::FloatRect intersection;
 
-    // add nextPosition offset
+
+
     if (otherBounds.intersects(nextPosition, intersection))
     {
         float width = intersection.width;
         float height = intersection.height;
 
-        // std::cout << width << ", " << height << std::endl;
-        if (obj.collisionType != GraphicsObject::CHAR )
-            collisionResponse(obj);
-        if (other.collisionType != GraphicsObject::CHAR )
-            collisionResponse(other);
-    
+// stop x movement of Platform if x collision 
+// do not stop movement if y collision
+
+        // x axis collision
         if ( width < height )
         {
-            // collision on x axis
-            stopDirMovement(obj, 0);
+            // std::cout << "X" << std::endl;
+            // handle the non character objects
+            if ( obj.collisionTypeX != GraphicsObject::CHAR )
+                collisionResponse(obj, 0);
+            if ( other.collisionTypeX != GraphicsObject::CHAR )
+                collisionResponse(other, 0);
+
+            //     // TODO:
+            //     // character movement is blocked when colliding?
+            // if ( obj.collisionTypeX == GraphicsObject::CHAR )
+            //     stopMovement(obj, 0);
+            // if ( other.collisionTypeX == GraphicsObject::CHAR )
+            //     stopMovement(other, 0);
+
+
+                // PLATFORM
+    // collisionTypeX = STOP_MOVEMENT;
+    // collisionTypeY = NONE;
+
         }
-        else
-        {
-            // return true;
-        }   // collision on Y axis (due to gravity). Do nothing for now
+        // y axis collision
+        else if ( width > height ) {
+
+            // 
+
+        }
+        else {
+            // std::cout << "?" << std::endl;
+        }
+
+        // // std::cout << width << ", " << height << std::endl;
+
         return true;
     }
     return false;

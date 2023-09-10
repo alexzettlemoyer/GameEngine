@@ -24,7 +24,8 @@ Character::Character(sf::Vector2f position)
     if (!loadTexture(characterTexture, IMG_CHARACTER.c_str()))
         {}          // TODO: handle error
     this -> setTexture(&characterTexture);
-    this -> collisionType = CHAR;
+    this -> collisionTypeX = CHAR;
+    this -> collisionTypeY = CHAR;
 }
 
 void Character::addWindowReference(sf::RenderWindow* windowRef)
@@ -84,19 +85,33 @@ bool Character::checkBounds()
     sf::Vector2u wSize = (*window).getSize();
     sf::Vector2f position = sf::RectangleShape::getPosition();
     sf::Rect<float> thisRect = (*this).getGlobalBounds();
-            
+
     // check left
     if ( thisRect.left < 0.f )
-        this -> setPosition(0.1f, position.y);
+    {
+        this -> velocity.x = 1.f;
+        return false;
+    }
     // check up
     if ( thisRect.top < 0.f )
+    {
         this -> setPosition(position.x, 0.1f);
+        return false;
+    }
     // check right
     if ( thisRect.left + thisRect.width + 1 >= wSize.x )
-        this -> setPosition(wSize.x - thisRect.width - 1, position.y);
+    {
+        this -> velocity.x = -1.f;
+        return false;
+    }
+        // this -> setPosition(wSize.x - thisRect.width - 1, position.y);
     // check down
     if ( thisRect.top + thisRect.height + 1 >= wSize.y )
-        this -> setPosition(position.x, wSize.y - thisRect.height - 1);
+    {
+        this -> velocity.y = -1.f;
+        return false;
+    }
+        // this -> setPosition(position.x, wSize.y - thisRect.height - 1);
 
     //  if any of the objects collide
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {

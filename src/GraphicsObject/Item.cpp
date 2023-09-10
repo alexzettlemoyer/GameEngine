@@ -9,8 +9,8 @@ Item::Item(const sf::Vector2f& size, const sf::Vector2f& position)
     : GraphicsObject(size, position)
 {
     if (!loadTexture(moneyTexture, IMG_MONEY.c_str()))
-    {}                              // TODO: handle error
+        { }                   // TODO: handle error
     this -> setTexture(&moneyTexture);
-    collisionType = ERASE;
-    //collisionType = STOP_MOVEMENT;
+    collisionTypeX = ERASE;
+    collisionTypeY = ERASE;
 }

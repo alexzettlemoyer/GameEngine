@@ -13,6 +13,6 @@ Platform::Platform(const sf::Vector2f& position)
 
     // Constructor
     (*this).setFillColor(COLOR_PLATFORM);
-    // collisionType = PUSH;
-    collisionType = STOP_MOVEMENT;
+    collisionTypeX = STOP_MOVEMENT;
+    collisionTypeY = NONE;
 }

@@ -44,8 +44,8 @@ $(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
 	g++ -c "$(SRC)/io/ioHandler.cpp" -o $(BIN)/ioHandler.o
 
 # Link all object files to create the executable
-game: 	$(BIN)/time.o $(BIN)/collider.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o
-	g++ -g $(BIN)/time.o $(BIN)/collider.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o -o game $(LIBS)
+game: 	$(BIN)/time.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/collider.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o
+	g++ -g $(BIN)/time.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/collider.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o -o game $(LIBS)
 
 
 clean:

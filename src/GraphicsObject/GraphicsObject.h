@@ -9,8 +9,9 @@ class GraphicsObject : public sf::RectangleShape
 
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position);
-        enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR };
-        CollisionType collisionType;
+        enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
+        CollisionType collisionTypeX;
+        CollisionType collisionTypeY;
         // void blockMove();
         sf::Vector2f velocity;
         sf::Vector2f getPosition();
@@ -25,7 +26,7 @@ class GraphicsObject : public sf::RectangleShape
     protected:
         // CollisionType collisionType;
         // sf::Vector2f velocity;
-        bool checkBounds(int dir);
+        bool checkBounds();
         void updateMovement();
         void blockMove();
         bool loadTexture(sf::Texture& texture, const std::string& image);
