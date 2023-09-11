@@ -2,7 +2,6 @@
 #include "Collider.hpp"
 #include "../Draw/Draw.hpp"
 #include "../Time/TimeHandler.h"
-#include <iostream>
 
 int mvmntDirCW = 0;                     // movement direction for the clockwise movement
 sf::Vector2f originalPositionCW;        // original position for the clockwise movement
@@ -87,7 +86,7 @@ bool movementLeftRight(GraphicsObject& obj)
         if ( xDiff >= CHANGE_DIFF_LR )
             mvmntDirLR = 2;
     }
-    if ( mvmntDirLR == 2  )            // right movement
+    if ( mvmntDirLR == 2  )  // right movement
     {
         obj.right();
         if ( xDiff <= 0 )

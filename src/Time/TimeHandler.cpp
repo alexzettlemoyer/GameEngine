@@ -3,7 +3,6 @@
 #include "TimeHandler.h"
 
 // singleton TimeHandler instance
-// TimeHandler TimeHandler::instance;
 TimeHandler* TimeHandler::instancePtr = nullptr;
 
 

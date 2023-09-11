@@ -5,7 +5,6 @@
 #include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/TimeHandler.h"
-#include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
@@ -64,11 +63,11 @@ bool Character::isGrounded()
 
     sf::Vector2u wSize = (*window).getSize();
     sf::FloatRect characterBounds = character.get() -> getGlobalBounds();
+
     // if bottom x coordinate of character is below top x coordinate of window
     // and the character is within the x coordinates of the platform ( on top )
     if (characterBounds.top + characterBounds.height >= wSize.y)
             return true;
-
 
     return false;
 }
@@ -107,12 +106,6 @@ bool Character::checkBounds()
         this -> velocity.x = -1.f;
         return false;
     }
-    // check down
-    // if ( thisRect.top + thisRect.height + 1 >= wSize.y )
-    // {
-    //     this -> velocity.y = -1.f;
-    //     return false;
-    // }
 
     //  if any of the objects collide
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {

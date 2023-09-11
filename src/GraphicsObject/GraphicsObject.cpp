@@ -3,7 +3,6 @@
 #include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/TimeHandler.h"
-#include <iostream>
 
 const float displacement = .015f;
 

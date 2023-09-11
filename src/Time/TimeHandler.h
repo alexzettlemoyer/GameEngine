@@ -12,7 +12,6 @@ class TimeHandler
         float dt;
         static TimeHandler *getInstance();
         sf::Time elapsedTime();
-        //static TimeHandler& getInstance();
         void updateDeltaTime();
 };
 

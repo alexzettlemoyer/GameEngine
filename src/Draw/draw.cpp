@@ -6,7 +6,6 @@
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/Item.h"
 #include "../Movement/Mover.hpp"
-#include <iostream>
 
 std::shared_ptr<Character> character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f));
 
@@ -42,9 +41,6 @@ bool setupGraphics(sf::RenderWindow* window)
 
 bool drawGraphics(sf::RenderWindow* window)
 {
-    // clear the window with light purple
-    // window -> clear(sf::Color::White);
-
     // draw the background
     window -> draw(background);
 
@@ -60,7 +56,6 @@ bool drawGraphics(sf::RenderWindow* window)
     window -> display();
 
     return true;
-
 }
 
 void startMovements()

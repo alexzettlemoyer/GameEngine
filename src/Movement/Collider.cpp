@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
 #include <chrono>
-#include <iostream>
 #include <cmath>
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
@@ -28,7 +27,7 @@ bool isCharacterGrounded(Character &character, Platform &platform)
 
 // STOP_MOVEMENT, ERASE, PUSH
 // dir = 0: x axis
-// // dir = 1: y axis
+// dir = 1: y axis
 void stopMovement(GraphicsObject &obj, int dir = -1)
 {
     if ( dir == 0 || dir == -1 )
@@ -43,8 +42,6 @@ void eraseObj(GraphicsObject &obj)
     graphicsObjects.remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
         return ptr.get() == &obj;
     });
-
-    // after 20s reappear ?
 }
 
 // x: 0

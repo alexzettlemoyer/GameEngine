@@ -5,8 +5,6 @@
 
 class GraphicsObject : public sf::RectangleShape
 {
-    private:
-
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
