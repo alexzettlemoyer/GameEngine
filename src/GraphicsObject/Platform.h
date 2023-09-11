@@ -5,6 +5,9 @@
 
 class Platform : public GraphicsObject
 {
+    private:
+        sf::Texture platformTexture;
+    
     public: 
         Platform(const sf::Vector2f& position);
 };

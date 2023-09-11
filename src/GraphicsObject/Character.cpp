@@ -12,7 +12,7 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 static sf::RenderWindow* window;
 
 static const float displacement = .065f;
-static const float acceleration = -1800.f;       // m/s * s
+static const float acceleration = -1850.f;       // m/s * s
 static const float GRAVITY = 520.f;            // m/s * s
 
 sf::Vector2f initialPosition;
