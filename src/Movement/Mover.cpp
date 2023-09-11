@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Collider.hpp"
-#include "../Draw/draw.hpp"
+#include "../Draw/Draw.hpp"
 #include "../Time/TimeHandler.h"
 #include <iostream>
 

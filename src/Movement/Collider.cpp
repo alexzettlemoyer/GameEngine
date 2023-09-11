@@ -6,7 +6,7 @@
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/Platform.h"
-#include "../Draw/draw.hpp"
+#include "../Draw/Draw.hpp"
 #include "../Time/TimeHandler.h"
 
 sf::FloatRect nextPosition;
@@ -21,12 +21,8 @@ bool isCharacterGrounded(Character &character, Platform &platform)
     if (characterBounds.top + characterBounds.height >= otherBounds.top &&
         characterBounds.left + characterBounds.width >= otherBounds.left &&
         characterBounds.left <= otherBounds.left + otherBounds.width)
-        {
-            // std::cout << "ground" << std::endl;
             return true;
-        }
 
-    // std::cout << "not" << std::endl;
     return false;
 }
 
@@ -114,7 +110,8 @@ bool collisionResponse(GraphicsObject &obj, int dir)
  *
  *  AABB : axis-aligned line bounding box
  */
-bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, float mvmntDir = -1.f)
+
+bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
 {
     sf::FloatRect characterBounds = obj.getGlobalBounds();
     sf::FloatRect otherBounds = other.getGlobalBounds();
@@ -124,6 +121,7 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
     // when it is visually not on the platform
     characterBounds.height -= 5.f;
 
+    // calculate the characters next position
     nextPosition = characterBounds;
     sf::Vector2f velocity = obj.getVelocity();
     nextPosition.left += velocity.x;
@@ -131,51 +129,23 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, floa
 
     // intersection rectangle between the 2 objects
     sf::FloatRect intersection;
-
-
-
     if (otherBounds.intersects(nextPosition, intersection))
     {
         float width = intersection.width;
         float height = intersection.height;
 
-// stop x movement of Platform if x collision 
-// do not stop movement if y collision
-
         // x axis collision
         if ( width < height )
         {
-            // std::cout << "X" << std::endl;
             // handle the non character objects
             if ( obj.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(obj, 0);
             if ( other.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(other, 0);
-
-            //     // TODO:
-            //     // character movement is blocked when colliding?
-            // if ( obj.collisionTypeX == GraphicsObject::CHAR )
-            //     stopMovement(obj, 0);
-            // if ( other.collisionTypeX == GraphicsObject::CHAR )
-            //     stopMovement(other, 0);
-
-
-                // PLATFORM
-    // collisionTypeX = STOP_MOVEMENT;
-    // collisionTypeY = NONE;
-
         }
         // y axis collision
-        else if ( width > height ) {
-
-            // 
-
-        }
-        else {
-            // std::cout << "?" << std::endl;
-        }
-
-        // // std::cout << width << ", " << height << std::endl;
+        else if ( width > height ) {}   // y collision - do nothing for now
+        else {}                         // perfect x=y collision - do nothing for now
 
         return true;
     }

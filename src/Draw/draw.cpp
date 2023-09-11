@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <list>
-#include "draw.hpp"
+#include "Draw.hpp"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Platform.h"
 #include "../GraphicsObject/Character.h"

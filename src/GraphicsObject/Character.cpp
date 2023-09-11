@@ -2,7 +2,7 @@
 #include <SFML/System.hpp>
 #include "GraphicsObject.h"
 #include "Character.h"
-#include "../Draw/draw.hpp"
+#include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/TimeHandler.h"
 #include <iostream>
@@ -12,8 +12,8 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 static sf::RenderWindow* window;
 
 static const float displacement = .065f;
-static const float acceleration = -1750.f;       // m/s * s
-static const float GRAVITY = 500.f;            // m/s * s
+static const float acceleration = -1800.f;       // m/s * s
+static const float GRAVITY = 520.f;            // m/s * s
 
 sf::Vector2f initialPosition;
 
@@ -61,7 +61,6 @@ bool Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
     for (std::shared_ptr<Platform> const& i : platforms) {
-        // std::cout << i.get() -> getPosition().x << std::endl; 
         if (isCharacterGrounded(*this, *i))
             return true;
     }
@@ -70,8 +69,6 @@ bool Character::isGrounded()
 
 void Character::updateMovement()
 {
-    sf::Vector2f currentPosition = getPosition();
-
     if (!isGrounded())
         velocity.y += GRAVITY * TimeHandler::getInstance()->dt;
 
@@ -104,24 +101,18 @@ bool Character::checkBounds()
         this -> velocity.x = -1.f;
         return false;
     }
-        // this -> setPosition(wSize.x - thisRect.width - 1, position.y);
     // check down
     if ( thisRect.top + thisRect.height + 1 >= wSize.y )
     {
         this -> velocity.y = -1.f;
         return false;
     }
-        // this -> setPosition(position.x, wSize.y - thisRect.height - 1);
 
     //  if any of the objects collide
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
-        if (checkCollision(*this, *i, 0.0f))
-        {
-            // std::cout << "c" <<  position.y +thisRect.height << " - " << i.get() -> getPosition().y << std::endl;
+        if (checkCollision(*this, *i))
             return true;
-        }
     }
 
-    // std::cout << "not colliding" << position.y << std::endl;
     return false;
 }

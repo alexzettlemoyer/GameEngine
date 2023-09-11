@@ -12,7 +12,6 @@ class GraphicsObject : public sf::RectangleShape
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
         CollisionType collisionTypeX;
         CollisionType collisionTypeY;
-        // void blockMove();
         sf::Vector2f velocity;
         sf::Vector2f getPosition();
         sf::Vector2f getSize();
@@ -24,8 +23,6 @@ class GraphicsObject : public sf::RectangleShape
         void move(float x, float y);
 
     protected:
-        // CollisionType collisionType;
-        // sf::Vector2f velocity;
         bool checkBounds();
         void updateMovement();
         void blockMove();

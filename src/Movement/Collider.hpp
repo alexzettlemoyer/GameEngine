@@ -7,6 +7,6 @@
 
 bool isCharacterGrounded(Character &character, Platform &platform);
 bool collisionResponse(GraphicsObject &obj, int dir);
-bool checkCollision(GraphicsObject &obj, GraphicsObject &other, float push, float mvmntDir = -1);
+bool checkCollision(GraphicsObject &obj, GraphicsObject &other);
 
 #endif

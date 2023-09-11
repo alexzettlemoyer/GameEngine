@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "GraphicsObject.h"
-#include "../Draw/draw.hpp"
+#include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/TimeHandler.h"
 #include <iostream>
@@ -86,7 +86,7 @@ void GraphicsObject::updateMovement()
 
 bool GraphicsObject::checkBounds()
 {
-    if (checkCollision(*this, *character, 0.0f))
+    if (checkCollision(*this, *character))
         return false;
     return true;
 }

@@ -2,66 +2,74 @@ LIBS=-lsfml-graphics -lsfml-window -lsfml-system
 SRC=src
 BIN=bin
 
-# compile main.cpp
-# g++ bin/main.o -o game -lsfml-graphics -lsfml-window -lsfml-system
+SRCFILES = $(SRC)/Time/TimeHandler.cpp \
+		$(SRC)/Movement/Mover.cpp \
+		$(SRC)/GraphicsObject/GraphicsObject.cpp \
+		$(SRC)/GraphicsObject/Item.cpp \
+		$(SRC)/GraphicsObject/Platform.cpp \
+		$(SRC)/GraphicsObject/Character.cpp \
+		$(SRC)/Movement/Collider.cpp \
+		$(SRC)/Draw/Draw.cpp \
+		$(SRC)/io/ioHandler.cpp \
+		$(SRC)/main.cpp
+
+OBJS = $(BIN)/time.o \
+	   $(BIN)/mover.o \
+	   $(BIN)/graphicsObject.o \
+	   $(BIN)/item.o \
+	   $(BIN)/platform.o \
+	   $(BIN)/character.o \
+	   $(BIN)/collider.o \
+	   $(BIN)/draw.o \
+	   $(BIN)/ioHandler.o \
+	   $(BIN)/main.o
+
+# main copilation
 $(BIN)/main.o: $(SRC)/main.cpp
-	g++ -c "$(SRC)/main.cpp" -o $(BIN)/main.o
+	g++ -c $< -o $@
 
 # draw compilation
 $(BIN)/draw.o: $(SRC)/Draw/draw.cpp
-	g++ -c "$(SRC)/Draw/draw.cpp" -o $(BIN)/draw.o
+	g++ -c $< -o $@
 
 # time
 $(BIN)/time.o: $(SRC)/Time/TimeHandler.cpp
-	g++ -c "$(SRC)/Time/TimeHandler.cpp" -o $(BIN)/time.o
+	g++ -c $< -o $@
 
 # collider
 $(BIN)/collider.o: $(SRC)/Movement/Collider.cpp
-	g++ -c "$(SRC)/Movement/Collider.cpp" -o $(BIN)/collider.o
+	g++ -c $< -o $@
 
 # movement
 $(BIN)/mover.o: $(SRC)/Movement/Mover.cpp
-	g++ -c "$(SRC)/Movement/Mover.cpp" -o $(BIN)/mover.o
+	g++ -c $< -o $@
 
 # GraphicsObject
 $(BIN)/graphicsObject.o: $(SRC)/GraphicsObject/GraphicsObject.cpp
-	g++ -c "$(SRC)/GraphicsObject/GraphicsObject.cpp" -o $(BIN)/graphicsObject.o
+	g++ -c $< -o $@
 
 # character
 $(BIN)/character.o: $(SRC)/GraphicsObject/Character.cpp
-	g++ -c "$(SRC)/GraphicsObject/Character.cpp" -o $(BIN)/character.o
+	g++ -c $< -o $@
 
 # platform
 $(BIN)/platform.o: $(SRC)/GraphicsObject/Platform.cpp
-	g++ -c "$(SRC)/GraphicsObject/Platform.cpp" -o $(BIN)/platform.o
+	g++ -c $< -o $@
 
 # item
 $(BIN)/item.o: $(SRC)/GraphicsObject/Item.cpp
-	g++ -c "$(SRC)/GraphicsObject/Item.cpp" -o $(BIN)/item.o
+	g++ -c $< -o $@
 
 # io handler
 $(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
-	g++ -c "$(SRC)/io/ioHandler.cpp" -o $(BIN)/ioHandler.o
+	g++ -c $< -o $@
 
 # Link all object files to create the executable
-game: 	$(BIN)/time.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/collider.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o
-	g++ -g $(BIN)/time.o $(BIN)/mover.o $(BIN)/graphicsObject.o $(BIN)/collider.o $(BIN)/item.o $(BIN)/platform.o $(BIN)/character.o $(BIN)/draw.o $(BIN)/ioHandler.o $(BIN)/main.o -o game $(LIBS)
+game: $(OBJS)
+	g++ -g $(OBJS) -o game $(LIBS)
 
 
 clean:
-	rm -f $(BIN)/main.o 
-	rm -f $(BIN)/draw.o 
-	rm -f $(BIN)/mover.o 
-	rm -f $(BIN)/ioHandler.o
-	rm -f $(BIN)/graphicsObject.o 
-	rm -f $(BIN)/item.o 
-	rm -f $(BIN)/character.o 
-	rm -f $(BIN)/platform.o
-	rm -f $(BIN)/collider.o 
-	rm -f $(BIN)/time.o
-
+	rm -f $(BIN)/*.o 
 	rm -f ./game
-
-
-# g++ -c "src/main.cpp" -o bin/main.o
-# g++ bin/main.o -o game -lsfml-graphics -lsfml-window -lsfml-system
+	
