@@ -85,7 +85,7 @@ void GraphicsObject::updateMovement()
 
 bool GraphicsObject::checkBounds()
 {
-    if (checkCollision(*this, *character))
+    if (checkCollision(*this, *((Draw::getInstance() -> character).get())))
         return false;
     return true;
 }

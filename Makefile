@@ -3,6 +3,7 @@ SRC=src
 BIN=bin
 
 SRCFILES = $(SRC)/Time/TimeHandler.cpp \
+		$(SRC)/Time/Thread.cpp \
 		$(SRC)/Movement/Mover.cpp \
 		$(SRC)/GraphicsObject/GraphicsObject.cpp \
 		$(SRC)/GraphicsObject/Item.cpp \
@@ -14,6 +15,7 @@ SRCFILES = $(SRC)/Time/TimeHandler.cpp \
 		$(SRC)/main.cpp
 
 OBJS = $(BIN)/time.o \
+	   $(BIN)/thread.o \
 	   $(BIN)/mover.o \
 	   $(BIN)/graphicsObject.o \
 	   $(BIN)/item.o \
@@ -34,6 +36,10 @@ $(BIN)/draw.o: $(SRC)/Draw/draw.cpp
 
 # time
 $(BIN)/time.o: $(SRC)/Time/TimeHandler.cpp
+	g++ -c $< -o $@
+
+# thread
+$(BIN)/thread.o: $(SRC)/Time/Thread.cpp
 	g++ -c $< -o $@
 
 # collider
@@ -66,6 +72,9 @@ $(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
 
 # Link all object files to create the executable
 game: $(OBJS)
+	g++ $(OBJS) -o game $(LIBS)
+
+dame -d: $(OBJS)
 	g++ -g $(OBJS) -o game $(LIBS)
 
 

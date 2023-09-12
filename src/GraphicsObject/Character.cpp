@@ -56,13 +56,13 @@ void Character::down()
 bool Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
-    for (std::shared_ptr<Platform> const& i : platforms) {
+    for (std::shared_ptr<Platform> const& i : (Draw::getInstance() -> platforms)) {
         if (isCharacterGrounded(*this, *i))
             return true;
     }
 
     sf::Vector2u wSize = (*window).getSize();
-    sf::FloatRect characterBounds = character.get() -> getGlobalBounds();
+    sf::FloatRect characterBounds = this -> getGlobalBounds();
 
     // if bottom x coordinate of character is below top x coordinate of window
     // and the character is within the x coordinates of the platform ( on top )
@@ -108,7 +108,7 @@ bool Character::checkBounds()
     }
 
     //  if any of the objects collide
-    for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
+    for (std::shared_ptr<GraphicsObject> const& i : Draw::getInstance() -> graphicsObjects) {
         if (checkCollision(*this, *i))
             return true;
     }

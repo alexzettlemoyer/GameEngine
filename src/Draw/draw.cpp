@@ -7,19 +7,33 @@
 #include "../GraphicsObject/Item.h"
 #include "../Movement/Mover.hpp"
 
-std::shared_ptr<Character> character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f));
-
-std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
-std::list<std::shared_ptr<Platform>> platforms;
-std::shared_ptr<Platform> platform1 = std::make_shared<Platform>(sf::Vector2f(25.f, 520.f));
-std::shared_ptr<Platform> platform2 = std::make_shared<Platform>(sf::Vector2f(525.f, 650.f));
-std::shared_ptr<Item> item1 = std::make_shared<Item>(sf::Vector2f(100.2f, 64.6f), sf::Vector2f(800.f, 150.f));
-
 static const std::string IMG_BACKGROUND = "images/background.jpeg";
-sf::Sprite background;
-sf::Texture backgroundTexture;
+Draw* Draw::instancePtr = nullptr;
 
-bool setupGraphics(sf::RenderWindow* window)
+std::shared_ptr<Character> character;
+std::shared_ptr<Platform> platform1;
+std::shared_ptr<Platform> platform2;
+std::shared_ptr<Item> item1;
+
+// constructor
+Draw::Draw()
+{
+    character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f));
+    platform1 = std::make_shared<Platform>(sf::Vector2f(25.f, 520.f));
+    platform2 = std::make_shared<Platform>(sf::Vector2f(525.f, 650.f));
+    item1 = std::make_shared<Item>(sf::Vector2f(100.2f, 64.6f), sf::Vector2f(800.f, 150.f));
+}
+
+Draw* Draw::getInstance()
+{
+    if ( instancePtr == NULL )
+    {
+        instancePtr = new Draw();
+    }
+    return instancePtr;
+}
+
+bool Draw::setupGraphics(sf::RenderWindow* window)
 {
     if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
         return false;
@@ -38,8 +52,7 @@ bool setupGraphics(sf::RenderWindow* window)
     return true;
 }
 
-
-bool drawGraphics(sf::RenderWindow* window)
+bool Draw::drawGraphics(sf::RenderWindow* window)
 {
     // draw the background
     window -> draw(background);
@@ -58,15 +71,25 @@ bool drawGraphics(sf::RenderWindow* window)
     return true;
 }
 
-void startMovements()
+void Draw::startMovements()
 {
     characterMovement(*character);
     movementClockwise(*item1);
     movementLeftRight(*platform2);
 }
 
-bool finalize()
-{
+// static std::list<std::shared_ptr<Platform>> getPlatforms()
+// {
+//     return Draw::platforms;
+// }
+// static Draw::std::shared_ptr<Character> getCharacter()
+// {
+//     return Draw::character;
+// }
+// static Draw::std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects()
+// {
+//     return graphicsObjects;
+// }
 
-    return true;
-}
+
+

@@ -39,7 +39,7 @@ void stopMovement(GraphicsObject &obj, int dir = -1)
 void eraseObj(GraphicsObject &obj)
 {   
     // remove drawn pointer from list
-    graphicsObjects.remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
+    (Draw::getInstance() -> graphicsObjects).remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
         return ptr.get() == &obj;
     });
 }
