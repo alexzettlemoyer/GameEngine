@@ -1,9 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include "Draw/Draw.hpp"
 #include "io/ioHandler.h"
-#include "Time/TimeHandler.h"
+#include "Time/Timeline.h"
 #include "Time/Thread.cpp"
 #include <iostream>
+
 
 int main()
 {
@@ -13,26 +14,26 @@ int main()
     Draw *draw = Draw::getInstance();
     draw -> setupGraphics(&window);
 
-    ioHandler *io = new ioHandler(draw -> character);
+    ioHandler *io = ioHandler::getInstance(draw -> character);
 
     // Mutex to handle locking, condition variable to handle notifications between threads
     // std::mutex m;
     // std::condition_variable cv;
 
-    // // Create thread objects
-    // Thread t1(0, NULL, &m, &cv);
-    // Thread t2(1, &t1, &m, &cv);
+    // Create thread objects
+    // Thread t1(0, nullptr, &m, &cv, [&io]() { io->handle(); });
+    // Thread t2(1, &t1, &m, &cv, [&draw]() {draw->startMovements(); }); 
 
-    // std::thread first(&ioHandler::handle, io, &t1);
-    // std::thread second(&Draw::drawGraphics, draw, &window, &t2);
+    // Thread t1(0, nullptr, &m, &cv, [&io](){ io->handle(); }, std::ref(io));
+    // Thread t2(1, &t1, &m, &cv, [&draw](){ draw->startMovements(); }, std::ref(draw));
+
+    // Initialize threads
+    // std::thread first;
+    // std::thread second;
 
     while (window.isOpen()) 
     {
-
-        // first.join();
-        // second.join();
-
-        TimeHandler::getInstance() -> updateDeltaTime();
+        Timeline::getInstance() -> updateDeltaTime();
         
         sf::Event event;
         while (window.pollEvent(event))
@@ -41,23 +42,31 @@ int main()
                 window.close();
         }
 
-        // first = std::thread(&ioHandler::handle, io, &t1);
-        // second = std::thread(&Draw::drawGraphics, &window, &t2);
-
-        // Start threads
-        // first(ioHandler::handle(), *io, &t1);
-        // second(drawGraphics(&window), &t2);
-
-        io->handle();
-
+            // *** Keep draw -> drawGraphics(&window) in main thread
+            // *** SFML does not support rendering through a thread
         draw -> drawGraphics(&window);
-        draw -> startMovements();
-    }
 
-    // Make sure both threads are complete before stopping main thread
+        io -> handle();
+        draw -> startMovements();
+
+        // start the thread for io handling
+        // first = std::thread(&Thread::run, &t1);
+
+        // start the thread for object movements
+        // second = std::thread(&Thread::run, &t2);
+
+        // Join threads after each iteraion
+        // if (first.joinable())
+        //     first.join();
+        // if (second.joinable())
+        //     second.join();
+    }
+       
+    //    // Make sure both threads are complete before stopping main thread
     // first.join();
     // second.join();
 
+    delete draw;
     delete io;
     return 0;
 }

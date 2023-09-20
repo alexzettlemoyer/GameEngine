@@ -1,30 +1,30 @@
 #include <SFML/System/Clock.hpp>
 #include <cstddef>
-#include "TimeHandler.h"
+#include "Timeline.h"
 
 // singleton TimeHandler instance
-TimeHandler* TimeHandler::instancePtr = nullptr;
+Timeline* Timeline::instancePtr = nullptr;
 
 
 // Singleton Time class
-TimeHandler::TimeHandler()
+Timeline::Timeline()
     {}
 
-TimeHandler* TimeHandler::getInstance()
+Timeline* Timeline::getInstance()
 {
     if ( instancePtr == NULL )
     {
-        instancePtr = new TimeHandler();
+        instancePtr = new Timeline();
     }
     return instancePtr;
 }
 
-void TimeHandler::updateDeltaTime()
+void Timeline::updateDeltaTime()
 {
     dt = dt_clock.restart().asSeconds();
 }
 
-sf::Time TimeHandler::elapsedTime()
+sf::Time Timeline::elapsedTime()
 {
     return dt_clock.getElapsedTime();
 }

@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include <mutex>
 #include "GraphicsObject.h"
 #include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
-#include "../Time/TimeHandler.h"
+#include "../Time/Timeline.h"
 
 const float displacement = .015f;
 
@@ -34,6 +35,7 @@ sf::Vector2f GraphicsObject::getSize()
 
 void GraphicsObject::move(float x, float y)
 {
+    std::lock_guard<std::mutex> lock(this->objMutex);
     sf::RectangleShape::move(x, y);
 }
 
@@ -44,35 +46,48 @@ sf::Vector2f GraphicsObject::getVelocity()
 
 void GraphicsObject::left()
 {
-    if (TimeHandler::getInstance() -> dt != 0)
-        velocity.x += -displacement / TimeHandler::getInstance() -> dt;
+    if (Timeline::getInstance() -> dt != 0)
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.x += -displacement / Timeline::getInstance() -> dt;
+    }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::up()
 {
-    if (TimeHandler::getInstance() -> dt != 0)
-        velocity.y += -displacement / TimeHandler::getInstance() -> dt;
+    if (Timeline::getInstance() -> dt != 0)
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.y += -displacement / Timeline::getInstance() -> dt;
+    }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::right()
 {
-    if (TimeHandler::getInstance() -> dt != 0)
-        velocity.x += displacement / TimeHandler::getInstance() -> dt;
+    if (Timeline::getInstance() -> dt != 0)
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.x += displacement / Timeline::getInstance() -> dt;
+    }    
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::down()
 {
-    if (TimeHandler::getInstance() -> dt != 0)
-        velocity.y += displacement / TimeHandler::getInstance() -> dt;
+    if (Timeline::getInstance() -> dt != 0)
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.y += displacement / Timeline::getInstance() -> dt;
+    }    
     (*this).checkBounds();
-     updateMovement();
+    updateMovement();
 }
 
 void GraphicsObject::blockMove()
 {
+    std::lock_guard<std::mutex> lock(this->objMutex);
     velocity.x = 0.f;
     velocity.y = 0.f;  
 }
@@ -85,7 +100,7 @@ void GraphicsObject::updateMovement()
 
 bool GraphicsObject::checkBounds()
 {
-    if (checkCollision(*this, *((Draw::getInstance() -> character).get())))
+    if (checkCollision(*((Draw::getInstance() -> character).get()), *this))
         return false;
     return true;
 }

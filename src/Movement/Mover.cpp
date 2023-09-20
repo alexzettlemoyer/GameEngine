@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Collider.hpp"
 #include "../Draw/Draw.hpp"
-#include "../Time/TimeHandler.h"
+#include "../Time/Timeline.h"
 
 int mvmntDirCW = 0;                     // movement direction for the clockwise movement
 sf::Vector2f originalPositionCW;        // original position for the clockwise movement
@@ -13,11 +13,6 @@ const float CHANGE_DIFF_CW = 100.f;     // movement amount for clockwise
 const float CHANGE_DIFF_LR = 200.f;     // movement amount for left/right
 
 const float MOVE_DIST = 2.0f;           // movement amount for individual steps
-
-void characterMovement(Character& character)
-{
-    character.updateMovement();
-}
 
 /**
  * Clockwise movement
@@ -78,7 +73,7 @@ bool movementLeftRight(GraphicsObject& obj)
 
     float xDiff = originalPositionLR.x - obj.getPosition().x;
 
-    float dt = TimeHandler::getInstance() -> dt;
+    float dt = Timeline::getInstance() -> dt;
 
     if ( mvmntDirLR == 0  )  // left movement
     {

@@ -6,6 +6,7 @@
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/Item.h"
 #include "../Movement/Mover.hpp"
+#include <iostream>
 
 static const std::string IMG_BACKGROUND = "images/background.jpeg";
 Draw* Draw::instancePtr = nullptr;
@@ -73,23 +74,7 @@ bool Draw::drawGraphics(sf::RenderWindow* window)
 
 void Draw::startMovements()
 {
-    characterMovement(*character);
+    // std::cout << "starting movements" << std::endl;
     movementClockwise(*item1);
     movementLeftRight(*platform2);
 }
-
-// static std::list<std::shared_ptr<Platform>> getPlatforms()
-// {
-//     return Draw::platforms;
-// }
-// static Draw::std::shared_ptr<Character> getCharacter()
-// {
-//     return Draw::character;
-// }
-// static Draw::std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects()
-// {
-//     return graphicsObjects;
-// }
-
-
-

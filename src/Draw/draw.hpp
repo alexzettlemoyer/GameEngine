@@ -21,9 +21,6 @@ class Draw
         std::list<std::shared_ptr<Platform>> platforms;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
         std::shared_ptr<Character> character;
-        // static std::list<std::shared_ptr<Platform>> getPlatforms();
-        // static std::shared_ptr<Character> getCharacter();
-        // static std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
         bool setupGraphics(sf::RenderWindow* window);
         bool drawGraphics(sf::RenderWindow* window);
         void startMovements();

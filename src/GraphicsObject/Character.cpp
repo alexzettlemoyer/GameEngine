@@ -4,7 +4,7 @@
 #include "Character.h"
 #include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
-#include "../Time/TimeHandler.h"
+#include "../Time/Timeline.h"
 
 static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
@@ -34,22 +34,34 @@ void Character::addWindowReference(sf::RenderWindow* windowRef)
 
 void Character::left()
 {
-    velocity.x += -displacement / TimeHandler::getInstance() -> dt;
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.x += -displacement / Timeline::getInstance() -> dt;
+    }
     updateMovement();
 }
 void Character::up()
 {
-    velocity.y = acceleration * TimeHandler::getInstance() -> dt;
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.y = acceleration * Timeline::getInstance() -> dt;
+    }
     updateMovement();
 }
 void Character::right()
 {
-    velocity.x += displacement / TimeHandler::getInstance() -> dt;
+    { 
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.x += displacement / Timeline::getInstance() -> dt;
+    }
     updateMovement();
 }
 void Character::down()
 {
-    velocity.y += displacement / TimeHandler::getInstance() -> dt;
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.y += displacement / Timeline::getInstance() -> dt;
+    }
     updateMovement();
 }
 
@@ -75,8 +87,10 @@ bool Character::isGrounded()
 void Character::updateMovement()
 {
     if (!isGrounded())
-        velocity.y += GRAVITY * TimeHandler::getInstance()->dt;
-
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.y += GRAVITY * Timeline::getInstance()->dt;
+    }
     if (!checkBounds())
         move(velocity.x, velocity.y);
     this -> blockMove();
@@ -91,18 +105,21 @@ bool Character::checkBounds()
     // check left
     if ( thisRect.left < 0.f )
     {
+        std::lock_guard<std::mutex> lock(this->objMutex);
         this -> velocity.x = 1.f;
         return false;
     }
     // check up
     if ( thisRect.top < 0.f )
     {
+        std::lock_guard<std::mutex> lock(this->objMutex);
         this -> setPosition(position.x, 0.1f);
         return false;
     }
     // check right
     if ( thisRect.left + thisRect.width + 1 >= wSize.x )
     {
+        std::lock_guard<std::mutex> lock(this->objMutex);
         this -> velocity.x = -1.f;
         return false;
     }

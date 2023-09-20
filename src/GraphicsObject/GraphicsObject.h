@@ -2,6 +2,7 @@
 #define GRAPHICS_OBJECT_H
 
 #include <SFML/Graphics.hpp>
+#include <mutex>
 
 class GraphicsObject : public sf::RectangleShape
 {
@@ -19,6 +20,7 @@ class GraphicsObject : public sf::RectangleShape
         void right();
         void down();
         void move(float x, float y);
+        std::mutex objMutex;
 
     protected:
         bool checkBounds();

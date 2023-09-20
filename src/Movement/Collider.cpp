@@ -1,14 +1,14 @@
 #include <SFML/Graphics.hpp>
-#include <SFML/System/Time.hpp>
 #include <chrono>
 #include <cmath>
+#include <mutex>
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/Platform.h"
 #include "../Draw/Draw.hpp"
-#include "../Time/TimeHandler.h"
 
 sf::FloatRect nextPosition;
+std::mutex characterMutex;
 
 bool isCharacterGrounded(Character &character, Platform &platform)
 {
@@ -30,6 +30,7 @@ bool isCharacterGrounded(Character &character, Platform &platform)
 // dir = 1: y axis
 void stopMovement(GraphicsObject &obj, int dir = -1)
 {
+    std::lock_guard<std::mutex> lock(obj.objMutex);
     if ( dir == 0 || dir == -1 )
         obj.velocity.x = 0.f;
     if ( dir == 1 || dir == -1 )
@@ -143,8 +144,9 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
         // y axis collision
         else if ( width > height ) {}   // y collision - do nothing for now
         else {}                         // perfect x=y collision - do nothing for now
-
+        
         return true;
     }
+    
     return false;
 }

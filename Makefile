@@ -2,7 +2,7 @@ LIBS=-lsfml-graphics -lsfml-window -lsfml-system
 SRC=src
 BIN=bin
 
-SRCFILES = $(SRC)/Time/TimeHandler.cpp \
+SRCFILES = $(SRC)/Time/Timeline.cpp \
 		$(SRC)/Time/Thread.cpp \
 		$(SRC)/Movement/Mover.cpp \
 		$(SRC)/GraphicsObject/GraphicsObject.cpp \
@@ -35,7 +35,7 @@ $(BIN)/draw.o: $(SRC)/Draw/draw.cpp
 	g++ -c $< -o $@
 
 # time
-$(BIN)/time.o: $(SRC)/Time/TimeHandler.cpp
+$(BIN)/time.o: $(SRC)/Time/Timeline.cpp
 	g++ -c $< -o $@
 
 # thread

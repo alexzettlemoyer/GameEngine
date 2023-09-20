@@ -6,8 +6,12 @@
 
 class ioHandler 
 {
-    public:
+    private:
         ioHandler(std::shared_ptr<Character> c);
+        static ioHandler* instancePtr;
+
+    public:
+        static ioHandler *getInstance(std::shared_ptr<Character> c = nullptr);
         void handle();
 };
 
