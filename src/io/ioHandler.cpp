@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "ioHandler.h"
 #include "../Draw/Draw.hpp"
+#include "../Time/Timeline.h"
 #include <memory>
 #include <mutex>
 #include <iostream>
@@ -42,6 +43,9 @@ void ioHandler::handle()
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         characterRef->left();
+
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+    //     Timeline::getInstance() -> pause();
 
         // update the characters' movement, ensuring gravity is applied in every frame
     characterRef -> updateMovement();

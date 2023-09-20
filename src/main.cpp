@@ -40,15 +40,21 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            else if (event.type == sf::Event::KeyPressed)
+                if (event.key.code == sf::Keyboard::Key::P)
+                    Timeline::getInstance() -> pause();
         }
 
             // *** Keep draw -> drawGraphics(&window) in main thread
             // *** SFML does not support rendering through a thread
         draw -> drawGraphics(&window);
 
-        io -> handle();
-        draw -> startMovements();
-
+        if (!(Timeline::getInstance() -> isPaused()))
+        {
+            io -> handle();
+            draw -> startMovements();
+        }
+        
         // start the thread for io handling
         // first = std::thread(&Thread::run, &t1);
 

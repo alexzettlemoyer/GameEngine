@@ -1,9 +1,11 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
 #include <mutex>
 #include "GraphicsObject.h"
 #include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
+#include <iostream>
 
 const float displacement = .015f;
 
@@ -46,41 +48,45 @@ sf::Vector2f GraphicsObject::getVelocity()
 
 void GraphicsObject::left()
 {
-    if (Timeline::getInstance() -> dt != 0)
+    float dt = Timeline::getInstance() -> getDt();
+    if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += -displacement / Timeline::getInstance() -> dt;
+        velocity.x += -displacement / dt;
     }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::up()
 {
-    if (Timeline::getInstance() -> dt != 0)
+    float dt = Timeline::getInstance() -> getDt();
+    if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += -displacement / Timeline::getInstance() -> dt;
+        velocity.y += -displacement / dt;
     }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::right()
 {
-    if (Timeline::getInstance() -> dt != 0)
+    float dt = Timeline::getInstance() -> getDt();
+    if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += displacement / Timeline::getInstance() -> dt;
-    }    
+        velocity.x += displacement / dt;
+    }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::down()
 {
-    if (Timeline::getInstance() -> dt != 0)
+    float dt = Timeline::getInstance() -> getDt();
+    if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += displacement / Timeline::getInstance() -> dt;
-    }    
+        velocity.y += displacement / dt;
+    }
     (*this).checkBounds();
     updateMovement();
 }

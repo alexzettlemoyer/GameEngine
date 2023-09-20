@@ -73,8 +73,6 @@ bool movementLeftRight(GraphicsObject& obj)
 
     float xDiff = originalPositionLR.x - obj.getPosition().x;
 
-    float dt = Timeline::getInstance() -> dt;
-
     if ( mvmntDirLR == 0  )  // left movement
     {
         obj.left();

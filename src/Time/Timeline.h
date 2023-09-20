@@ -6,11 +6,14 @@ class Timeline
     private:
         Timeline();
         static Timeline* instancePtr;
+        float dt;
 
     public:
         sf::Clock dt_clock;
-        float dt;
         static Timeline *getInstance();
+        void pause();
+        bool isPaused();
+        float getDt();
         sf::Time elapsedTime();
         void updateDeltaTime();
 };

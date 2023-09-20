@@ -34,33 +34,37 @@ void Character::addWindowReference(sf::RenderWindow* windowRef)
 
 void Character::left()
 {
+    float dt = Timeline::getInstance() -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += -displacement / Timeline::getInstance() -> dt;
+        velocity.x += -displacement / Timeline::getInstance() -> getDt();
     }
     updateMovement();
 }
 void Character::up()
 {
+    float dt = Timeline::getInstance() -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y = acceleration * Timeline::getInstance() -> dt;
+        velocity.y = acceleration * Timeline::getInstance() -> getDt();
     }
     updateMovement();
 }
 void Character::right()
 {
+    float dt = Timeline::getInstance() -> getDt();
     { 
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += displacement / Timeline::getInstance() -> dt;
+        velocity.x += displacement / Timeline::getInstance() -> getDt();
     }
     updateMovement();
 }
 void Character::down()
 {
+    float dt = Timeline::getInstance() -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += displacement / Timeline::getInstance() -> dt;
+        velocity.y += displacement / dt;
     }
     updateMovement();
 }
@@ -89,7 +93,7 @@ void Character::updateMovement()
     if (!isGrounded())
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += GRAVITY * Timeline::getInstance()->dt;
+        velocity.y += GRAVITY * Timeline::getInstance() -> getDt();
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);
