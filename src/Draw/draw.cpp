@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <list>
+#include <atomic>
 #include "Draw.hpp"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Platform.h"
@@ -55,26 +56,28 @@ bool Draw::setupGraphics(sf::RenderWindow* window)
 
 bool Draw::drawGraphics(sf::RenderWindow* window)
 {
-    // draw the background
+        // draw the background
     window -> draw(background);
 
-    // draw the objects
+        // draw the objects
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects) {
         window -> draw(*i);
     }
 
-    // Draw the player
+        // Draw the player
     window -> draw(*character);
 
-    // Display the drawing on the window
+        // Display the drawing on the window
     window -> display();
 
     return true;
 }
 
-void Draw::startMovements()
+void Draw::startMovements(std::atomic<bool>& isGameRunning)
 {
-    // std::cout << "starting movements" << std::endl;
-    movementClockwise(*item1);
-    movementLeftRight(*platform2);
+    // while (isGameRunning.load())
+    // {
+        movementClockwise(*item1);
+        movementLeftRight(*platform2);
+    // }
 }

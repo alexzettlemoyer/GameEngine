@@ -11,6 +11,7 @@ bool paused;
 Timeline::Timeline()
     {
         paused = false;
+        scale = 1.0;
     }
 
 Timeline* Timeline::getInstance()
@@ -37,6 +38,30 @@ float Timeline::getDt()
     return dt;
 }
 
+float Timeline::getScale()
+{
+    // if the game is paused, the time scale is 0.0
+    if (paused)
+        return 0.0;
+    return scale;
+}
+
+void Timeline::changeScale(SCALE s)
+{
+    switch (s)
+    {
+        case SCALE_HALF:
+            scale = 0.5;
+            break;
+        case SCALE_REAL:
+            scale = 1.0;
+            break;
+        case SCALE_DOUBLE:
+            scale = 2.0;
+            break;
+    }
+}
+
 bool Timeline::isPaused()
 {
     return paused;
@@ -48,13 +73,7 @@ bool Timeline::isPaused()
 void Timeline::pause()
 {
     if (paused)
-    {
-        std::cout << "Unpausing" << std::endl;
         paused = false;
-    }
     else
-    {
-        std::cout << "Pausing" << std::endl;
         paused = true;
-    }
 }

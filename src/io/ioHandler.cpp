@@ -3,6 +3,7 @@
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
 #include <memory>
+#include <atomic>
 #include <mutex>
 #include <iostream>
 
@@ -26,27 +27,27 @@ ioHandler* ioHandler::getInstance(std::shared_ptr<Character> c)
     return instancePtr;
 }
 
-void ioHandler::handle()
+void ioHandler::handle(std::atomic<bool>& isGameRunning)
 {
-    // std::cout << "handling" << std::endl;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        characterRef->up();
+    // while (isGameRunning.load())
+    // {
+        // std::cout << "handling" << std::endl;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            characterRef->up();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        characterRef->up();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            characterRef->up();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        characterRef->down();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            characterRef->down();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        characterRef->right();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            characterRef->right();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        characterRef->left();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            characterRef->left();
 
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-    //     Timeline::getInstance() -> pause();
-
-        // update the characters' movement, ensuring gravity is applied in every frame
-    characterRef -> updateMovement();
+            // update the characters' movement, ensuring gravity is applied in every frame
+        characterRef -> updateMovement();
+    // }
 }

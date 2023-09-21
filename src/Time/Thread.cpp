@@ -47,29 +47,29 @@ class Thread
                 try
                 {
                     threadFunction();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-                    { // anonymous inner block to manage scope of mutex lock 
-                        std::unique_lock<std::mutex> cv_lock(*this->_mutex);
-                        std::cout << "Thread " << i << " is done sleeping" << std::endl;
-                        _condition_variable->notify_all();
-                        std::cout << "Thread " << i << " is notifying with busy=" << busy << std::endl;
-                    }
-                    std::cout << "Thread " << i << " is sleeping" << std::endl;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-                    { // anonymous inner block to manage scope of mutex lock 
-                        std::unique_lock<std::mutex> cv_lock(*this->_mutex);
-                        _condition_variable->notify_all();
-                        std::cout << "Thread " << i << " is notifying with busy=" << busy << std::endl;
-                    }
-                    std::cout << "Thread " << i << " is sleeping" << std::endl;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-                    { // anonymous inner block to manage scope of mutex lock 
-                        std::unique_lock<std::mutex> cv_lock(*this->_mutex);
-                        busy = !busy;
-                        _condition_variable->notify_all();
-                        std::cout << "Thread " << i << " is notifying with busy=" << busy << std::endl;
-                        std::cout << "Thread " << i << " is FINISHED!" << std::endl;
-                    }
+                    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+                    // { // anonymous inner block to manage scope of mutex lock 
+                    //     std::unique_lock<std::mutex> cv_lock(*this->_mutex);
+                    //     std::cout << "Thread " << i << " is done sleeping" << std::endl;
+                    //     _condition_variable->notify_all();
+                    //     std::cout << "Thread " << i << " is notifying with busy=" << busy << std::endl;
+                    // }
+                    // std::cout << "Thread " << i << " is sleeping" << std::endl;
+                    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+                    // { // anonymous inner block to manage scope of mutex lock 
+                    //     std::unique_lock<std::mutex> cv_lock(*this->_mutex);
+                    //     _condition_variable->notify_all();
+                    //     std::cout << "Thread " << i << " is notifying with busy=" << busy << std::endl;
+                    // }
+                    // std::cout << "Thread " << i << " is sleeping" << std::endl;
+                    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+                    // { // anonymous inner block to manage scope of mutex lock 
+                    //     std::unique_lock<std::mutex> cv_lock(*this->_mutex);
+                    //     busy = !busy;
+                    //     _condition_variable->notify_all();
+                    //     std::cout << "Thread " << i << " is notifying with busy=" << busy << std::endl;
+                    //     std::cout << "Thread " << i << " is FINISHED!" << std::endl;
+                    // }
                 }
                 catch (...)
                 {

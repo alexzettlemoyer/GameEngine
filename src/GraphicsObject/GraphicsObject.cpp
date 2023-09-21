@@ -52,7 +52,7 @@ void GraphicsObject::left()
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += -displacement / dt;
+        velocity.x += (-displacement / dt) * Timeline::getInstance() -> getScale();
     }
     (*this).checkBounds();
     updateMovement();
@@ -63,7 +63,7 @@ void GraphicsObject::up()
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += -displacement / dt;
+        velocity.y += (-displacement / dt) * Timeline::getInstance() -> getScale();
     }
     (*this).checkBounds();
     updateMovement();
@@ -74,7 +74,7 @@ void GraphicsObject::right()
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += displacement / dt;
+        velocity.x += (displacement / dt) * Timeline::getInstance() -> getScale();
     }
     (*this).checkBounds();
     updateMovement();
@@ -85,7 +85,7 @@ void GraphicsObject::down()
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += displacement / dt;
+        velocity.y += (displacement / dt) * Timeline::getInstance() -> getScale();
     }
     (*this).checkBounds();
     updateMovement();

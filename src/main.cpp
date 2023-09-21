@@ -3,8 +3,13 @@
 #include "io/ioHandler.h"
 #include "Time/Timeline.h"
 #include "Time/Thread.cpp"
+#include <functional>
 #include <iostream>
+#include <atomic>
 
+std::atomic<bool> isGameRunning(true);
+std::mutex mutex;
+std::condition_variable conditionV;
 
 int main()
 {
@@ -16,22 +21,14 @@ int main()
 
     ioHandler *io = ioHandler::getInstance(draw -> character);
 
-    // Mutex to handle locking, condition variable to handle notifications between threads
-    // std::mutex m;
-    // std::condition_variable cv;
+    // std::thread thread1(&ioHandler::handle, io, std::ref(isGameRunning));
+    // std::thread thread2(&Draw::startMovements, draw, std::ref(isGameRunning));
+    // {
+    //     std::unique_lock<std::mutex> lock(mutex);
+    //     conditionV.wait(lock, [] { return !isGameRunning.load(); });
+    // }
 
-    // Create thread objects
-    // Thread t1(0, nullptr, &m, &cv, [&io]() { io->handle(); });
-    // Thread t2(1, &t1, &m, &cv, [&draw]() {draw->startMovements(); }); 
-
-    // Thread t1(0, nullptr, &m, &cv, [&io](){ io->handle(); }, std::ref(io));
-    // Thread t2(1, &t1, &m, &cv, [&draw](){ draw->startMovements(); }, std::ref(draw));
-
-    // Initialize threads
-    // std::thread first;
-    // std::thread second;
-
-    while (window.isOpen()) 
+    while (window.isOpen())
     {
         Timeline::getInstance() -> updateDeltaTime();
         
@@ -39,38 +36,55 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                isGameRunning = false;
+            }
             else if (event.type == sf::Event::KeyPressed)
-                if (event.key.code == sf::Keyboard::Key::P)
-                    Timeline::getInstance() -> pause();
+            {
+                switch (event.key.code)
+                {
+                    case sf::Keyboard::Key::P:
+                        Timeline::getInstance() -> pause();
+                        std::cout << "PAUSE/UNPAUSE" << std::endl;
+                        break;
+                    case sf::Keyboard::Key::Num1:
+                        Timeline::getInstance() -> changeScale(Timeline::SCALE_HALF);
+                        std::cout << "0.5" << std::endl;
+                        break;
+                    case sf::Keyboard::Key::Num2:
+                        Timeline::getInstance() -> changeScale(Timeline::SCALE_REAL);
+                        std::cout << "1.0" << std::endl;
+                        break;
+                    case sf::Keyboard::Key::Num3:
+                        Timeline::getInstance() -> changeScale(Timeline::SCALE_DOUBLE);
+                        std::cout << "2.0" << std::endl;
+                        break;
+                }
+            }
         }
-
             // *** Keep draw -> drawGraphics(&window) in main thread
             // *** SFML does not support rendering through a thread
         draw -> drawGraphics(&window);
 
-        if (!(Timeline::getInstance() -> isPaused()))
-        {
-            io -> handle();
-            draw -> startMovements();
-        }
-        
-        // start the thread for io handling
-        // first = std::thread(&Thread::run, &t1);
+        // io -> handle();
+        // draw -> startMovements();
 
-        // start the thread for object movements
-        // second = std::thread(&Thread::run, &t2);
+        // std::thread thread1(&ioHandler::handle, io, );
+        // std::thread thread2(&Draw::startMovements, draw);
 
-        // Join threads after each iteraion
-        // if (first.joinable())
-        //     first.join();
-        // if (second.joinable())
-        //     second.join();
+        std::thread thread1(&ioHandler::handle, io, std::ref(isGameRunning));
+        std::thread thread2(&Draw::startMovements, draw, std::ref(isGameRunning));
+
+        if (thread1.joinable())
+            thread1.join();
+        if (thread2.joinable())
+            thread2.join();
     }
-       
-    //    // Make sure both threads are complete before stopping main thread
-    // first.join();
-    // second.join();
+
+    // thread1.join();
+    // thread2.join();
+
 
     delete draw;
     delete io;

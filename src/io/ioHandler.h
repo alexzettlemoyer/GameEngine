@@ -12,7 +12,7 @@ class ioHandler
 
     public:
         static ioHandler *getInstance(std::shared_ptr<Character> c = nullptr);
-        void handle();
+        void handle(std::atomic<bool>& isGameRunning);
 };
 
 #endif

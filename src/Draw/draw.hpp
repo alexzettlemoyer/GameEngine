@@ -23,6 +23,6 @@ class Draw
         std::shared_ptr<Character> character;
         bool setupGraphics(sf::RenderWindow* window);
         bool drawGraphics(sf::RenderWindow* window);
-        void startMovements();
+        void startMovements(std::atomic<bool>& isGameRunning);
 };
 #endif
