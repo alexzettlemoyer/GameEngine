@@ -10,7 +10,7 @@ static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 static sf::RenderWindow* window;
 
-static const float displacement = .065f;
+static const float displacement = .085f;
 static const float acceleration = -1850.f;       // m/s * s
 static const float GRAVITY = 520.f;            // m/s * s
 

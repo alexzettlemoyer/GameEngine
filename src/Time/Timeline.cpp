@@ -3,6 +3,11 @@
 #include "Timeline.h"
 #include <iostream>
 
+// TODO: 
+// - support an adjustable tic size
+// - enable anchoring your timeline to another, arbitrary timeline (or to some measure of real time)
+
+
 // singleton TimeHandler instance
 Timeline* Timeline::instancePtr = nullptr;
 bool paused;

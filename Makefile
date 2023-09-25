@@ -74,9 +74,13 @@ $(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
 game: $(OBJS)
 	g++ $(OBJS) -o game $(LIBS)
 
-dame -d: $(OBJS)
-	g++ -g $(OBJS) -o game $(LIBS)
+# debugging game
+# game -d: $(OBJS)
+# 	g++ -g $(OBJS) -o game $(LIBS)
 
+# Compilation
+# g++ -c "src/main.cpp" -o bin/main.o
+# g++ bin/main.o -o game -lsfml-graphics -lsfml-window -lsfml-system
 
 clean:
 	rm -f $(BIN)/*.o 
