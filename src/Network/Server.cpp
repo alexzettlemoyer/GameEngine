@@ -45,7 +45,10 @@ int main()
 
                 // if clients have already connected, they start all messages with their clientID
                 // which is assigned to them on first connection
-            std::string clientID = std::string(static_cast<char*>(request.data()), request.size());
+            std::string clientMessage= std::string(static_cast<char*>(request.data()), request.size());
+            std::vector<std::string> dataVector = GameState::split(clientMessage, ' ');
+            std::string clientID = dataVector[0];
+        
             int idNum;
 
                 // if this is the clients' first time connecting
@@ -65,23 +68,29 @@ int main()
                 // if the client has connected before
             else
             {
+                    // get any inputs from the original message the clients sent
+                if (dataVector.size() > 1) 
+                {
+                    if (dataVector[1] != "9")
+                        GameState::getInstance() -> input(dataVector[1]);
+                    if (dataVector[2] != "9")
+                        GameState::getInstance() -> input(dataVector[2]);
+                }
 
-                
-                // apply any input to the state
+                    // update GameState: object movement
+                GameState::getInstance() -> updateGameState();
+
                 // update the character's movement
-                // update the platform's movement
-
-                // GameState *state = GameState::getInstance();
-                // zmq::message_t gameState(state -> data(), state -> size());
-                // socket.send(gameState, zmq::send_flags::none);
 
                     //  do some 'work'
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                // std::this_thread::sleep_for(std::chrono::seconds(1));
 
-                //     // increase the client's iteration number and send their message
-                connections[clientID] += 1;
-                std::string iterationString = "Client " + clientID + ": Iteration " + std::to_string(connections[clientID]) + "\n";
-                zmq::message_t iterationReply(iterationString.data(), iterationString.size());
+                std::string data = GameState::getInstance() -> serialize();
+
+                    // increase the client's iteration number and send their message
+                // connections[clientID] += 1;
+                // std::string iterationString = "Client " + clientID + ": Iteration " + std::to_string(connections[clientID]) + "\n";
+                zmq::message_t iterationReply(data.data(), data.size());
                 socket.send(iterationReply, zmq::send_flags::none);
             }
         }

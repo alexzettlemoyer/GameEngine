@@ -21,6 +21,7 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     id = idNum;
 }
 
+
 bool GraphicsObject::loadTexture(sf::Texture& texture, const std::string& image)
 {
     if (!texture.loadFromFile(image))

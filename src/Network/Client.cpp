@@ -2,7 +2,6 @@
 #include <string>
 #include <iostream>
 #include "../GameRunner/GameRunner.h"
-#include "../GameRunner/GameState.h"
 
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
 
@@ -26,7 +25,10 @@ InputType pollWindowEvent(sf::RenderWindow *window)
     while (window -> pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
+        {
+            window -> close();
             return CLOSE;
+        }
         else if (event.type == sf::Event::KeyPressed)
         {
             switch (event.key.code)
@@ -47,6 +49,11 @@ InputType pollWindowEvent(sf::RenderWindow *window)
         }
     }
     return NONE;
+}
+
+std::string getInputString(std::string clientID, InputType event, InputType keys)
+{
+    return "" + clientID + " " + std::to_string(event) + " " + std::to_string(keys);
 }
 
 int main ()
@@ -89,28 +96,25 @@ int main ()
         // wait for server messages
     while (game -> getWindow() -> isOpen())
     {
+        zmq::message_t reply;
+        zmq::recv_result_t result = socket.recv(reply, zmq::recv_flags::none);
+
+        std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
+
+        game -> deserialize(data);
+        game -> drawGraphics();
+
             // handle input
         InputType events = pollWindowEvent(game -> getWindow());
         InputType keys = handleInput();
 
-        zmq::message_t reply;
-        zmq::recv_result_t result = socket.recv(reply, zmq::recv_flags::none);
+        if (events == CLOSE)
+            break;
 
-        // GameState state;
-        // memcpy(&state, reply.data(), reply.size());
-        // state.getState();
-        // std::cout << std::endl;
-
-            // DRAW GRAPHICS
-        // game -> drawGraphics(game -> getWindow(), state -> getBackground(), state -> getGraphicsObjects(), state -> getCharacters());
+        std::string inputData = getInputString(clientID, events, keys);
         
-        
-        std::string serverMessage = std::string(static_cast<char*>(reply.data()), reply.size());
-        std::cout << serverMessage;
-
-
-        zmq::message_t request3(clientID.data(), clientID.size());
-        socket.send(request3, zmq::send_flags::none);
+        zmq::message_t inputRequest(inputData.data(), inputData.size());
+        socket.send(inputRequest, zmq::send_flags::none);
     }
     return 0;
 }

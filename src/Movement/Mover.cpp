@@ -66,7 +66,7 @@ bool movementClockwise(GraphicsObject& obj)
 // - left   0
 // - right  2
 bool movementLeftRight(GraphicsObject& obj)
-{
+{    
     // if the first time, get the original position
     if ( originalPositionLR == sf::Vector2f(0.f, 0.f) )
         originalPositionLR = obj.getPosition();

@@ -15,16 +15,14 @@ class GameRunner
         static GameRunner* instancePtr;
         std::atomic<bool> isGameRunning;
         sf::RenderWindow window;
-        std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
-        std::list<std::shared_ptr<Character>> characters;
         sf::Sprite background;
         sf::Texture backgroundTexture;
 
     public:
         static GameRunner *getInstance();
-        sf::RenderWindow *gameLoop(sf::RenderWindow *window);
         sf::RenderWindow *getWindow();
         void drawGraphics();
+        void deserialize(std::string data);
 };
 
 #endif
