@@ -26,3 +26,10 @@ USAGE:
 * pressing key `2` sets game speed to 1.0 (default)
 * pressing key `3` sets game speed to 2.0
 
+
+VERSIONS:
+this game is being developed on
+    - Ubuntu Virtual Machine `22.04.3 LTS (GNU/Linux 5.15.0-83-generic aarch64)`
+    - SFML version `2.5.1`
+    - Lib ZEROmq `4.3.4`
+
