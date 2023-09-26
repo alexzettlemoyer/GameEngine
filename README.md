@@ -3,7 +3,7 @@
 COMPILE & RUN INSTRUCTIONS: 
 
 - Game
-* from the Project Directory directory run `make game`
+* from the project directory run `make game`
 * to run the game enter ./game
 
 - Networking Basics
@@ -11,6 +11,12 @@ COMPILE & RUN INSTRUCTIONS:
 * to start the server enter ./server
 * from the Network directory run `make client`
 * to start the client enter ./client
+
+- Networking Game
+* from the project directory run `make gameServer`
+* to start the game server enter ./gameServer
+* from the project directory run `make gameClient`
+* to start any game client enter ./gameClient
 
 USAGE:
 

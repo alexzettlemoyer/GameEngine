@@ -85,15 +85,15 @@ $(BIN)/gameRunner.o: $(SRC)/GameRunner/GameRunner.cpp
 $(BIN)/server.o: $(SRC)/Network/Server.cpp
 	g++ -c $< -o $@
 
-server: $(OBJ_FILES) $(BIN)/server.o
-	g++ $(OBJ_FILES) $(BIN)/server.o -o server $(LIBS)
+gameServer: $(OBJ_FILES) $(BIN)/server.o
+	g++ $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
 
 
 $(BIN)/client.o: $(SRC)/Network/Client.cpp
 	g++ -c $< -o $@
 
-client: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
-	g++ $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o client $(LIBS)
+gameClient: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
+	g++ $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o gameClient $(LIBS)
 
 # debugging game
 # game -d: $(OBJS)
@@ -105,5 +105,7 @@ client: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
 
 clean:
 	rm -f $(BIN)/*.o 
-	rm -f ./game ./server ./client
+	rm -f ./game 
+	rm -f ./gameServer 
+	rm -f ./gameClient
 	
