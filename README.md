@@ -1,6 +1,6 @@
 # CSC481: Game Engine Foundations
 
-##COMPILE & RUN INSTRUCTIONS: 
+## COMPILE & RUN INSTRUCTIONS: 
 
 **Game**
 * from the project directory run `make game`
@@ -19,7 +19,7 @@
 * to start any game client enter ./gameClient
 
 
-##USAGE:
+## USAGE:
 
 * player movement is input using the arrow keys and space bar to jump
 * pressing key `P` pauses all movement
@@ -28,7 +28,7 @@
 * pressing key `3` sets game speed to 2.0
 
 
-##VERSIONS:
+## VERSIONS:
 this game is being developed on
 * Ubuntu Virtual Machine `22.04.3 LTS (GNU/Linux 5.15.0-83-generic aarch64)`
 * SFML version `2.5.1`
