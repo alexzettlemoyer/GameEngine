@@ -1,24 +1,25 @@
 # CSC481: Game Engine Foundations
 
-COMPILE & RUN INSTRUCTIONS: 
+##COMPILE & RUN INSTRUCTIONS: 
 
-- Game
+**Game**
 * from the project directory run `make game`
 * to run the game enter ./game
 
-- Networking Basics
+**Networking Basics**
 * from the Network directory run `make server`
 * to start the server enter ./server
 * from the Network directory run `make client`
 * to start the client enter ./client
 
-- Networking Game
+**Networking Game**
 * from the project directory run `make gameServer`
 * to start the game server enter ./gameServer
 * from the project directory run `make gameClient`
 * to start any game client enter ./gameClient
 
-USAGE:
+
+##USAGE:
 
 * player movement is input using the arrow keys and space bar to jump
 * pressing key `P` pauses all movement
@@ -27,9 +28,9 @@ USAGE:
 * pressing key `3` sets game speed to 2.0
 
 
-VERSIONS:
+##VERSIONS:
 this game is being developed on
-    - Ubuntu Virtual Machine `22.04.3 LTS (GNU/Linux 5.15.0-83-generic aarch64)`
-    - SFML version `2.5.1`
-    - Lib ZEROmq `4.3.4`
+* Ubuntu Virtual Machine `22.04.3 LTS (GNU/Linux 5.15.0-83-generic aarch64)`
+* SFML version `2.5.1`
+* Lib ZEROmq `4.3.4`
 
