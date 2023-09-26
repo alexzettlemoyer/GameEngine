@@ -2,15 +2,6 @@
 #include <string>
 #include <iostream>
 
-
-void sendEmptyMessage(zmq::socket_t *socket, int clientID)
-{
-    std::cout << clientID << std::endl;
-    zmq::message_t request(sizeof(int));
-    memcpy(request.data (), &clientID, sizeof(int));
-    socket -> send(request, zmq::send_flags::none);
-}
-
 int main ()
 {
     //  Prepare our context and socket

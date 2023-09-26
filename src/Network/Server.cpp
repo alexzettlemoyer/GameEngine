@@ -1,10 +1,12 @@
+#include <SFML/Graphics.hpp>
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
 #include <atomic>
 #include <thread>
+#include "../GameRunner/GameState.h"
 
-int main () 
+int main() 
 {
         //  Prepare our context and socket
     zmq::context_t context(2);
@@ -23,14 +25,13 @@ int main ()
     zmq::pollitem_t serverItem = {static_cast<void*>(socket), 0, ZMQ_POLLIN, 0};
     pollItems.push_back(serverItem);
 
-
         // Start a server process that listens for incoming network connections
-    while (true) 
+    while(true)
     {
             // poll for incoming data on server socket
         int rc = zmq::poll(pollItems.data(), pollItems.size(), std::chrono::milliseconds(-1));
         if (rc < 0) {
-            std::cerr << "Error in zmq::poll: " << zmq_strerror(errno) << std::endl;
+            std::cout << "Error in poll" << zmq_strerror(errno) << std::endl;
             break;
         }
 
@@ -64,10 +65,20 @@ int main ()
                 // if the client has connected before
             else
             {
+
+                
+                // apply any input to the state
+                // update the character's movement
+                // update the platform's movement
+
+                // GameState *state = GameState::getInstance();
+                // zmq::message_t gameState(state -> data(), state -> size());
+                // socket.send(gameState, zmq::send_flags::none);
+
                     //  do some 'work'
                 std::this_thread::sleep_for(std::chrono::seconds(1));
 
-                    // increase the client's iteration number and send their message
+                //     // increase the client's iteration number and send their message
                 connections[clientID] += 1;
                 std::string iterationString = "Client " + clientID + ": Iteration " + std::to_string(connections[clientID]) + "\n";
                 zmq::message_t iterationReply(iterationString.data(), iterationString.size());

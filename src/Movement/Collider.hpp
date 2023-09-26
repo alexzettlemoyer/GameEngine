@@ -5,7 +5,7 @@
 #include "../GraphicsObject/Platform.h"
 #include "../GraphicsObject/GraphicsObject.h"
 
-bool isCharacterGrounded(Character &character, Platform &platform);
+bool isCharacterGrounded(Character &character, GraphicsObject &ground);
 bool collisionResponse(GraphicsObject &obj, int dir);
 bool checkCollision(GraphicsObject &obj, GraphicsObject &other);
 

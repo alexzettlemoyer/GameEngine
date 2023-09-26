@@ -11,7 +11,7 @@ class Character : public GraphicsObject
         bool checkBounds();
 
     public:
-        Character(sf::Vector2f position);
+        Character(sf::Vector2f position, int idNum);
         void updateMovement();
         void left();
         void up();

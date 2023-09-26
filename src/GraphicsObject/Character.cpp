@@ -17,8 +17,8 @@ static const float GRAVITY = 520.f;            // m/s * s
 sf::Vector2f initialPosition;
 
 // Constructor
-Character::Character(sf::Vector2f position)
-    : GraphicsObject(SIZE_CHARACTER, position)
+Character::Character(sf::Vector2f position, int idNum)
+    : GraphicsObject(SIZE_CHARACTER, position, false, idNum)
 {
     if (!loadTexture(characterTexture, IMG_CHARACTER.c_str()))
         {}          // TODO: handle error
@@ -72,8 +72,8 @@ void Character::down()
 bool Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
-    for (std::shared_ptr<Platform> const& i : (Draw::getInstance() -> platforms)) {
-        if (isCharacterGrounded(*this, *i))
+    for (std::shared_ptr<GraphicsObject> const& i : (Draw::getInstance() -> graphicsObjects)) {
+        if (i -> isGround() && isCharacterGrounded(*this, *i))
             return true;
     }
 
@@ -102,6 +102,7 @@ void Character::updateMovement()
 
 bool Character::checkBounds()
 {
+        // TODO: Remove Window Size
     sf::Vector2u wSize = (*window).getSize();
     sf::Vector2f position = sf::RectangleShape::getPosition();
     sf::Rect<float> thisRect = (*this).getGlobalBounds();

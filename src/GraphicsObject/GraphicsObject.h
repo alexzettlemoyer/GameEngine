@@ -7,7 +7,7 @@
 class GraphicsObject : public sf::RectangleShape
 {
     public:
-        GraphicsObject(sf::Vector2f size, sf::Vector2f position);
+        GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
         CollisionType collisionTypeX;
         CollisionType collisionTypeY;
@@ -21,8 +21,13 @@ class GraphicsObject : public sf::RectangleShape
         void down();
         void move(float x, float y);
         std::mutex objMutex;
+        bool isGround();
+        int identifier();
+
 
     protected:
+        bool ground;
+        int id;
         bool checkBounds();
         void updateMovement();
         void blockMove();

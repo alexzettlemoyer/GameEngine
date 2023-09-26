@@ -18,11 +18,12 @@ class Draw
 
     public:
         static Draw *getInstance();
-        std::list<std::shared_ptr<Platform>> platforms;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
+        std::list<std::shared_ptr<Character>> characters;
         std::shared_ptr<Character> character;
         bool setupGraphics(sf::RenderWindow* window);
         bool drawGraphics(sf::RenderWindow* window);
         void startMovements(std::atomic<bool>& isGameRunning);
+        std::shared_ptr<Character> newCharacter();
 };
 #endif

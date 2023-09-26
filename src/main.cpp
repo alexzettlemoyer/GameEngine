@@ -8,8 +8,6 @@
 #include <atomic>
 
 std::atomic<bool> isGameRunning(true);
-std::mutex mutex;
-std::condition_variable conditionV;
 
 int main()
 {
@@ -20,13 +18,6 @@ int main()
     draw -> setupGraphics(&window);
 
     ioHandler *io = ioHandler::getInstance(draw -> character);
-
-    // std::thread thread1(&ioHandler::handle, io, std::ref(isGameRunning));
-    // std::thread thread2(&Draw::startMovements, draw, std::ref(isGameRunning));
-    // {
-    //     std::unique_lock<std::mutex> lock(mutex);
-    //     conditionV.wait(lock, [] { return !isGameRunning.load(); });
-    // }
 
     while (window.isOpen())
     {
@@ -67,12 +58,6 @@ int main()
             // *** SFML does not support rendering through a thread
         draw -> drawGraphics(&window);
 
-        // io -> handle();
-        // draw -> startMovements();
-
-        // std::thread thread1(&ioHandler::handle, io, );
-        // std::thread thread2(&Draw::startMovements, draw);
-
         std::thread thread1(&ioHandler::handle, io, std::ref(isGameRunning));
         std::thread thread2(&Draw::startMovements, draw, std::ref(isGameRunning));
 
@@ -81,10 +66,6 @@ int main()
         if (thread2.joinable())
             thread2.join();
     }
-
-    // thread1.join();
-    // thread2.join();
-
 
     delete draw;
     delete io;

@@ -6,7 +6,7 @@ COMPILE & RUN INSTRUCTIONS:
 * from the Project Directory directory run `make game`
 * to run the game enter ./game
 
-- Network
+- Networking Basics
 * from the Network directory run `make server`
 * to start the server enter ./server
 * from the Network directory run `make client`

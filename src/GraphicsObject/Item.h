@@ -9,7 +9,7 @@ class Item : public GraphicsObject
         sf::Texture moneyTexture;
         
     public:
-        Item(const sf::Vector2f& size, const sf::Vector2f& position);
+        Item(const sf::Vector2f& size, const sf::Vector2f& position, int idNum);
 };
 
 #endif

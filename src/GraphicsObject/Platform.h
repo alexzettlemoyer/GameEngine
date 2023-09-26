@@ -9,7 +9,7 @@ class Platform : public GraphicsObject
         sf::Texture platformTexture;
     
     public: 
-        Platform(const sf::Vector2f& position);
+        Platform(const sf::Vector2f& position, int idNum);
 };
 
 #endif

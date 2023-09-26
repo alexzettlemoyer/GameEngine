@@ -4,17 +4,16 @@
 #include <mutex>
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
-#include "../GraphicsObject/Platform.h"
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
 
 sf::FloatRect nextPosition;
 std::mutex characterMutex;
 
-bool isCharacterGrounded(Character &character, Platform &platform)
+bool isCharacterGrounded(Character &character, GraphicsObject &ground)
 {
     sf::FloatRect characterBounds = character.getGlobalBounds();
-    sf::FloatRect otherBounds = platform.getGlobalBounds();
+    sf::FloatRect otherBounds = ground.getGlobalBounds();
 
     // if bottom x coordinate of character is below top x coordinate of platform
     // and the character is within the x coordinates of the platform ( on top )
@@ -118,7 +117,7 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
     // reduce character height by 5.f
     // this is so that the character is not detected colliding with a platform
     // when it is visually not on the platform
-    characterBounds.height -= 5.f * Timeline::getInstance() -> getScale();
+    characterBounds.height -= 10.f;
 
     // calculate the characters next position
     nextPosition = characterBounds;

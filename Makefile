@@ -1,18 +1,6 @@
-LIBS=-lsfml-graphics -lsfml-window -lsfml-system
+LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq
 SRC=src
 BIN=bin
-
-SRCFILES = $(SRC)/Time/Timeline.cpp \
-		$(SRC)/Time/Thread.cpp \
-		$(SRC)/Movement/Mover.cpp \
-		$(SRC)/GraphicsObject/GraphicsObject.cpp \
-		$(SRC)/GraphicsObject/Item.cpp \
-		$(SRC)/GraphicsObject/Platform.cpp \
-		$(SRC)/GraphicsObject/Character.cpp \
-		$(SRC)/Movement/Collider.cpp \
-		$(SRC)/Draw/Draw.cpp \
-		$(SRC)/io/ioHandler.cpp \
-		$(SRC)/main.cpp
 
 OBJS = $(BIN)/time.o \
 	   $(BIN)/thread.o \
@@ -24,7 +12,18 @@ OBJS = $(BIN)/time.o \
 	   $(BIN)/collider.o \
 	   $(BIN)/draw.o \
 	   $(BIN)/ioHandler.o \
-	   $(BIN)/main.o
+
+OBJ_FILES = $(BIN)/time.o \
+	   $(BIN)/thread.o \
+	   $(BIN)/mover.o \
+	   $(BIN)/graphicsObject.o \
+	   $(BIN)/item.o \
+	   $(BIN)/platform.o \
+	   $(BIN)/character.o \
+	   $(BIN)/collider.o \
+	   $(BIN)/draw.o \
+	   $(BIN)/ioHandler.o \
+	   $(BIN)/gameState.o
 
 # main copilation
 $(BIN)/main.o: $(SRC)/main.cpp
@@ -70,9 +69,31 @@ $(BIN)/item.o: $(SRC)/GraphicsObject/Item.cpp
 $(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
 	g++ -c $< -o $@
 
+# single client game
 # Link all object files to create the executable
-game: $(OBJS)
-	g++ $(OBJS) -o game $(LIBS)
+game: $(OBJS) $(BIN)/main.o
+	g++ $(OBJS) $(BIN)/main.o -o game $(LIBS)	
+
+
+# networking game
+$(BIN)/gameState.o: $(SRC)/GameRunner/GameState.cpp
+	g++ -c $< -o $@
+
+$(BIN)/gameRunner.o: $(SRC)/GameRunner/GameRunner.cpp
+	g++ -c $< -o $@
+
+$(BIN)/server.o: $(SRC)/Network/Server.cpp
+	g++ -c $< -o $@
+
+server: $(OBJ_FILES) $(BIN)/server.o
+	g++ $(OBJ_FILES) $(BIN)/server.o -o server $(LIBS)
+
+
+$(BIN)/client.o: $(SRC)/Network/Client.cpp
+	g++ -c $< -o $@
+
+client: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
+	g++ $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o client $(LIBS)
 
 # debugging game
 # game -d: $(OBJS)
@@ -84,5 +105,5 @@ game: $(OBJS)
 
 clean:
 	rm -f $(BIN)/*.o 
-	rm -f ./game
+	rm -f ./game ./server ./client
 	

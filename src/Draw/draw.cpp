@@ -17,21 +17,21 @@ std::shared_ptr<Platform> platform1;
 std::shared_ptr<Platform> platform2;
 std::shared_ptr<Item> item1;
 
+int characterCount = 0;
+
 // constructor
 Draw::Draw()
 {
-    character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f));
-    platform1 = std::make_shared<Platform>(sf::Vector2f(25.f, 520.f));
-    platform2 = std::make_shared<Platform>(sf::Vector2f(525.f, 650.f));
-    item1 = std::make_shared<Item>(sf::Vector2f(100.2f, 64.6f), sf::Vector2f(800.f, 150.f));
+    character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f), 4);
+    platform1 = std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 1);
+    platform2 = std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 2);
+    item1 = std::make_shared<Item>(sf::Vector2f(100.2f, 64.6f), sf::Vector2f(800.f, 150.f), 3);
 }
 
 Draw* Draw::getInstance()
 {
     if ( instancePtr == NULL )
-    {
-        instancePtr = new Draw();
-    }
+        { instancePtr = new Draw(); }
     return instancePtr;
 }
 
@@ -44,12 +44,11 @@ bool Draw::setupGraphics(sf::RenderWindow* window)
     background.setTexture(backgroundTexture);
 
     character.get() -> addWindowReference(window);
+    characters.push_back(character);
+
     graphicsObjects.push_back(platform1);
     graphicsObjects.push_back(platform2);
     graphicsObjects.push_back(item1);
-
-    platforms.push_back(platform1);
-    platforms.push_back(platform2);
 
     return true;
 }

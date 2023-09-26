@@ -9,13 +9,16 @@
 
 const float displacement = .015f;
 
-GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position)
+GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum)
 {
     this -> setSize(size);
     this -> setPosition(position);
+    ground = isGround;
 
     velocity.x = 0.f;
     velocity.y = 0.f;
+
+    id = idNum;
 }
 
 bool GraphicsObject::loadTexture(sf::Texture& texture, const std::string& image)
@@ -23,6 +26,11 @@ bool GraphicsObject::loadTexture(sf::Texture& texture, const std::string& image)
     if (!texture.loadFromFile(image))
         return false;
     return true;
+}
+
+int GraphicsObject::identifier()
+{
+    return id;
 }
 
 sf::Vector2f GraphicsObject::getPosition()
@@ -111,3 +119,7 @@ bool GraphicsObject::checkBounds()
     return true;
 }
 
+bool GraphicsObject::isGround()
+{
+    return ground;
+}
