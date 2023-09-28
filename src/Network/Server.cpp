@@ -2,99 +2,103 @@
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
-#include <atomic>
 #include <thread>
+#include <mutex>
 #include "../GameRunner/GameState.h"
+
+std::mutex repMutex;
+
+void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>& connections, int& nextConnection)
+{
+    while (true)
+    {
+        //  Wait for next request from connecting client
+        zmq::message_t request;
+        // assign to a zmq recv_result_t to supress compiler warnings about ignored return
+        zmq::recv_result_t result = repSocket.recv(request, zmq::recv_flags::none);
+
+        // if clients have already connected, they start all messages with their clientID
+        // which is assigned to them on first connection
+        std::string clientMessage = std::string(static_cast<char*>(request.data()), request.size());
+        std::vector<std::string> dataVector = GameState::split(clientMessage, ' ');
+        std::string clientID = dataVector[0];
+
+        if (clientID == "REQ" || connections.find(clientID) == connections.end()) 
+        {
+            // Assign a connection number to the client
+            int idNum = GameState::getInstance() -> newCharacter();
+            clientID = std::to_string(idNum);
+            {
+                std::lock_guard<std::mutex> lock(repMutex);
+                connections[clientID] = 0;
+            }
+            std::cout << "Client " << idNum << " connected." << std::endl;
+
+                // send the client's ID back to them
+            zmq::message_t idReply(sizeof(int));
+            memcpy(idReply.data (), &idNum, sizeof(int));
+            repSocket.send(idReply, zmq::send_flags::none);
+        }
+        else
+        {
+                // get any inputs from the original message the clients sent
+            if (dataVector.size() > 1) 
+            {
+                if (dataVector[1] != "9")
+                {
+                    std::lock_guard<std::mutex> lock(repMutex);
+                    GameState::getInstance() -> input(clientID, dataVector[1]);
+                }
+                if (dataVector[2] != "9")
+                {
+                    std::lock_guard<std::mutex> lock(repMutex);
+                    GameState::getInstance() -> input(clientID, dataVector[2]);
+                }
+            }
+
+            {
+                // update GameState: object movement
+                std::lock_guard<std::mutex> lock(repMutex);
+                GameState::getInstance() -> updateGameState();
+            }
+
+            // tell the client we received their update
+            std::string response = "R";
+            zmq::message_t reply(response.data(), response.size());
+            repSocket.send(reply, zmq::send_flags::none);
+        }
+    }
+}
+
 
 int main() 
 {
         //  Prepare our context and socket
     zmq::context_t context(2);
-    zmq::socket_t socket(context, zmq::socket_type::rep);
-    socket.bind("tcp://*:5555");
+    zmq::socket_t repSocket(context, zmq::socket_type::rep);
+    repSocket.bind("tcp://*:5555");
 
-        // vector of poll items to keep track of multiple clients
-    std::vector<zmq::pollitem_t> pollItems;
+    zmq::socket_t pubSocket(context, zmq::socket_type::pub);
+    pubSocket.bind("tcp://*:5556");
 
         // maps client connection number to client loop counter
     std::unordered_map<std::string, int> connections;
         // atomic counter to assign connection numbers
-    std::atomic<int> nextConnection(1);
+    int nextConnection(1);
 
-        // put a server item in the poll items list
-    zmq::pollitem_t serverItem = {static_cast<void*>(socket), 0, ZMQ_POLLIN, 0};
-    pollItems.push_back(serverItem);
+    std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections), std::ref(nextConnection));
 
-        // Start a server process that listens for incoming network connections
+        // Publish loop to all clients
     while(true)
     {
-            // poll for incoming data on server socket
-        int rc = zmq::poll(pollItems.data(), pollItems.size(), std::chrono::milliseconds(-1));
-        if (rc < 0) {
-            std::cout << "Error in poll" << zmq_strerror(errno) << std::endl;
-            break;
-        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
 
-            // check for incoming data on the server socket
-        if (pollItems[0].revents & ZMQ_POLLIN) 
-        {
-                //  Wait for next request from client
-            zmq::message_t request;
-                // assign to a zmq recv_result_t to supress compiler warnings about ignored return
-            zmq::recv_result_t result = socket.recv(request, zmq::recv_flags::none);
+        // update the gameState each iteration
+        GameState::getInstance() -> updateGameState();
+        std::string data = GameState::getInstance() -> serialize();
 
-                // if clients have already connected, they start all messages with their clientID
-                // which is assigned to them on first connection
-            std::string clientMessage= std::string(static_cast<char*>(request.data()), request.size());
-            std::vector<std::string> dataVector = GameState::split(clientMessage, ' ');
-            std::string clientID = dataVector[0];
-        
-            int idNum;
-
-                // if this is the clients' first time connecting
-            if (clientID == "REQ" || connections.find(clientID) == connections.end()) 
-            {
-                idNum = GameState::getInstance() -> newCharacter();
-                // Assign a connection number to the client
-                // idNum = nextConnection.fetch_add(1);
-                clientID = std::to_string(idNum);
-                connections[clientID] = 0;
-                std::cout << "Client " << idNum << " connected." << std::endl;
-
-                    // send the client's ID back to them
-                zmq::message_t idReply(sizeof(int));
-                memcpy(idReply.data (), &idNum, sizeof(int));
-                socket.send(idReply, zmq::send_flags::none);
-            }
-                // if the client has connected before
-            else
-            {
-                    // get any inputs from the original message the clients sent
-                if (dataVector.size() > 1) 
-                {
-                    if (dataVector[1] != "9")
-                        GameState::getInstance() -> input(clientID, dataVector[1]);
-                    if (dataVector[2] != "9")
-                        GameState::getInstance() -> input(clientID, dataVector[2]);
-                }
-
-                    // update GameState: object movement
-                GameState::getInstance() -> updateGameState();
-
-                // update the character's movement
-
-                    //  do some 'work'
-                // std::this_thread::sleep_for(std::chrono::seconds(1));
-
-                std::string data = GameState::getInstance() -> serialize();
-
-                    // increase the client's iteration number and send their message
-                // connections[clientID] += 1;
-                // std::string iterationString = "Client " + clientID + ": Iteration " + std::to_string(connections[clientID]) + "\n";
-                zmq::message_t iterationReply(data.data(), data.size());
-                socket.send(iterationReply, zmq::send_flags::none);
-            }
-        }
+        zmq::message_t iterationReply(data.data(), data.size());
+        pubSocket.send(iterationReply, zmq::send_flags::none);
     }
     return 0;
 }

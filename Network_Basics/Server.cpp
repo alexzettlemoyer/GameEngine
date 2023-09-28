@@ -1,7 +1,6 @@
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
-#include <atomic>
 #include <thread>
 #include <sstream>
 #include <mutex>
