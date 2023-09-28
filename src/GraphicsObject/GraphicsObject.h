@@ -9,6 +9,9 @@ class GraphicsObject : public sf::RectangleShape
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
+        static const int CHARACTER_TYPE = 1;
+        static const int PLATFORM_TYPE = 2;
+        static const int ITEM_TYPE = 3;
         CollisionType collisionTypeX;
         CollisionType collisionTypeY;
         sf::Vector2f velocity;
@@ -23,6 +26,7 @@ class GraphicsObject : public sf::RectangleShape
         std::mutex objMutex;
         bool isGround();
         int identifier();
+        virtual int getType() const = 0;
 
 
     protected:

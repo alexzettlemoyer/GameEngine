@@ -9,7 +9,8 @@ class Item : public GraphicsObject
         sf::Texture moneyTexture;
         
     public:
-        Item(const sf::Vector2f& size, const sf::Vector2f& position, int idNum);
+        Item(const sf::Vector2f& position, int idNum);
+        int getType() const override { return GraphicsObject::ITEM_TYPE; }
 };
 
 #endif

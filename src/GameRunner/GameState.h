@@ -13,7 +13,6 @@ class GameState
         static GameState *instancePtr;
         float timescale;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
-        // std::list<std::shared_ptr<Character>> characters;
         std::shared_ptr<GraphicsObject> findObjById(int id);
 
     public:
@@ -24,10 +23,11 @@ class GameState
         void getState();
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
         std::list<std::shared_ptr<Character>> getCharacters();
-        std::shared_ptr<Character> newCharacter();
+        int newCharacter();
+        void removeCharacter(int id);
         std::string serialize();
         void deserialize(std::string data);
-        void input(std::string i);
+        void input(std::string objId, std::string i);
 };
 
 #endif

@@ -19,6 +19,7 @@ class Character : public GraphicsObject
         void down();
         void addWindowReference(sf::RenderWindow* window);
         sf::Vector2f getVelocity();
+        int getType() const override { return GraphicsObject::CHARACTER_TYPE; }
 };
 
 #endif

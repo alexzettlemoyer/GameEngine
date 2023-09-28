@@ -116,5 +116,7 @@ int main ()
         zmq::message_t inputRequest(inputData.data(), inputData.size());
         socket.send(inputRequest, zmq::send_flags::none);
     }
+
+    
     return 0;
 }

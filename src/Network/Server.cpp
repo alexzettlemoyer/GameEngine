@@ -54,8 +54,9 @@ int main()
                 // if this is the clients' first time connecting
             if (clientID == "REQ" || connections.find(clientID) == connections.end()) 
             {
+                idNum = GameState::getInstance() -> newCharacter();
                 // Assign a connection number to the client
-                idNum = nextConnection.fetch_add(1);
+                // idNum = nextConnection.fetch_add(1);
                 clientID = std::to_string(idNum);
                 connections[clientID] = 0;
                 std::cout << "Client " << idNum << " connected." << std::endl;
@@ -72,9 +73,9 @@ int main()
                 if (dataVector.size() > 1) 
                 {
                     if (dataVector[1] != "9")
-                        GameState::getInstance() -> input(dataVector[1]);
+                        GameState::getInstance() -> input(clientID, dataVector[1]);
                     if (dataVector[2] != "9")
-                        GameState::getInstance() -> input(dataVector[2]);
+                        GameState::getInstance() -> input(clientID, dataVector[2]);
                 }
 
                     // update GameState: object movement

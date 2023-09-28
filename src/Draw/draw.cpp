@@ -7,7 +7,6 @@
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/Item.h"
 #include "../Movement/Mover.hpp"
-#include <iostream>
 
 static const std::string IMG_BACKGROUND = "images/background.jpeg";
 Draw* Draw::instancePtr = nullptr;
@@ -25,7 +24,7 @@ Draw::Draw()
     character = std::make_shared<Character>(sf::Vector2f(100.f, 180.f), 4);
     platform1 = std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 1);
     platform2 = std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 2);
-    item1 = std::make_shared<Item>(sf::Vector2f(100.2f, 64.6f), sf::Vector2f(800.f, 150.f), 3);
+    item1 = std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 3);
 }
 
 Draw* Draw::getInstance()
@@ -43,7 +42,7 @@ bool Draw::setupGraphics(sf::RenderWindow* window)
     background.setScale(1.f, 1.f);
     background.setTexture(backgroundTexture);
 
-    character.get() -> addWindowReference(window);
+    // character.get() -> addWindowReference(window);
     characters.push_back(character);
 
     graphicsObjects.push_back(platform1);

@@ -24,6 +24,7 @@ int main ()
     int connectionNumber;
     memcpy(&connectionNumber, reply.data(), sizeof(int));
     std::string clientID = std::to_string(connectionNumber);
+    std::cout << clientID << std::endl;
 
         // send message to start receiving iteration updates
     zmq::message_t request2(clientID.data(), clientID.size());

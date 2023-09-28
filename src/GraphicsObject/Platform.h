@@ -10,6 +10,7 @@ class Platform : public GraphicsObject
     
     public: 
         Platform(const sf::Vector2f& position, int idNum);
+        int getType() const override { return GraphicsObject::PLATFORM_TYPE; }
 };
 
 #endif
