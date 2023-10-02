@@ -6,15 +6,16 @@
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
 #include "../GameRunner/GameState.h"
+#include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 // static sf::RenderWindow* window;
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .085f;
+static const float displacement = .085f;            // .085
 static const float acceleration = -1850.f;       // m/s * s
-static const float GRAVITY = 600.f;            // m/s * s
+static const float GRAVITY = 600.f;            // m/s * s   // 600
 
 sf::Vector2f initialPosition;
 
@@ -28,12 +29,6 @@ Character::Character(sf::Vector2f position, int idNum)
     this -> collisionTypeX = CHAR;
     this -> collisionTypeY = CHAR;
 }
-
-// void Character::addWindowReference(sf::RenderWindow* windowRef)
-// {
-//     window = windowRef;
-// }
-
 
 void Character::left()
 {

@@ -82,10 +82,12 @@ void GameState::updateGameState()
  */
 void GameState::input(std::string objId, std::string in)
 {
-    std::lock_guard<std::mutex> lock(stateMutex);
     int charId = stoi(objId);
     int i = stoi(in);
 
+    std::cout << objId << " " << in << std::endl;
+
+    std::lock_guard<std::mutex> lock(stateMutex);
     switch (i)
     {
         case 0:             // character jump
@@ -135,6 +137,7 @@ void GameState::input(std::string objId, std::string in)
  */
 std::string GameState::serialize()
 {
+    std::lock_guard<std::mutex> lock(stateMutex);
     std::stringstream s;
 
         // add all graphics objects
@@ -185,7 +188,7 @@ void GameState::deserialize(std::string data)
             switch(stoi(objData[4]))
             {
                 case GraphicsObject::CHARACTER_TYPE:
-                    std::cout << "NEW CHARACTER" << std::endl;
+                    // std::cout << "NEW CHARACTER" << std::endl;
                     graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id));
                     break;
                 case GraphicsObject::PLATFORM_TYPE:
@@ -227,11 +230,12 @@ int GameState::newCharacter()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
     int id = graphicsObjects.size();
-    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(100.f, 180.f), id));
+    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(100.f, 100.f), id)); // 100, 180
     return id;
 }
 
 void GameState::removeCharacter(int id)
 {
+    std::lock_guard<std::mutex> lock(stateMutex);
     graphicsObjects.remove(findObjById(id));
 }

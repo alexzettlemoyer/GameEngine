@@ -56,6 +56,7 @@ void GameRunner::deserialize(std::string data)
  */
 void GameRunner::drawGraphics()
 {
+    window.clear();
     window.draw(background);
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects()) {
         window.draw(*i);

@@ -61,12 +61,12 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
         else
         {
                 // get any inputs from the original message the clients sent
-            if (dataVector.size() > 1) 
+            if (dataVector.size() > 0) 
             {
-                // std::cout << dataVector[1] << " " << dataVector[2] << std::endl;
+                // std::cout << dataVector[1] << std::endl;
                 if (dataVector[1] != "9")
                 {
-                    std::lock_guard<std::mutex> lock(repMutex);
+                    // std::lock_guard<std::mutex> lock(repMutex);
                     GameState::getInstance() -> input(clientID, dataVector[1]);
                 }
             }
@@ -99,18 +99,19 @@ int main()
         // Publish loop to all clients
     while(true)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         if ( connections.size() > 0 )
         {
+            // std::lock_guard<std::mutex> lock(repMutex);
                 // update the gameState each iteration
             GameState::getInstance() -> updateGameState();
             std::string data = GameState::getInstance() -> serialize();
-            // std::cout << data << std::endl;
+            std::cout << data << std::endl;
 
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
         }
+
     }
     repThread.join();
     return 0;

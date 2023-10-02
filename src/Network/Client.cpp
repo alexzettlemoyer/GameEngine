@@ -1,9 +1,62 @@
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
+#include <thread>
+#include <mutex>
+#include <atomic>
 #include "../GameRunner/GameRunner.h"
 
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
+// std::atomic<InputType> event;
+// InputType event;
+std::mutex reqMutex;
+
+/**
+ * creates the input string to send to the client
+ *
+ * params: this clients' ID (the characters' id on the server), and the event found
+ * returns: the formatted input string
+ */
+std::string getInputString(std::string id, InputType eventT)
+{
+    return "" + id + " " + std::to_string(eventT);
+}
+
+/**
+ * request-reply socket thread function
+ * thread is started in the main function that runs the requestSocket function
+ *
+ * checks for input, which is handled by the main thread
+ *  - if there is input (an event or key press)
+ *  - format the input using getInputString
+ *  - send the request to the server via the reqSocket
+ *  - wait for a reply from the server confirming they received the request
+ *
+ * params:
+ *  - reqSocket, the rep-req socket to send requests to
+ *  - clientId, this clients' id assigned by the server on first connection
+ *  - event, a reference to the event variable which stores any input found in the main thread
+ * 
+ */
+void requestSocket(zmq::socket_t& reqSocket, std::string clientId, InputType& event)
+{
+    while (true)
+    {
+        // std::lock_guard<std::mutex> lock(reqMutex);
+        // std::cout << event << std::endl;
+        if (event != NONE)
+        {
+                // send input request
+            std::string inputData = getInputString(clientId, event);
+            zmq::message_t inputRequest(inputData.data(), inputData.size());
+            reqSocket.send(inputRequest, zmq::send_flags::none);
+
+                // wait to confirm the client received the request
+            zmq::message_t confirm;
+            zmq::recv_result_t result = reqSocket.recv(confirm, zmq::recv_flags::none);
+        }
+    }
+}
 
 /**
  * handles keyboard input from the user
@@ -24,18 +77,17 @@ InputType handleInput(sf::RenderWindow *window)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         return RIGHT;
 
-    sf::Event event;
-    while (window -> pollEvent(event))
+    sf::Event localEvent;
+    while (window -> pollEvent(localEvent))
     {
-        if (event.type == sf::Event::Closed)
+        if (localEvent.type == sf::Event::Closed)
         {
             window -> close();
             return CLOSE;
         }
-        else if (event.type == sf::Event::KeyPressed)
+        else if (localEvent.type == sf::Event::KeyPressed)
         {
-            // std::cout << event.key.code << std::endl;
-            switch (event.key.code)
+            switch (localEvent.key.code)
             {
                 case sf::Keyboard::Key::P:
                     return PAUSE;
@@ -55,19 +107,10 @@ InputType handleInput(sf::RenderWindow *window)
     return NONE;
 }
 
-/**
- * creates the input string to send to the client
- *
- * params: this clients' ID (the characters' id on the server), and the event found
- * returns: the formatted input string
- */
-std::string getInputString(std::string clientID, InputType event)
-{
-    return "" + clientID + " " + std::to_string(event);
-}
-
 int main ()
 {
+    InputType event = NONE;
+
     //  Prepare our context and socket
     zmq::context_t context(1);
     zmq::socket_t reqSocket(context, zmq::socket_type::req);
@@ -92,40 +135,47 @@ int main ()
         // get the connection number / client id from the reply
     int connectionNumber;
     memcpy(&connectionNumber, reply.data(), sizeof(int));
-    std::string clientID = std::to_string(connectionNumber);
+    std::string clientId = std::to_string(connectionNumber);
 
         // start the game window!
     GameRunner *game = GameRunner::getInstance();
     game -> drawGraphics();
 
-    // start thread for io handling ?
+    // start thread for io handling
+    std::thread reqThread(requestSocket, std::ref(reqSocket), clientId, std::ref(event));
 
         // wait for server messages
     while (game -> getWindow() -> isOpen())
     {
+
         zmq::message_t reply;
         zmq::recv_result_t result = subSocket.recv(reply, zmq::recv_flags::none);
 
         std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
+        std::cout << data << std::endl;
 
         game -> deserialize(data);
         game -> drawGraphics();
 
             // handle input
-        InputType event = handleInput(game -> getWindow());
+        {
+            std::lock_guard<std::mutex> lock(reqMutex);
+            event = handleInput(game -> getWindow());
+        }
 
             // if there is some input, send a request to the client
-        if ( event != NONE )
-        {
-                // send input request
-            std::string inputData = getInputString(clientID, event);
-            zmq::message_t inputRequest(inputData.data(), inputData.size());
-            reqSocket.send(inputRequest, zmq::send_flags::none);
+        // if ( event != NONE )
+        // {
+        //         // send input request
+        //     std::string inputData = getInputString(clientID, event);
+        //     zmq::message_t inputRequest(inputData.data(), inputData.size());
+        //     reqSocket.send(inputRequest, zmq::send_flags::none);
 
-                // wait to confirm the client received the request
-            zmq::message_t confirm;
-            result = reqSocket.recv(confirm, zmq::recv_flags::none);
-        }
+        //         // wait to confirm the client received the request
+        //     zmq::message_t confirm;
+        //     result = reqSocket.recv(confirm, zmq::recv_flags::none);
+        // }
     }
+    // reqThread.join();
     return 0;
 }

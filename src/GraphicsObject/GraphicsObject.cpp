@@ -7,7 +7,7 @@
 #include "../Time/Timeline.h"
 #include <iostream>
 
-const float displacement = .015f;
+const float displacement = .0015f;
 
 GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum)
 {
