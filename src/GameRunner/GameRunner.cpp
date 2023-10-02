@@ -19,12 +19,14 @@ std::atomic<bool> isGameRunning(true);
 
 static const std::string IMG_BACKGROUND = "images/background.jpeg";
 
-
-// Singleton GameRunner class
+/**
+ * Singleton GameRunner class
+ * creates the instance, window, and sets the background
+ */
 GameRunner::GameRunner()
     : window(sf::VideoMode(1000, 800), "Glennwood Mania", sf::Style::Default)
 {
-    window.setFramerateLimit(120);
+    window.setFramerateLimit(100);
 
         // setup background
     if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
@@ -40,11 +42,18 @@ GameRunner* GameRunner::getInstance()
     return instancePtr;
 }
 
+/**
+ * deserializes game state data using the gameState deserialize function
+ * used by the client to deserialize game state data (object positions)
+ */
 void GameRunner::deserialize(std::string data)
 {
     GameState::getInstance() -> deserialize( data );
 }
 
+/**
+ * draws all graphicsObjects on screen and displays the updates
+ */
 void GameRunner::drawGraphics()
 {
     window.draw(background);
@@ -57,9 +66,4 @@ void GameRunner::drawGraphics()
 sf::RenderWindow *GameRunner::getWindow()
 {
     return &window;
-}
-
-sf::RenderWindow *startGame()
-{
-    return NULL;
 }

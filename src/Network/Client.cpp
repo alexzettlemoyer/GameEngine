@@ -5,10 +5,16 @@
 
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
 
-InputType handleInput()
+/**
+ * handles keyboard input from the user
+ * checks for keypresses: up/space, down, left, right
+ * polls the window for keypressed events: close, P, 1, 2, 3
+ *
+ * parameter: the window to poll for events
+ * returns: the InputType found, or NONE
+ */
+InputType handleInput(sf::RenderWindow *window)
 {
-    // std::cout << "HANDLE" << std::endl;
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         return UP;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -18,12 +24,6 @@ InputType handleInput()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         return RIGHT;
 
-    return NONE;
-}
-
-InputType pollWindowEvent(sf::RenderWindow *window)
-{
-    // std::cout << "POLL EVENT" << std::endl;
     sf::Event event;
     while (window -> pollEvent(event))
     {
@@ -34,6 +34,7 @@ InputType pollWindowEvent(sf::RenderWindow *window)
         }
         else if (event.type == sf::Event::KeyPressed)
         {
+            // std::cout << event.key.code << std::endl;
             switch (event.key.code)
             {
                 case sf::Keyboard::Key::P:
@@ -54,9 +55,15 @@ InputType pollWindowEvent(sf::RenderWindow *window)
     return NONE;
 }
 
-std::string getInputString(std::string clientID, InputType event, InputType keys)
+/**
+ * creates the input string to send to the client
+ *
+ * params: this clients' ID (the characters' id on the server), and the event found
+ * returns: the formatted input string
+ */
+std::string getInputString(std::string clientID, InputType event)
 {
-    return "" + clientID + " " + std::to_string(event) + " " + std::to_string(keys);
+    return "" + clientID + " " + std::to_string(event);
 }
 
 int main ()
@@ -91,7 +98,7 @@ int main ()
     GameRunner *game = GameRunner::getInstance();
     game -> drawGraphics();
 
-    // start thread for io handling
+    // start thread for io handling ?
 
         // wait for server messages
     while (game -> getWindow() -> isOpen())
@@ -100,24 +107,18 @@ int main ()
         zmq::recv_result_t result = subSocket.recv(reply, zmq::recv_flags::none);
 
         std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
-        std::cout << data << std::endl;
 
         game -> deserialize(data);
         game -> drawGraphics();
 
             // handle input
-        InputType events = pollWindowEvent(game -> getWindow());
-        InputType keys = handleInput();
-
-        if ( events == CLOSE )
-            break;
+        InputType event = handleInput(game -> getWindow());
 
             // if there is some input, send a request to the client
-        if ( events != NONE && keys != NONE )
+        if ( event != NONE )
         {
-            std::cout << "INPUT" << std::endl;
                 // send input request
-            std::string inputData = getInputString(clientID, events, keys);
+            std::string inputData = getInputString(clientID, event);
             zmq::message_t inputRequest(inputData.data(), inputData.size());
             reqSocket.send(inputRequest, zmq::send_flags::none);
 

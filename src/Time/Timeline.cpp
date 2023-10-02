@@ -1,22 +1,21 @@
 #include <SFML/System/Clock.hpp>
 #include <cstddef>
+#include <mutex>
 #include "Timeline.h"
-#include <iostream>
 
 // TODO: 
-// - support an adjustable tic size
 // - enable anchoring your timeline to another, arbitrary timeline (or to some measure of real time)
 
+std::mutex timeMutex;
 
 // singleton TimeHandler instance
 Timeline* Timeline::instancePtr = nullptr;
-bool paused;
 
 // Singleton Time class
 Timeline::Timeline()
     {
         paused = false;
-        scale = 1.0;
+        ticSize = 1.0;
     }
 
 Timeline* Timeline::getInstance()
@@ -30,11 +29,13 @@ Timeline* Timeline::getInstance()
 
 void Timeline::updateDeltaTime()
 {
+    std::lock_guard<std::mutex> lock(timeMutex);
     dt = dt_clock.restart().asSeconds();
 }
 
 sf::Time Timeline::elapsedTime()
 {
+    std::lock_guard<std::mutex> lock(timeMutex);
     return dt_clock.getElapsedTime();
 }
 
@@ -43,28 +44,18 @@ float Timeline::getDt()
     return dt;
 }
 
-float Timeline::getScale()
+float Timeline::getTicSize()
 {
     // if the game is paused, the time scale is 0.0
     if (paused)
         return 0.0;
-    return scale;
+    return ticSize;
 }
 
-void Timeline::changeScale(SCALE s)
+void Timeline::editTicSize(float s)
 {
-    switch (s)
-    {
-        case SCALE_HALF:
-            scale = 0.5;
-            break;
-        case SCALE_REAL:
-            scale = 1.0;
-            break;
-        case SCALE_DOUBLE:
-            scale = 2.0;
-            break;
-    }
+    std::lock_guard<std::mutex> lock(timeMutex);
+    ticSize = s;
 }
 
 bool Timeline::isPaused()
@@ -77,6 +68,7 @@ bool Timeline::isPaused()
  */
 void Timeline::pause()
 {
+    std::lock_guard<std::mutex> lock(timeMutex);
     if (paused)
         paused = false;
     else

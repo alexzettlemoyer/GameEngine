@@ -40,7 +40,7 @@ void Character::left()
     float dt = Timeline::getInstance() -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (-displacement / dt) * Timeline::getInstance() -> getScale();
+        velocity.x += (-displacement / dt) * Timeline::getInstance() -> getTicSize();
     }
     updateMovement();
 }
@@ -49,7 +49,7 @@ void Character::up()
     float dt = Timeline::getInstance() -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y = (acceleration * dt) * Timeline::getInstance() -> getScale();
+        velocity.y = (acceleration * dt) * Timeline::getInstance() -> getTicSize();
     }
     updateMovement();
 }
@@ -58,7 +58,7 @@ void Character::right()
     float dt = Timeline::getInstance() -> getDt();
     { 
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (displacement / dt) * Timeline::getInstance() -> getScale();
+        velocity.x += (displacement / dt) * Timeline::getInstance() -> getTicSize();
     }
     updateMovement();
 }
@@ -67,7 +67,7 @@ void Character::down()
     float dt = Timeline::getInstance() -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (displacement / dt) * Timeline::getInstance() -> getScale();
+        velocity.y += (displacement / dt) * Timeline::getInstance() -> getTicSize();
     }
     updateMovement();
 }
@@ -98,7 +98,7 @@ void Character::updateMovement()
     if (!isGrounded())
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (GRAVITY * Timeline::getInstance() -> getDt()) * Timeline::getInstance() -> getScale();
+        velocity.y += (GRAVITY * Timeline::getInstance() -> getDt()) * Timeline::getInstance() -> getTicSize();
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);

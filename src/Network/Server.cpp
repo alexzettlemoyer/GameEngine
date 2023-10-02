@@ -8,7 +8,26 @@
 
 std::mutex repMutex;
 
-void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>& connections, int& nextConnection)
+/**
+ * reply-request socket function
+ * thread is started in the main function that runs the replySocket function
+ * 
+ * waits for requests from new clients
+ *  - new clients send a "REQ" message
+ *  - the gameState makes a new character and assigns it an id
+ *  - the reply to the client is its characters' id
+ * 
+ * waits for requests from existing clients
+ *  - takes the input string and decodes it
+ *  - calls the gameState's input function to apply the input to the clients' character
+ *  - sends a simple reply to the client to confirm the message was received
+ *
+ * params:
+ *  - repSocket, the rep-req socket to wait for requests from
+ *  - connections, the map of clients connected
+ *  
+ */
+void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>& connections)
 {
     while (true)
     {
@@ -44,22 +63,12 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
                 // get any inputs from the original message the clients sent
             if (dataVector.size() > 1) 
             {
+                // std::cout << dataVector[1] << " " << dataVector[2] << std::endl;
                 if (dataVector[1] != "9")
                 {
                     std::lock_guard<std::mutex> lock(repMutex);
                     GameState::getInstance() -> input(clientID, dataVector[1]);
                 }
-                if (dataVector[2] != "9")
-                {
-                    std::lock_guard<std::mutex> lock(repMutex);
-                    GameState::getInstance() -> input(clientID, dataVector[2]);
-                }
-            }
-
-            {
-                // update GameState: object movement
-                std::lock_guard<std::mutex> lock(repMutex);
-                GameState::getInstance() -> updateGameState();
             }
 
             // tell the client we received their update
@@ -83,22 +92,26 @@ int main()
 
         // maps client connection number to client loop counter
     std::unordered_map<std::string, int> connections;
-        // atomic counter to assign connection numbers
-    int nextConnection(1);
 
-    std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections), std::ref(nextConnection));
+        // thread to handle server replies
+    std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
 
         // Publish loop to all clients
     while(true)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        // update the gameState each iteration
-        GameState::getInstance() -> updateGameState();
-        std::string data = GameState::getInstance() -> serialize();
+        if ( connections.size() > 0 )
+        {
+                // update the gameState each iteration
+            GameState::getInstance() -> updateGameState();
+            std::string data = GameState::getInstance() -> serialize();
+            // std::cout << data << std::endl;
 
-        zmq::message_t iterationReply(data.data(), data.size());
-        pubSocket.send(iterationReply, zmq::send_flags::none);
+            zmq::message_t publishData(data.data(), data.size());
+            pubSocket.send(publishData, zmq::send_flags::none);
+        }
     }
+    repThread.join();
     return 0;
 }

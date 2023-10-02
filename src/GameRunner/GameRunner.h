@@ -23,6 +23,7 @@ class GameRunner
         sf::RenderWindow *getWindow();
         void drawGraphics();
         void deserialize(std::string data);
+        std::string getState();
 };
 
 #endif
