@@ -13,9 +13,9 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 // static sf::RenderWindow* window;
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .002f;            // .085
+static const float displacement = .005f;            // .085
 static const float acceleration = -750.f;           // m/s * s
-static const float GRAVITY = 700.f;                 // m/s * s   // 600
+static const float GRAVITY = 725.f;                 // m/s * s   // 600
 
 sf::Vector2f initialPosition;
 
@@ -132,7 +132,6 @@ bool Character::checkBounds()
     }
 
     //  if any of the objects collide
-    // for (std::shared_ptr<GraphicsObject> const& i : Draw::getInstance() -> graphicsObjects)
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
     {
         // check if the graphicsObject is this character

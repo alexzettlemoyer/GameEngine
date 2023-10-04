@@ -40,9 +40,6 @@ int main ()
 
         std::string serverMessage = std::string(static_cast<char*>(reply.data()), reply.size());
         std::cout << serverMessage;
-
-        // zmq::message_t request3(clientID.data(), clientID.size());
-        // reqSocket.send(request3, zmq::send_flags::none);
     }
     return 0;
 }

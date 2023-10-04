@@ -43,8 +43,7 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, InputType& ev
 
     while (true)
     {
-        // std::lock_guard<std::mutex> lock(reqMutex);
-        // std::cout << event << std::endl;
+        std::lock_guard<std::mutex> lock(reqMutex);
         if (event != NONE)
         {
                 // send input request
@@ -68,6 +67,8 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, InputType& ev
  * returns: the InputType found, or NONE
  */
 InputType handleInput(sf::RenderWindow *window)
+
+// TODO: make this a vector
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         return UP;
@@ -155,18 +156,17 @@ int main ()
         zmq::recv_result_t result = subSocket.recv(reply, zmq::recv_flags::none);
 
         std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
-        // std::cout << data << std::endl;
 
         game -> deserialize(data);
         game -> drawGraphics();
 
             // handle input
+        if ( game -> getWindow() -> hasFocus())
         {
             std::lock_guard<std::mutex> lock(reqMutex);
             event = handleInput(game -> getWindow());
         }
     }
     reqThread.join();
-    // dealerThread.join();
     return 0;
 }

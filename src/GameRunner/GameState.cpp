@@ -47,8 +47,6 @@ void GameState::setupGameState()
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 0, timeline));
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 1, timeline));
     graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 2, timeline));
-
-    // Timeline::getInstance() -> changeScale(0.0005);
 }
 
 /**

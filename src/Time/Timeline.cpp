@@ -5,9 +5,6 @@
 #include "Timeline.h"
 #include <iostream>
 
-// TODO: 
-// - enable anchoring your timeline to another, arbitrary timeline (or to some measure of real time)
-
 std::mutex timeMutex;
 
 Timeline::Timeline()
@@ -21,7 +18,6 @@ Timeline::Timeline()
 void Timeline::updateDeltaTime()
 {
     std::lock_guard<std::mutex> lock(timeMutex);
-
     if ( anchor == NULL )
     {
         std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
@@ -29,20 +25,15 @@ void Timeline::updateDeltaTime()
 
         lastTime = currentTime;
         dt = duration.count();
-        // std::cout << dt << std::endl;
     }
     else
-    {
         anchor -> updateDeltaTime();
-    }
 }
 
 float Timeline::getDt()
 {
     if (anchor != NULL)
-    {
         return anchor -> getDt();
-    }
     return dt;
 }
 

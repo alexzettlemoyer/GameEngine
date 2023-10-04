@@ -63,17 +63,13 @@ int main ()
     {
             //  do some 'work'
         std::this_thread::sleep_for(std::chrono::seconds(1));
-
-
         std::stringstream publishData;
         for (auto &c : connections )
         {
             c.second++;
             publishData << "Client " << c.first << ": Iteration " << std::to_string(c.second) + "\n";
         }
-
-        // std::cout << connections.size() << std::endl;
-
+        
         std::string publishString = publishData.str();
         zmq::message_t pubMessage(publishString.data(), publishString.size());
         pubSocket.send(pubMessage, zmq::send_flags::none);

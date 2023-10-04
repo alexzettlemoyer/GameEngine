@@ -42,13 +42,10 @@ void eraseObj(GraphicsObject &obj)
 {   
     // remove drawn pointer from list
     GameState::getInstance() -> removeObject(obj.identifier());
-    // (Draw::getInstance() -> graphicsObjects).remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
-    //     return ptr.get() == &obj;
-    // });
 }
 
 // x: 0
-// y: 0
+// y: 1
 bool collisionResponse(GraphicsObject &obj, int dir)
 {
     if ( dir == 0 )
@@ -75,7 +72,7 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         switch (obj.collisionTypeY)
         {
             case GraphicsObject::STOP_MOVEMENT:
-                stopMovement(obj, 1);
+                // stopMovement(obj, 1);
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
@@ -142,9 +139,13 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
                 collisionResponse(obj, 0);
             if ( other.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(other, 0);
+
+            if (obj.collisionTypeX == GraphicsObject::CHAR)
+                return false;
         }
         // y axis collision
-        else if ( width > height ) {}   // y collision - do nothing for now
+        else if ( width > height ) 
+        { }   // y collision - do nothing for now
         else {}                         // perfect x=y collision - do nothing for now
         
         return true;

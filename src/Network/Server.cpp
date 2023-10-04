@@ -63,12 +63,8 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
                 // get any inputs from the original message the clients sent
             if (dataVector.size() > 0) 
             {
-                // std::cout << dataVector[1] << std::endl;
                 if (dataVector[1] != "9")
-                {
-                    // std::lock_guard<std::mutex> lock(repMutex);
                     GameState::getInstance() -> input(clientID, dataVector[1]);
-                }
             }
 
             // tell the client we received their update
@@ -96,36 +92,20 @@ int main()
         // thread to handle server replies
     std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
 
-
-    std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-
-
         // Publish loop to all clients
-    while(true)             // displacement pixels / second
+    while(true)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(15));          // # of frames per millisecond
         if ( connections.size() > 0 )
         {
-            // std::lock_guard<std::mutex> lock(repMutex);
                 // update the gameState each iteration
             GameState::getInstance() -> updateGameState();
             std::string data = GameState::getInstance() -> serialize();
-            // std::cout << data << std::endl;
 
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
 
-        std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
-        std::chrono::duration<float> duration = currentTime - startTime;
-
-        startTime = currentTime;
-        float dt = duration.count();
-
-        // std::cout << dt << std::endl;
-
-
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
-
     }
     repThread.join();
     return 0;
