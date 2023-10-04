@@ -2,6 +2,7 @@
 #define PLATFORM_H
 
 #include "GraphicsObject.h"
+#include "../Time/Timeline.h"
 
 class Platform : public GraphicsObject
 {
@@ -9,7 +10,7 @@ class Platform : public GraphicsObject
         sf::Texture platformTexture;
     
     public: 
-        Platform(const sf::Vector2f& position, int idNum);
+        Platform(const sf::Vector2f& position, int idNum, Timeline* timeline);
         int getType() const override { return GraphicsObject::PLATFORM_TYPE; }
 };
 

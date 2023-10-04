@@ -3,11 +3,13 @@
 
 #include <SFML/Graphics.hpp>
 #include <mutex>
+#include "../Time/Timeline.h"
+
 
 class GraphicsObject : public sf::RectangleShape
 {
     public:
-        GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum);
+        GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline* timeline);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
         static const int CHARACTER_TYPE = 1;
         static const int PLATFORM_TYPE = 2;
@@ -36,6 +38,7 @@ class GraphicsObject : public sf::RectangleShape
         void updateMovement();
         void blockMove();
         bool loadTexture(sf::Texture& texture, const std::string& image);
+        Timeline *timeline;
 };
 
 #endif

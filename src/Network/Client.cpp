@@ -6,9 +6,9 @@
 #include <atomic>
 #include "../GameRunner/GameRunner.h"
 
+// 60 fps
+
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
-// std::atomic<InputType> event;
-// InputType event;
 std::mutex reqMutex;
 
 /**
@@ -40,6 +40,7 @@ std::string getInputString(std::string id, InputType eventT)
  */
 void requestSocket(zmq::socket_t& reqSocket, std::string clientId, InputType& event)
 {
+
     while (true)
     {
         // std::lock_guard<std::mutex> lock(reqMutex);
@@ -120,7 +121,6 @@ int main ()
 
     zmq::socket_t subSocket(context, zmq::socket_type::sub);
     subSocket.connect("tcp://localhost:5556");
-
     subSocket.set(zmq::sockopt::subscribe, "");
 
         // send inital request
@@ -132,10 +132,14 @@ int main ()
     zmq::message_t reply;
     zmq::recv_result_t result = reqSocket.recv(reply);
 
+
         // get the connection number / client id from the reply
     int connectionNumber;
     memcpy(&connectionNumber, reply.data(), sizeof(int));
     std::string clientId = std::to_string(connectionNumber);
+
+    std::cout << "id" << clientId << std::endl;
+
 
         // start the game window!
     GameRunner *game = GameRunner::getInstance();
@@ -147,12 +151,11 @@ int main ()
         // wait for server messages
     while (game -> getWindow() -> isOpen())
     {
-
         zmq::message_t reply;
         zmq::recv_result_t result = subSocket.recv(reply, zmq::recv_flags::none);
 
         std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
-        std::cout << data << std::endl;
+        // std::cout << data << std::endl;
 
         game -> deserialize(data);
         game -> drawGraphics();
@@ -162,20 +165,8 @@ int main ()
             std::lock_guard<std::mutex> lock(reqMutex);
             event = handleInput(game -> getWindow());
         }
-
-            // if there is some input, send a request to the client
-        // if ( event != NONE )
-        // {
-        //         // send input request
-        //     std::string inputData = getInputString(clientID, event);
-        //     zmq::message_t inputRequest(inputData.data(), inputData.size());
-        //     reqSocket.send(inputRequest, zmq::send_flags::none);
-
-        //         // wait to confirm the client received the request
-        //     zmq::message_t confirm;
-        //     result = reqSocket.recv(confirm, zmq::recv_flags::none);
-        // }
     }
-    // reqThread.join();
+    reqThread.join();
+    // dealerThread.join();
     return 0;
 }

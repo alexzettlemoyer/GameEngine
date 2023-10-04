@@ -21,8 +21,6 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
 	   $(BIN)/collider.o \
-	   $(BIN)/draw.o \
-	   $(BIN)/ioHandler.o \
 	   $(BIN)/gameState.o
 
 # main copilation

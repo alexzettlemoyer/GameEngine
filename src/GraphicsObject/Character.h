@@ -2,6 +2,8 @@
 #define CHARACTER_H
 
 #include "GraphicsObject.h"
+#include "../Time/Timeline.h"
+
 
 class Character : public GraphicsObject
 {
@@ -11,7 +13,7 @@ class Character : public GraphicsObject
         bool checkBounds();
 
     public:
-        Character(sf::Vector2f position, int idNum);
+        Character(sf::Vector2f position, int idNum, Timeline* timeline);
         void updateMovement();
         void left();
         void up();

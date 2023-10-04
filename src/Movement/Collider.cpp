@@ -6,6 +6,7 @@
 #include "../GraphicsObject/Character.h"
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
+#include "../GameRunner/GameState.h"
 
 sf::FloatRect nextPosition;
 std::mutex characterMutex;
@@ -40,9 +41,10 @@ void stopMovement(GraphicsObject &obj, int dir = -1)
 void eraseObj(GraphicsObject &obj)
 {   
     // remove drawn pointer from list
-    (Draw::getInstance() -> graphicsObjects).remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
-        return ptr.get() == &obj;
-    });
+    GameState::getInstance() -> removeObject(obj.identifier());
+    // (Draw::getInstance() -> graphicsObjects).remove_if([&obj](const std::shared_ptr<GraphicsObject>& ptr) {
+    //     return ptr.get() == &obj;
+    // });
 }
 
 // x: 0

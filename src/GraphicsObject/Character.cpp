@@ -13,15 +13,15 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 // static sf::RenderWindow* window;
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .085f;            // .085
+static const float displacement = .1f;            // .085
 static const float acceleration = -1850.f;       // m/s * s
-static const float GRAVITY = 600.f;            // m/s * s   // 600
+static const float GRAVITY = 1200.f;            // m/s * s   // 600
 
 sf::Vector2f initialPosition;
 
 // Constructor
-Character::Character(sf::Vector2f position, int idNum)
-    : GraphicsObject(SIZE_CHARACTER, position, false, idNum)
+Character::Character(sf::Vector2f position, int idNum, Timeline* timeline)
+    : GraphicsObject(SIZE_CHARACTER, position, false, idNum, timeline)
 {
     if (!loadTexture(characterTexture, IMG_CHARACTER.c_str()))
         {}          // TODO: handle error
@@ -32,37 +32,37 @@ Character::Character(sf::Vector2f position, int idNum)
 
 void Character::left()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (-displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.x += (-displacement / dt) * timeline -> getTicSize();
     }
     updateMovement();
 }
 void Character::up()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y = (acceleration * dt) * Timeline::getInstance() -> getTicSize();
+        velocity.y = (acceleration * dt) * timeline -> getTicSize();
     }
     updateMovement();
 }
 void Character::right()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     { 
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.x += (displacement / dt) * timeline -> getTicSize();
     }
     updateMovement();
 }
 void Character::down()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.y += (displacement / dt) * timeline -> getTicSize();
     }
     updateMovement();
 }
@@ -93,7 +93,7 @@ void Character::updateMovement()
     if (!isGrounded())
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (GRAVITY * Timeline::getInstance() -> getDt()) * Timeline::getInstance() -> getTicSize();
+        velocity.y += (GRAVITY * timeline -> getDt()) * timeline -> getTicSize();
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);

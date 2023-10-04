@@ -22,9 +22,9 @@ class GameState
         void setupGameState();
         void getState();
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
-        std::list<std::shared_ptr<Character>> getCharacters();
+        std::list<Character*> getCharacters();
         int newCharacter();
-        void removeCharacter(int id);
+        void removeObject(int id);
         std::string serialize();
         void deserialize(std::string data);
         void input(std::string objId, std::string i);

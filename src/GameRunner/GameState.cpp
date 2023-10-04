@@ -14,6 +14,7 @@
 
 std::mutex stateMutex;
 GameState* GameState::instancePtr = nullptr;
+Timeline* timeline;
 
 /**
  * Singleton game state instance
@@ -40,10 +41,12 @@ void GameState::setupGameState()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
 
+    timeline = new Timeline();
+
     // setup graphics objects: platforms and item
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 0));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 1));
-    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 2));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 0, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 1, timeline));
+    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 2, timeline));
 
     // Timeline::getInstance() -> changeScale(0.0005);
 }
@@ -59,7 +62,7 @@ void GameState::setupGameState()
  */
 void GameState::updateGameState()
 {
-    Timeline::getInstance() -> updateDeltaTime();
+    timeline -> updateDeltaTime();
 
         // the item should move clockwise, id = 2
     movementClockwise(*findObjById(2));
@@ -103,20 +106,20 @@ void GameState::input(std::string objId, std::string in)
             dynamic_cast<Character*>(findObjById(charId).get()) -> right();
             break;
         case 4:
-            Timeline::getInstance() -> editTicSize(Timeline::SCALE_HALF);
+            timeline -> editTicSize(Timeline::SCALE_HALF);
             break;
         case 5:
-            Timeline::getInstance() -> editTicSize(Timeline::SCALE_REAL);
+            timeline -> editTicSize(Timeline::SCALE_REAL);
             break;
         case 6:
-            Timeline::getInstance() -> editTicSize(Timeline::SCALE_DOUBLE);
+            timeline -> editTicSize(Timeline::SCALE_DOUBLE);
             break;
         case 7:
-            Timeline::getInstance() -> pause();
+            timeline -> pause();
             std::cout << "PAUSING" << std::endl;
             break;
         case 8:     // CLIENT WINDOW CLOSED -> remove their character
-            removeCharacter(charId);
+            removeObject(charId);
             break;
         default:
             // do nothing
@@ -173,7 +176,6 @@ void GameState::deserialize(std::string data)
     std::vector<std::string> objs = split(data, ']');
 
     // std::cout << data << std::endl;
-
     for ( std::string const& obj : objs )
     {
         std::vector<std::string> objData = split(obj, ' ');
@@ -189,13 +191,13 @@ void GameState::deserialize(std::string data)
             {
                 case GraphicsObject::CHARACTER_TYPE:
                     // std::cout << "NEW CHARACTER" << std::endl;
-                    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id));
+                    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
                     break;
                 case GraphicsObject::PLATFORM_TYPE:
-                    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id));
+                    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
                     break;
                 case GraphicsObject::ITEM_TYPE:
-                    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id));
+                    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
                     break;
                 default:
                     std::cout << "Error in deserialization: object cannot be created. id: " << id << std::endl;
@@ -204,6 +206,11 @@ void GameState::deserialize(std::string data)
         }
         else
             currentObj.get() -> setPosition( sf::Vector2f(stof(objData[2]), stof(objData[3])) );
+    }
+
+    if (objs.size() != graphicsObjects.size())
+    {
+        // TODO: an object was removed / added
     }
 }
 
@@ -230,12 +237,21 @@ int GameState::newCharacter()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
     int id = graphicsObjects.size();
-    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(100.f, 100.f), id)); // 100, 180
+    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(100.f, 0.f), id, timeline)); // 100, 180
     return id;
 }
 
-void GameState::removeCharacter(int id)
+void GameState::removeObject(int id)
 {
     std::lock_guard<std::mutex> lock(stateMutex);
     graphicsObjects.remove(findObjById(id));
+}
+
+std::list<Character*> GameState::getCharacters()
+{
+    std::list<Character*> characters;
+    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+        if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
+            characters.push_back((dynamic_cast<Character*>((i.get()))));
+    return characters;
 }

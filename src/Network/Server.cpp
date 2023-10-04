@@ -87,6 +87,9 @@ int main()
     zmq::socket_t repSocket(context, zmq::socket_type::rep);
     repSocket.bind("tcp://*:5555");
 
+    // zmq::socket_t routerSocket(context, zmq::socket_type::router);
+    // routerSocket.bind("tcp://*:5555");
+
     zmq::socket_t pubSocket(context, zmq::socket_type::pub);
     pubSocket.bind("tcp://*:5556");
 
@@ -94,25 +97,27 @@ int main()
     std::unordered_map<std::string, int> connections;
 
         // thread to handle server replies
+    // std::thread routerThread(route, std::ref(routerSocket), std::ref(connections));
     std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
 
         // Publish loop to all clients
-    while(true)
+    while(true)             // displacement pixels / second
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));          // # of frames per millisecond
         if ( connections.size() > 0 )
         {
             // std::lock_guard<std::mutex> lock(repMutex);
                 // update the gameState each iteration
             GameState::getInstance() -> updateGameState();
             std::string data = GameState::getInstance() -> serialize();
-            std::cout << data << std::endl;
+            // std::cout << data << std::endl;
 
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
         }
 
     }
+    // routerThread.join();
     repThread.join();
     return 0;
 }

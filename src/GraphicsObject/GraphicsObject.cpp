@@ -5,11 +5,12 @@
 #include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
+#include "../GameRunner/GameState.h"
 #include <iostream>
 
-const float displacement = .0015f;
+const float displacement = .02f;
 
-GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum)
+GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline *timeline)
 {
     this -> setSize(size);
     this -> setPosition(position);
@@ -19,6 +20,8 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     velocity.y = 0.f;
 
     id = idNum;
+
+    this -> timeline = timeline;
 }
 
 
@@ -57,44 +60,44 @@ sf::Vector2f GraphicsObject::getVelocity()
 
 void GraphicsObject::left()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (-displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.x += (-displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::up()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (-displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.y += (-displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::right()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.x += (displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
     updateMovement();
 }
 void GraphicsObject::down()
 {
-    float dt = Timeline::getInstance() -> getDt();
+    float dt = timeline -> getDt();
     if (dt != 0)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (displacement / dt) * Timeline::getInstance() -> getTicSize();
+        velocity.y += (displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
     updateMovement();
@@ -115,8 +118,11 @@ void GraphicsObject::updateMovement()
 
 bool GraphicsObject::checkBounds()
 {
-    if (checkCollision(*((Draw::getInstance() -> character).get()), *this))
-        return false;
+    for (Character* i : GameState::getInstance() -> getCharacters())
+    {
+        if (checkCollision(*i, *this))
+            return false;
+    }
     return true;
 }
 
