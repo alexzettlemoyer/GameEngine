@@ -60,12 +60,8 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
         }
         else
         {
-                // get any inputs from the original message the clients sent
-            if (dataVector.size() > 0) 
-            {
-                if (dataVector[1] != "9")
-                    GameState::getInstance() -> input(clientID, dataVector[1]);
-            }
+            for (int i = 1; i < dataVector.size(); i++)
+                GameState::getInstance() -> input(clientID, dataVector[i]);
 
             // tell the client we received their update
             std::string response = "R";
@@ -104,7 +100,7 @@ int main()
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            std::this_thread::sleep_for(std::chrono::milliseconds(15)); // 
         }
     }
     repThread.join();

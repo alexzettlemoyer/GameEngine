@@ -8,7 +8,7 @@
 #include "../GameRunner/GameState.h"
 #include <iostream>
 
-const float displacement = .02f;
+const float displacement = .03f;
 
 GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline *timeline)
 {
@@ -39,6 +39,7 @@ int GraphicsObject::identifier()
 
 sf::Vector2f GraphicsObject::getPosition()
 {
+    std::lock_guard<std::mutex> lock(this->objMutex);
     return sf::RectangleShape::getPosition();
 }
 
@@ -107,7 +108,7 @@ void GraphicsObject::blockMove()
 {
     std::lock_guard<std::mutex> lock(this->objMutex);
     velocity.x = 0.f;
-    velocity.y = 0.f;  
+    velocity.y = 0.f;
 }
 
 void GraphicsObject::updateMovement()
@@ -120,7 +121,7 @@ bool GraphicsObject::checkBounds()
 {
     for (Character* i : GameState::getInstance() -> getCharacters())
     {
-        if (checkCollision(*i, *this))
+        if (checkCollision(*this, *i))
             return false;
     }
     return true;

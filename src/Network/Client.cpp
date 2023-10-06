@@ -38,19 +38,25 @@ std::string getInputString(std::string id, InputType eventT)
  *  - event, a reference to the event variable which stores any input found in the main thread
  * 
  */
-void requestSocket(zmq::socket_t& reqSocket, std::string clientId, InputType& event)
+void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<InputType>& events)
 {
-
     while (true)
     {
-        std::lock_guard<std::mutex> lock(reqMutex);
-        if (event != NONE)
+        // std::lock_guard<std::mutex> lock(reqMutex);
+        if (events.size() > 0)
         {
+            std::string inputData = clientId;
+            for (InputType const& i: events)
+            {
+                inputData += " " + std::to_string(i);
+            }
+            // std::cout << inputData << std::endl;
+
                 // send input request
-            std::string inputData = getInputString(clientId, event);
             zmq::message_t inputRequest(inputData.data(), inputData.size());
             reqSocket.send(inputRequest, zmq::send_flags::none);
 
+            // std::cout << "3" << std::endl;
                 // wait to confirm the client received the request
             zmq::message_t confirm;
             zmq::recv_result_t result = reqSocket.recv(confirm, zmq::recv_flags::none);
@@ -66,18 +72,22 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, InputType& ev
  * parameter: the window to poll for events
  * returns: the InputType found, or NONE
  */
-InputType handleInput(sf::RenderWindow *window)
-
-// TODO: make this a vector
+std::list<InputType> handleInput(sf::RenderWindow *window)
 {
+    std::list<InputType> list;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        return UP;
+        list.push_back(UP);
+        // return UP;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        return DOWN;
+        list.push_back(DOWN);
+        // return DOWN;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        return LEFT;
+        list.push_back(LEFT);
+        // return LEFT;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        return RIGHT;
+        list.push_back(RIGHT);
+        // return RIGHT;
 
     sf::Event localEvent;
     while (window -> pollEvent(localEvent))
@@ -85,33 +95,38 @@ InputType handleInput(sf::RenderWindow *window)
         if (localEvent.type == sf::Event::Closed)
         {
             window -> close();
-            return CLOSE;
+            list.push_back(CLOSE);
+            // return CLOSE;
         }
         else if (localEvent.type == sf::Event::KeyPressed)
         {
             switch (localEvent.key.code)
             {
                 case sf::Keyboard::Key::P:
-                    return PAUSE;
+                    list.push_back(PAUSE);
+                    // return PAUSE;
                     break;
                 case sf::Keyboard::Key::Num1:
-                    return HALF;
+                    list.push_back(HALF);
+                    // return HALF;
                     break;
                 case sf::Keyboard::Key::Num2:
-                    return REAL;
+                    list.push_back(REAL);
+                    // return REAL;
                     break;
                 case sf::Keyboard::Key::Num3:
-                    return DOUBLE;
+                    list.push_back(DOUBLE);
+                    // return DOUBLE;
                     break;
             }
         }
     }
-    return NONE;
+    return list;
 }
 
 int main ()
 {
-    InputType event = NONE;
+    std::list<InputType> events;
 
     //  Prepare our context and socket
     zmq::context_t context(1);
@@ -141,13 +156,12 @@ int main ()
 
     std::cout << "id" << clientId << std::endl;
 
-
         // start the game window!
     GameRunner *game = GameRunner::getInstance();
     game -> drawGraphics();
 
     // start thread for io handling
-    std::thread reqThread(requestSocket, std::ref(reqSocket), clientId, std::ref(event));
+    std::thread reqThread(requestSocket, std::ref(reqSocket), clientId, std::ref(events));
 
         // wait for server messages
     while (game -> getWindow() -> isOpen())
@@ -163,8 +177,10 @@ int main ()
             // handle input
         if ( game -> getWindow() -> hasFocus())
         {
+            std::list inputList = handleInput(game -> getWindow());
+
             std::lock_guard<std::mutex> lock(reqMutex);
-            event = handleInput(game -> getWindow());
+            events = inputList;
         }
     }
     reqThread.join();

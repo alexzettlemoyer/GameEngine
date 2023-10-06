@@ -4,6 +4,7 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
+#include <set>
 #include "GameState.h"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
@@ -63,9 +64,14 @@ void GameState::updateGameState()
     timeline -> updateDeltaTime();
 
         // the item should move clockwise, id = 2
-    movementClockwise(*findObjById(2));
+    GraphicsObject* item = findObjById(2).get();
+    if (item != NULL )
+        movementClockwise(*findObjById(2));
+    
         // platform2 should move left right, id = 1
-    movementLeftRight(*findObjById(1));
+    GraphicsObject* platform2 = findObjById(1).get();
+    if (platform2 != NULL )
+        movementLeftRight(*findObjById(1));
 
         // update all the character movements
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
@@ -86,9 +92,7 @@ void GameState::input(std::string objId, std::string in)
     int charId = stoi(objId);
     int i = stoi(in);
 
-    std::cout << objId << " " << in << std::endl;
-
-    std::lock_guard<std::mutex> lock(stateMutex);
+    // std::lock_guard<std::mutex> lock(stateMutex);
     switch (i)
     {
         case 0:             // character jump
@@ -170,16 +174,16 @@ std::vector<std::string> GameState::split(const std::string& str, char delimiter
  */
 void GameState::deserialize(std::string data)
 {
-    std::lock_guard<std::mutex> lock(stateMutex);
     std::vector<std::string> objs = split(data, ']');
+    std::set<int> currentGameIds;
 
-    // std::cout << data << std::endl;
     for ( std::string const& obj : objs )
     {
         std::vector<std::string> objData = split(obj, ' ');
 
         // ignore objData[0] -> '['
         int id = stoi(objData[1]);
+        currentGameIds.insert(id);
         std::shared_ptr<GraphicsObject> currentObj = findObjById( id );
 
         // there is a new graphics object that this client hasn't stored yet
@@ -188,7 +192,6 @@ void GameState::deserialize(std::string data)
             switch(stoi(objData[4]))
             {
                 case GraphicsObject::CHARACTER_TYPE:
-                    // std::cout << "NEW CHARACTER" << std::endl;
                     graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
                     break;
                 case GraphicsObject::PLATFORM_TYPE:
@@ -206,9 +209,15 @@ void GameState::deserialize(std::string data)
             currentObj.get() -> setPosition( sf::Vector2f(stof(objData[2]), stof(objData[3])) );
     }
 
-    if (objs.size() != graphicsObjects.size())
+        // compare the ids given by the server to the current ids we have in our graphics object list
+    if ( currentGameIds.size() != graphicsObjects.size() )
     {
-        // TODO: an object was removed / added
+        for ( std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects() )
+        {
+            // found the object we need to remove
+            if ( currentGameIds.find(i->identifier()) == currentGameIds.end())
+                removeObject(i -> identifier());
+        }
     }
 }
 

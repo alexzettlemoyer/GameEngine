@@ -13,9 +13,9 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 // static sf::RenderWindow* window;
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .005f;            // .085
-static const float acceleration = -750.f;           // m/s * s
-static const float GRAVITY = 725.f;                 // m/s * s   // 600
+static const float displacement = .003f;            // .085             // 0.05
+static const float acceleration = -750.f;           // m/s * s          // - 750
+static const float GRAVITY = 730.f;                 // m/s * s   // 600
 
 sf::Vector2f initialPosition;
 
@@ -97,15 +97,13 @@ void Character::updateMovement()
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);
+
     this -> blockMove();
 }
 
 bool Character::checkBounds()
 {
-
     // window size = 1000x, 800y
-    // sf::Vector2u wSize = sf::Vector2u(1000, 800);
-    // sf::Vector2u wSize = (*window).getSize();
     sf::Vector2f position = sf::RectangleShape::getPosition();
     sf::Rect<float> thisRect = (*this).getGlobalBounds();
 
@@ -139,6 +137,5 @@ bool Character::checkBounds()
         if (i.get() -> identifier() != this -> identifier() && checkCollision(*this, *i))
             return true;
     }
-
     return false;
 }

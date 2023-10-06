@@ -7,6 +7,7 @@
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
 #include "../GameRunner/GameState.h"
+#include <iostream>
 
 sf::FloatRect nextPosition;
 std::mutex characterMutex;
@@ -72,7 +73,7 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         switch (obj.collisionTypeY)
         {
             case GraphicsObject::STOP_MOVEMENT:
-                // stopMovement(obj, 1);
+                stopMovement(obj, 1);
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
@@ -137,16 +138,15 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
             // handle the non character objects
             if ( obj.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(obj, 0);
+            else
+                return false;
             if ( other.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(other, 0);
-
-            if (obj.collisionTypeX == GraphicsObject::CHAR)
-                return false;
         }
         // y axis collision
         else if ( width > height ) 
         { }   // y collision - do nothing for now
-        else {}                         // perfect x=y collision - do nothing for now
+        else { }                         // perfect x=y collision - do nothing for now
         
         return true;
     }
