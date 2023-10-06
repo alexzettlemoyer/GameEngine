@@ -13,9 +13,9 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 // static sf::RenderWindow* window;
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .003f;            // .085             // 0.05
-static const float acceleration = -750.f;           // m/s * s          // - 750
-static const float GRAVITY = 730.f;                 // m/s * s   // 600
+static const float displacement = .002f;            // .085             // 0.05
+static const float acceleration = -530.f;           // m/s * s          // - 750
+static const float GRAVITY = 500.f;                 // m/s * s   // 600 // 730
 
 sf::Vector2f initialPosition;
 
