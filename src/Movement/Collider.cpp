@@ -54,16 +54,19 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         switch (obj.collisionTypeX)
         {
             case GraphicsObject::STOP_MOVEMENT:
+                std::cout << "Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 0);
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
+                std::cout << "Erase X: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
                 break;
             case GraphicsObject::NONE: 
                 break;
             default:
+                std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 1);
                 break;
         }
@@ -74,13 +77,16 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         {
             case GraphicsObject::STOP_MOVEMENT:
                 stopMovement(obj, 1);
+                std::cout << "Stop movement Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
+                std::cout << "Erase Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
                 break;
             default:
+                std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;
                 stopMovement(obj, 1);
                 break;
         }
@@ -138,8 +144,8 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
             // handle the non character objects
             if ( obj.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(obj, 0);
-            else
-                return false;
+            // else
+            //     return false;
             if ( other.collisionTypeX != GraphicsObject::CHAR )
                 collisionResponse(other, 0);
         }

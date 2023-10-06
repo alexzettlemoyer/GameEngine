@@ -121,10 +121,7 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
             }
         }
     }
-
-    std::lock_guard<std::mutex> lock(reqMutex);
-    events = list;
-    // return list;
+    return list;
 }
 
 int main ()
@@ -169,15 +166,6 @@ int main ()
         // wait for server messages
     while (game -> getWindow() -> isOpen())
     {
-        // handle input
-        bool windowOpen = game -> getWindow() -> hasFocus()
-        if ( windowOpen )
-        {
-            std::thread inputThread(handleInput, std::ref(game -> getWindow()), std::ref(events));
-            std::list inputList = handleInput(game -> getWindow());
-
-            // inputThread.join()
-        }
         zmq::message_t reply;
         zmq::recv_result_t result = subSocket.recv(reply, zmq::recv_flags::none);
 
@@ -186,8 +174,14 @@ int main ()
         game -> deserialize(data);
         game -> drawGraphics();
 
-        if ( windowOpen )
-            inputThread.join();
+            // handle input
+        if ( game -> getWindow() -> hasFocus())
+        {
+            std::list inputList = handleInput(game -> getWindow());
+
+            std::lock_guard<std::mutex> lock(reqMutex);
+            events = inputList;
+        }
     }
     reqThread.join();
     return 0;
