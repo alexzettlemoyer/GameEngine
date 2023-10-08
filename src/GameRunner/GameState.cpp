@@ -92,11 +92,13 @@ void GameState::input(std::string objId, std::string in)
     int charId = stoi(objId);
     int i = stoi(in);
 
-    // std::lock_guard<std::mutex> lock(stateMutex);
     switch (i)
     {
         case 0:             // character jump
+            // std::chrono::time_point<std::chrono::system_clock> time = std::chrono::system_clock::now();
             dynamic_cast<Character*>(findObjById(charId).get()) -> up();
+            // std::chrono::duration<float> duration = std::chrono::system_clock::now() - time;
+            // std::cout << duration.count() << std::endl;
             break;
         case 1:             // character down
             dynamic_cast<Character*>(findObjById(charId).get()) -> down();

@@ -54,19 +54,19 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         switch (obj.collisionTypeX)
         {
             case GraphicsObject::STOP_MOVEMENT:
-                std::cout << "Stop movement X: " << obj.identifier() << std::endl;
+                // std::cout << "Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 0);
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
-                std::cout << "Erase X: " << obj.identifier() << std::endl;
+                // std::cout << "Erase X: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
                 break;
             case GraphicsObject::NONE: 
                 break;
             default:
-                std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
+                // std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 1);
                 break;
         }
@@ -77,16 +77,16 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         {
             case GraphicsObject::STOP_MOVEMENT:
                 stopMovement(obj, 1);
-                std::cout << "Stop movement Y: " << obj.identifier() << std::endl;
+                // std::cout << "Stop movement Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
-                std::cout << "Erase Y: " << obj.identifier() << std::endl;
+                // std::cout << "Erase Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
                 break;
             default:
-                std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;
+                // std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;
                 stopMovement(obj, 1);
                 break;
         }

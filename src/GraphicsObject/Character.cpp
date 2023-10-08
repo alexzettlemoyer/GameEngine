@@ -136,7 +136,6 @@ bool Character::checkBounds()
         // if its not the same character (has the same ID), check for collisions
         if (i.get() -> identifier() != this -> identifier() && checkCollision(*this, *i))
         {
-            std::cout << "COLLIDING: " << i.get() -> identifier() << this -> identifier() << std::endl;
             return true;
         }
     }
