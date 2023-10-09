@@ -17,6 +17,8 @@ std::mutex stateMutex;
 GameState* GameState::instancePtr = nullptr;
 Timeline* timeline;
 
+int newCharacterId = 3;
+
 /**
  * Singleton game state instance
  * on instantiation, sets up the initial graphics objects using setupGameState
@@ -91,6 +93,8 @@ void GameState::input(std::string objId, std::string in)
 {
     int charId = stoi(objId);
     int i = stoi(in);
+
+    // std::cout << in << std::endl;
 
     switch (i)
     {
@@ -242,7 +246,7 @@ std::list<std::shared_ptr<GraphicsObject>> GameState::getGraphicsObjects()
 int GameState::newCharacter()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
-    int id = graphicsObjects.size();
+    int id = newCharacterId++;
     graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(100.f, 0.f), id, timeline)); // 100, 180
     return id;
 }

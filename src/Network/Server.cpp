@@ -60,6 +60,7 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
         }
         else
         {
+            // std::cout << "NEW LOOP" << std::endl;
             for (int i = 1; i < dataVector.size(); i++)
                 GameState::getInstance() -> input(clientID, dataVector[i]);
 
@@ -100,7 +101,8 @@ int main()
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(9)); // 
+            // std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 
+            std::this_thread::sleep_for(std::chrono::microseconds(9000));
         }
     }
     repThread.join();

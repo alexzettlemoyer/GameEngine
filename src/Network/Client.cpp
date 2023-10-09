@@ -12,17 +12,6 @@ enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE }
 std::mutex reqMutex;
 
 /**
- * creates the input string to send to the client
- *
- * params: this clients' ID (the characters' id on the server), and the event found
- * returns: the formatted input string
- */
-// std::string getInputString(std::string id, InputType eventT)
-// {
-//     return "" + id + " " + std::to_string(eventT);
-// }
-
-/**
  * request-reply socket thread function
  * thread is started in the main function that runs the requestSocket function
  *
@@ -51,12 +40,13 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
                 for (InputType const& i: events)
                 {
                     inputData += " " + std::to_string(i);
-                    // std::cout << inputData << std::endl;
                 }
+                events.clear();
                 // std::cout << "unlocking thread" << std::endl;
             }
             // std::cout << inputData << std::endl;
             // std::cout << "hereee" << std::endl;
+
 
                 // send input request
             zmq::message_t inputRequest(inputData.data(), inputData.size());
@@ -126,6 +116,7 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
             }
         }
     }
+    list.unique();
     return list;
 }
 
@@ -181,12 +172,20 @@ int main ()
             // handle input
         if ( game -> getWindow() -> hasFocus())
         {
+            // {
+            //     std::lock_guard<std::mutex> lock(reqMutex);
+            //     events.clear();
+            // }
+
             std::list inputList = handleInput(game -> getWindow());
+            // InputType input = handleInput(game -> getWindow());
 
             {
             // std::cout << "locking main" << std::endl;
             std::lock_guard<std::mutex> lock(reqMutex);
             events = inputList;
+            // if ( input != NONE )
+            //     events.push_back(input);
             // std::cout << "unlocking main" << std::endl;
             }
         }
