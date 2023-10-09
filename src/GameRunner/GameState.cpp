@@ -95,10 +95,7 @@ void GameState::input(std::string objId, std::string in)
     switch (i)
     {
         case 0:             // character jump
-            // std::chrono::time_point<std::chrono::system_clock> time = std::chrono::system_clock::now();
             dynamic_cast<Character*>(findObjById(charId).get()) -> up();
-            // std::chrono::duration<float> duration = std::chrono::system_clock::now() - time;
-            // std::cout << duration.count() << std::endl;
             break;
         case 1:             // character down
             dynamic_cast<Character*>(findObjById(charId).get()) -> down();
@@ -120,7 +117,7 @@ void GameState::input(std::string objId, std::string in)
             break;
         case 7:
             timeline -> pause();
-            std::cout << "PAUSING" << std::endl;
+            std::cout << (timeline->isPaused() ? "PAUSING" : "UNPAUSING") << std::endl;
             break;
         case 8:     // CLIENT WINDOW CLOSED -> remove their character
             removeObject(charId);

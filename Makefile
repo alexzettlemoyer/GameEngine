@@ -84,14 +84,14 @@ $(BIN)/server.o: $(SRC)/Network/Server.cpp
 	g++ -c $< -o $@
 
 gameServer: $(OBJ_FILES) $(BIN)/server.o
-	g++ $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
+	g++ -g $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
 
 
 $(BIN)/client.o: $(SRC)/Network/Client.cpp
 	g++ -c $< -o $@
 
 gameClient: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
-	g++ $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o gameClient $(LIBS)
+	g++ -g $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o gameClient $(LIBS)
 
 # debugging game
 # game -d: $(OBJS)

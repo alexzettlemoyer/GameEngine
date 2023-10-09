@@ -134,9 +134,10 @@ bool Character::checkBounds()
     {
         // check if the graphicsObject is this character
         // if its not the same character (has the same ID), check for collisions
-        if (i.get() -> identifier() != this -> identifier() && checkCollision(*this, *i))
+        if (i.get() -> identifier() != this -> identifier())
         {
-            return true;
+            checkCollision(*this, *i);
+            // return true;
         }
     }
     return false;

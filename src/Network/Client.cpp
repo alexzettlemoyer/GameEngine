@@ -17,10 +17,10 @@ std::mutex reqMutex;
  * params: this clients' ID (the characters' id on the server), and the event found
  * returns: the formatted input string
  */
-std::string getInputString(std::string id, InputType eventT)
-{
-    return "" + id + " " + std::to_string(eventT);
-}
+// std::string getInputString(std::string id, InputType eventT)
+// {
+//     return "" + id + " " + std::to_string(eventT);
+// }
 
 /**
  * request-reply socket thread function
@@ -42,21 +42,26 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
 {
     while (true)
     {
-        // std::lock_guard<std::mutex> lock(reqMutex);
         if (events.size() > 0)
         {
             std::string inputData = clientId;
-            for (InputType const& i: events)
             {
-                inputData += " " + std::to_string(i);
+                // std::cout << "locking thread" << std::endl;
+                std::lock_guard<std::mutex> lock(reqMutex);
+                for (InputType const& i: events)
+                {
+                    inputData += " " + std::to_string(i);
+                    // std::cout << inputData << std::endl;
+                }
+                // std::cout << "unlocking thread" << std::endl;
             }
             // std::cout << inputData << std::endl;
+            // std::cout << "hereee" << std::endl;
 
                 // send input request
             zmq::message_t inputRequest(inputData.data(), inputData.size());
             reqSocket.send(inputRequest, zmq::send_flags::none);
 
-            // std::cout << "3" << std::endl;
                 // wait to confirm the client received the request
             zmq::message_t confirm;
             zmq::recv_result_t result = reqSocket.recv(confirm, zmq::recv_flags::none);
@@ -103,8 +108,8 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
             switch (localEvent.key.code)
             {
                 case sf::Keyboard::Key::P:
+                    std::cout << "P" << std::endl;
                     list.push_back(PAUSE);
-                    // return PAUSE;
                     break;
                 case sf::Keyboard::Key::Num1:
                     list.push_back(HALF);
@@ -148,7 +153,6 @@ int main ()
     zmq::message_t reply;
     zmq::recv_result_t result = reqSocket.recv(reply);
 
-
         // get the connection number / client id from the reply
     int connectionNumber;
     memcpy(&connectionNumber, reply.data(), sizeof(int));
@@ -179,8 +183,12 @@ int main ()
         {
             std::list inputList = handleInput(game -> getWindow());
 
+            {
+            // std::cout << "locking main" << std::endl;
             std::lock_guard<std::mutex> lock(reqMutex);
             events = inputList;
+            // std::cout << "unlocking main" << std::endl;
+            }
         }
     }
     reqThread.join();

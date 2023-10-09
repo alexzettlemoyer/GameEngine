@@ -49,6 +49,7 @@ void eraseObj(GraphicsObject &obj)
 // y: 1
 bool collisionResponse(GraphicsObject &obj, int dir)
 {
+    // x collision
     if ( dir == 0 )
     {
         switch (obj.collisionTypeX)
@@ -65,12 +66,16 @@ bool collisionResponse(GraphicsObject &obj, int dir)
                 break;
             case GraphicsObject::NONE: 
                 break;
+            case GraphicsObject::CHAR:
+                stopMovement(obj, 0);
+                break;
             default:
                 // std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
-                stopMovement(obj, 1);
+                stopMovement(obj, 0);
                 break;
         }
     }
+    // y collision
     else if ( dir == 1 )
     {
         switch (obj.collisionTypeY)
@@ -84,6 +89,8 @@ bool collisionResponse(GraphicsObject &obj, int dir)
                 // std::cout << "Erase Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
+                break;
+            case GraphicsObject::CHAR:
                 break;
             default:
                 // std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;
@@ -141,17 +148,15 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
         // x axis collision
         if ( width < height )
         {
-            // handle the non character objects
-            if ( obj.collisionTypeX != GraphicsObject::CHAR )
-                collisionResponse(obj, 0);
-            // else
-            //     return false;
-            if ( other.collisionTypeX != GraphicsObject::CHAR )
-                collisionResponse(other, 0);
+            collisionResponse(obj, 0);
+            collisionResponse(other, 0);
         }
         // y axis collision
         else if ( width > height ) 
-        { }   // y collision - do nothing for now
+        { 
+            collisionResponse(obj, 1);
+            collisionResponse(other, 1);
+        }   // y collision - do nothing for now
         else { }                         // perfect x=y collision - do nothing for now
         
         return true;
