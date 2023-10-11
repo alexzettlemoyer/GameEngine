@@ -13,7 +13,7 @@ static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(154.f, 340.f);
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
 static const float displacement = .085f;
-static const float acceleration = -1500.f;
+static const float acceleration = -1600.f;
 static const float GRAVITY = 300.f;
 
 sf::Vector2f initialPosition;
@@ -69,7 +69,6 @@ void Character::down()
 bool Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
-    // for (std::shared_ptr<GraphicsObject> const& i : Draw::getInstance() -> graphicsObjects)
     for (std::shared_ptr<GraphicsObject> const& i : (GameState::getInstance() -> getGraphicsObjects()))
     {
         if (i -> isGround() && isCharacterGrounded(*this, *i))

@@ -34,18 +34,13 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
         {
             std::string inputData = clientId;
             {
-                // std::cout << "locking thread" << std::endl;
                 std::lock_guard<std::mutex> lock(reqMutex);
                 for (InputType const& i: events)
                 {
                     inputData += " " + std::to_string(i);
                 }
                 events.clear();
-                // std::cout << "unlocking thread" << std::endl;
             }
-            // std::cout << inputData << std::endl;
-            // std::cout << "hereee" << std::endl;
-
 
                 // send input request
             zmq::message_t inputRequest(inputData.data(), inputData.size());
@@ -72,16 +67,12 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         list.push_back(UP);
-        // return UP;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         list.push_back(DOWN);
-        // return DOWN;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         list.push_back(LEFT);
-        // return LEFT;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         list.push_back(RIGHT);
-        // return RIGHT;
 
     sf::Event localEvent;
     while (window -> pollEvent(localEvent))
@@ -90,7 +81,6 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
         {
             window -> close();
             list.push_back(CLOSE);
-            // return CLOSE;
         }
         else if (localEvent.type == sf::Event::KeyPressed)
         {
@@ -102,15 +92,12 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
                     break;
                 case sf::Keyboard::Key::Num1:
                     list.push_back(HALF);
-                    // return HALF;
                     break;
                 case sf::Keyboard::Key::Num2:
                     list.push_back(REAL);
-                    // return REAL;
                     break;
                 case sf::Keyboard::Key::Num3:
                     list.push_back(DOUBLE);
-                    // return DOUBLE;
                     break;
             }
         }
@@ -131,10 +118,8 @@ int main ()
     reqSocket.connect("tcp://localhost:5555");
 
     zmq::socket_t subSocket(context, zmq::socket_type::sub);
-    subSocket.set(zmq::sockopt::conflate, 1);
+    subSocket.set(zmq::sockopt::conflate, 1);       // CONFLATE OPTION FOR SUB SOCKET
 
-    // zmq::zmq_set_sockopt()''
-    // zmq::socket_t.setOption subscriber (ZMQ.CONFLATE, 1)
     subSocket.connect("tcp://localhost:5556");
     subSocket.set(zmq::sockopt::subscribe, "");
 
