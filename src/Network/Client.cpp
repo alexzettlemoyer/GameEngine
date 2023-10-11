@@ -7,7 +7,6 @@
 #include "../GameRunner/GameRunner.h"
 
 // 60 fps
-
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
 std::mutex reqMutex;
 
@@ -132,6 +131,10 @@ int main ()
     reqSocket.connect("tcp://localhost:5555");
 
     zmq::socket_t subSocket(context, zmq::socket_type::sub);
+    subSocket.set(zmq::sockopt::conflate, 1);
+
+    // zmq::zmq_set_sockopt()''
+    // zmq::socket_t.setOption subscriber (ZMQ.CONFLATE, 1)
     subSocket.connect("tcp://localhost:5556");
     subSocket.set(zmq::sockopt::subscribe, "");
 
@@ -172,21 +175,10 @@ int main ()
             // handle input
         if ( game -> getWindow() -> hasFocus())
         {
-            // {
-            //     std::lock_guard<std::mutex> lock(reqMutex);
-            //     events.clear();
-            // }
-
             std::list inputList = handleInput(game -> getWindow());
-            // InputType input = handleInput(game -> getWindow());
-
             {
-            // std::cout << "locking main" << std::endl;
-            std::lock_guard<std::mutex> lock(reqMutex);
-            events = inputList;
-            // if ( input != NONE )
-            //     events.push_back(input);
-            // std::cout << "unlocking main" << std::endl;
+                std::lock_guard<std::mutex> lock(reqMutex);
+                events = inputList;
             }
         }
     }

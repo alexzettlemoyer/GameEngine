@@ -112,12 +112,15 @@ void GameState::input(std::string objId, std::string in)
             break;
         case 4:
             timeline -> editTicSize(Timeline::SCALE_HALF);
+            std::cout << "HALF" << std::endl;
             break;
         case 5:
             timeline -> editTicSize(Timeline::SCALE_REAL);
+            std::cout << "REAL" << std::endl;
             break;
         case 6:
             timeline -> editTicSize(Timeline::SCALE_DOUBLE);
+            std::cout << "DOUBLE" << std::endl;
             break;
         case 7:
             timeline -> pause();

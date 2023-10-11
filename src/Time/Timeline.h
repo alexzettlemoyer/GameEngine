@@ -17,14 +17,15 @@ class Timeline
 
     public:
         Timeline();
-        enum SCALE { SCALE_HALF, SCALE_REAL, SCALE_DOUBLE };
+        static constexpr double SCALE_HALF = 0.5;
+        static constexpr double SCALE_REAL = 1.0;
+        static constexpr double SCALE_DOUBLE = 2.0;
         static Timeline *getInstance();
         void pause();
         bool isPaused();
         float getDt();
         float getTicSize();
         void editTicSize(float s);
-        // sf::Time elapsedTime();
         void updateDeltaTime();
         void setAnchor(Timeline* anchor);
 };

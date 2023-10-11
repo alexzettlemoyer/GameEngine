@@ -48,6 +48,8 @@ float Timeline::getTicSize()
 
 void Timeline::editTicSize(float s)
 {
+    std::cout << s << std::endl;
+
     std::lock_guard<std::mutex> lock(timeMutex);
     ticSize = s;
 }

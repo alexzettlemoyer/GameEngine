@@ -95,7 +95,7 @@ gameClient: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
 
 
 debugServer: $(OBJ_FILES) $(BIN)/server.o
-	g++ -g $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
+	g++ -pg $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
 
 debugClient: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
 	g++ -g $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o gameClient $(LIBS)

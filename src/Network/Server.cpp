@@ -101,8 +101,8 @@ int main()
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
 
-            // std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 
-            std::this_thread::sleep_for(std::chrono::microseconds(9000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(8));
+            // std::this_thread::sleep_for(std::chrono::microseconds(9000));
         }
     }
     repThread.join();
