@@ -8,7 +8,7 @@
 #include "../GameRunner/GameState.h"
 #include <iostream>
 
-const float displacement = .03f;
+const float displacement = .025f;
 
 GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline *timeline)
 {

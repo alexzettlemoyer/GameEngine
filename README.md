@@ -2,14 +2,10 @@
 
 ## COMPILE & RUN INSTRUCTIONS: 
 
-**Game**
-* from the project directory run `make game`
-* to run the game enter ./game
-
 **Networking Basics**
-* from the Network directory run `make server`
+* from the Network_Basics directory run `make server`
 * to start the server enter ./server
-* from the Network directory run `make client`
+* from the Network_Basics directory run `make client`
 * to start the client enter ./client
 
 **Networking Game**
