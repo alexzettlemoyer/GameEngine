@@ -14,6 +14,7 @@ Platform::Platform(const sf::Vector2f& position, int idNum, Timeline* timeline)
     
     // Constructor
     this -> setTexture(&platformTexture);
+    this -> setPosition(position);
     collisionTypeX = STOP_MOVEMENT;
     collisionTypeY = NONE;
 }

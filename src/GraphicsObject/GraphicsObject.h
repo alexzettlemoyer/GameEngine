@@ -10,10 +10,11 @@ class GraphicsObject : public sf::RectangleShape
 {
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline* timeline);
-        enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, NONE };
+        enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, DEATH, NONE };
         static const int CHARACTER_TYPE = 1;
         static const int PLATFORM_TYPE = 2;
         static const int ITEM_TYPE = 3;
+        static const int DEATHZONE_TYPE = 4;
         CollisionType collisionTypeX;
         CollisionType collisionTypeY;
         sf::Vector2f velocity;

@@ -12,6 +12,7 @@ Item::Item(const sf::Vector2f& position, int idNum, Timeline* timeline)
     if (!loadTexture(moneyTexture, IMG_MONEY.c_str()))
         { }                   // TODO: handle error
     this -> setTexture(&moneyTexture);
+    this -> setPosition(position);
     collisionTypeX = ERASE;
     collisionTypeY = ERASE;
 }

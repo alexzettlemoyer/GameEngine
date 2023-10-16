@@ -5,6 +5,8 @@
 #include <string>
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
+#include "../GraphicsObject/DeathZone.h"
+
 
 class GameState
 {
@@ -12,6 +14,7 @@ class GameState
         GameState();
         static GameState *instancePtr;
         float timescale;
+        std::shared_ptr<DeathZone> deathZone;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
         std::shared_ptr<GraphicsObject> findObjById(int id);
 
@@ -23,6 +26,7 @@ class GameState
         void getState();
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
         std::list<Character*> getCharacters();
+        std::shared_ptr<DeathZone> getDeathZone();
         int newCharacter();
         void removeObject(int id);
         std::string serialize();

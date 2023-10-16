@@ -19,7 +19,7 @@ static const float GRAVITY = 300.f;
 sf::Vector2f initialPosition;
 
 // Constructor
-Character::Character(sf::Vector2f position, int idNum, Timeline* timeline)
+Character::Character(sf::Vector2f position, int idNum, Timeline* timeline, SpawnPoint *spawnPoint)
     : GraphicsObject(SIZE_CHARACTER, position, false, idNum, timeline)
 {
     if (!loadTexture(characterTexture, IMG_CHARACTER.c_str()))
@@ -27,6 +27,7 @@ Character::Character(sf::Vector2f position, int idNum, Timeline* timeline)
     this -> setTexture(&characterTexture);
     this -> collisionTypeX = CHAR;
     this -> collisionTypeY = CHAR;
+    this -> spawnPoint = spawnPoint;
 }
 
 void Character::left()
@@ -75,7 +76,6 @@ bool Character::isGrounded()
             return true;
     }
 
-    // sf::Vector2u wSize = (*window).getSize();
     sf::FloatRect characterBounds = this -> getGlobalBounds();
 
     // if bottom x coordinate of character is below top x coordinate of window
@@ -135,8 +135,10 @@ bool Character::checkBounds()
         if (i.get() -> identifier() != this -> identifier())
         {
             checkCollision(*this, *i);
-            // return true;
         }
     }
+
+    checkCollision(*this, *(GameState::getInstance() -> getDeathZone()));
+
     return false;
 }

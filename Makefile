@@ -6,6 +6,7 @@ OBJS = $(BIN)/time.o \
 	   $(BIN)/thread.o \
 	   $(BIN)/mover.o \
 	   $(BIN)/graphicsObject.o \
+	   $(BIN)/spawnPoint.o \
 	   $(BIN)/item.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
@@ -17,6 +18,8 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/thread.o \
 	   $(BIN)/mover.o \
 	   $(BIN)/graphicsObject.o \
+	   $(BIN)/spawnPoint.o \
+	   $(BIN)/deathZone.o \
 	   $(BIN)/item.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
@@ -49,6 +52,14 @@ $(BIN)/mover.o: $(SRC)/Movement/Mover.cpp
 
 # GraphicsObject
 $(BIN)/graphicsObject.o: $(SRC)/GraphicsObject/GraphicsObject.cpp
+	g++ -c $< -o $@
+
+# SpawnPoint
+$(BIN)/spawnPoint.o: $(SRC)/GraphicsObject/SpawnPoint.cpp
+	g++ -c $< -o $@
+
+# DeathZone
+$(BIN)/deathZone.o: $(SRC)/GraphicsObject/DeathZone.cpp
 	g++ -c $< -o $@
 
 # character

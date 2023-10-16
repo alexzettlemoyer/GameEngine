@@ -69,6 +69,9 @@ bool collisionResponse(GraphicsObject &obj, int dir)
             case GraphicsObject::CHAR:
                 stopMovement(obj, 0);
                 break;
+            case GraphicsObject::DEATH:
+                std::cout << "DEATH X" << std::endl;
+                break;
             default:
                 // std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 0);
@@ -82,15 +85,16 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         {
             case GraphicsObject::STOP_MOVEMENT:
                 stopMovement(obj, 1);
-                // std::cout << "Stop movement Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
-                // std::cout << "Erase Y: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
                 break;
             case GraphicsObject::CHAR:
+                break;
+            case GraphicsObject::DEATH:
+                std::cout << "DEATH Y " << obj.identifier() << std::endl;
                 break;
             default:
                 // std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;
@@ -145,20 +149,18 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
         float width = intersection.width;
         float height = intersection.height;
 
+        int collisionDir;
         // x axis collision
         if ( width < height )
-        {
-            collisionResponse(obj, 0);
-            collisionResponse(other, 0);
-        }
+            collisionDir = 0;
         // y axis collision
         else if ( width > height ) 
-        { 
-            collisionResponse(obj, 1);
-            collisionResponse(other, 1);
-        }   // y collision - do nothing for now
+            collisionDir = 1;           // y collision - do nothing for now
         else { }                         // perfect x=y collision - do nothing for now
         
+        collisionResponse(obj, collisionDir);
+        collisionResponse(other, collisionDir);
+
         return true;
     }
     
