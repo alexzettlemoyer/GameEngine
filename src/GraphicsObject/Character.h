@@ -12,6 +12,7 @@ class Character : public GraphicsObject
         sf::Texture characterTexture;
         bool isGrounded();
         bool checkBounds();
+        void respawn();
         SpawnPoint *spawnPoint;
 
     public:

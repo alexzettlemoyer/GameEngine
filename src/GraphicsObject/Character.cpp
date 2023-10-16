@@ -99,6 +99,12 @@ void Character::updateMovement()
     this -> blockMove();
 }
 
+void Character::respawn()
+{
+    this -> spawnPoint = new SpawnPoint();
+    this -> setPosition(spawnPoint -> getPosition());
+}
+
 bool Character::checkBounds()
 {
     // window size = 1000x, 800y
@@ -138,7 +144,11 @@ bool Character::checkBounds()
         }
     }
 
-    checkCollision(*this, *(GameState::getInstance() -> getDeathZone()));
-
+        // check if we're colliding with the death zone
+    if (checkCollision(*this, *(GameState::getInstance() -> getDeathZone())))
+    {
+        respawn();
+        return false;
+    }
     return false;
 }
