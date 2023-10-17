@@ -23,10 +23,12 @@ static const std::string IMG_BACKGROUND = "images/background.jpeg";
  * Singleton GameRunner class
  * creates the instance, window, and sets the background
  */
-GameRunner::GameRunner()
+GameRunner::GameRunner(int clientId)
     : window(sf::VideoMode(1000, 800), "Glennwood Mania", sf::Style::Default)
 {
+    this -> characterId = clientId = clientId;
     window.setFramerateLimit(100);
+    window.setView(view);
 
         // setup background
     if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
@@ -35,10 +37,10 @@ GameRunner::GameRunner()
     background.setTexture(backgroundTexture);
 }
 
-GameRunner* GameRunner::getInstance()
+GameRunner* GameRunner::getInstance(int id)
 {
     if ( instancePtr == NULL )
-        { instancePtr = new GameRunner(); }
+        { instancePtr = new GameRunner(id); }
     return instancePtr;
 }
 
@@ -57,6 +59,19 @@ void GameRunner::deserialize(std::string data)
 void GameRunner::drawGraphics()
 {
     window.clear();
+
+    std::shared_ptr<GraphicsObject> obj = GameState::getInstance() -> findObjById(characterId);
+    if ( obj )
+    {
+        std::shared_ptr<Character> character = std::dynamic_pointer_cast<Character>( obj );
+        if ( character )
+        {
+            view.setCenter(sf::Vector2f(character.get() -> getPosition().x, 400.f));
+        }
+    }
+    window.setView(view);
+
+    // window.setView(view);
     window.draw(background);
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects()) {
         window.draw(*i);

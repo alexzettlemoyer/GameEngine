@@ -140,7 +140,7 @@ int main ()
     std::cout << "id" << clientId << std::endl;
 
         // start the game window!
-    GameRunner *game = GameRunner::getInstance();
+    GameRunner *game = GameRunner::getInstance(std::stoi(clientId));
     game -> drawGraphics();
 
     // start thread for io handling

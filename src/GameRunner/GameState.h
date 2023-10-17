@@ -6,6 +6,7 @@
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/DeathZone.h"
+#include "../GraphicsObject/SideBoundary.h"
 
 
 class GameState
@@ -15,8 +16,8 @@ class GameState
         static GameState *instancePtr;
         float timescale;
         std::shared_ptr<DeathZone> deathZone;
+        std::list<std::shared_ptr<SideBoundary>> sideBoundaries;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
-        std::shared_ptr<GraphicsObject> findObjById(int id);
 
     public:
         static GameState* getInstance();
@@ -27,11 +28,13 @@ class GameState
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
         std::list<Character*> getCharacters();
         std::shared_ptr<DeathZone> getDeathZone();
+        std::shared_ptr<SideBoundary> getSideBoundaries();
         int newCharacter();
         void removeObject(int id);
         std::string serialize();
         void deserialize(std::string data);
         void input(std::string objId, std::string i);
+        std::shared_ptr<GraphicsObject> findObjById(int id);
 };
 
 #endif

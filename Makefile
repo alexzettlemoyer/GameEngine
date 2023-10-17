@@ -2,44 +2,20 @@ LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq
 SRC=src
 BIN=bin
 
-OBJS = $(BIN)/time.o \
-	   $(BIN)/thread.o \
-	   $(BIN)/mover.o \
-	   $(BIN)/graphicsObject.o \
-	   $(BIN)/spawnPoint.o \
-	   $(BIN)/item.o \
-	   $(BIN)/platform.o \
-	   $(BIN)/character.o \
-	   $(BIN)/collider.o \
-	   $(BIN)/draw.o \
-	   $(BIN)/ioHandler.o \
-
 OBJ_FILES = $(BIN)/time.o \
-	   $(BIN)/thread.o \
 	   $(BIN)/mover.o \
 	   $(BIN)/graphicsObject.o \
 	   $(BIN)/spawnPoint.o \
 	   $(BIN)/deathZone.o \
+	   $(BIN)/sideBoundary.o \
 	   $(BIN)/item.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
 	   $(BIN)/collider.o \
 	   $(BIN)/gameState.o
 
-# main copilation
-$(BIN)/main.o: $(SRC)/main.cpp
-	g++ -c $< -o $@
-
-# draw compilation
-$(BIN)/draw.o: $(SRC)/Draw/draw.cpp
-	g++ -c $< -o $@
-
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
-	g++ -c $< -o $@
-
-# thread
-$(BIN)/thread.o: $(SRC)/Time/Thread.cpp
 	g++ -c $< -o $@
 
 # collider
@@ -62,6 +38,10 @@ $(BIN)/spawnPoint.o: $(SRC)/GraphicsObject/SpawnPoint.cpp
 $(BIN)/deathZone.o: $(SRC)/GraphicsObject/DeathZone.cpp
 	g++ -c $< -o $@
 
+# DeathZone
+$(BIN)/sideBoundary.o: $(SRC)/GraphicsObject/SideBoundary.cpp
+	g++ -c $< -o $@
+
 # character
 $(BIN)/character.o: $(SRC)/GraphicsObject/Character.cpp
 	g++ -c $< -o $@
@@ -73,16 +53,6 @@ $(BIN)/platform.o: $(SRC)/GraphicsObject/Platform.cpp
 # item
 $(BIN)/item.o: $(SRC)/GraphicsObject/Item.cpp
 	g++ -c $< -o $@
-
-# io handler
-$(BIN)/ioHandler.o: $(SRC)/io/ioHandler.cpp
-	g++ -c $< -o $@
-
-# single client game
-# Link all object files to create the executable
-game: $(OBJS) $(BIN)/main.o
-	g++ $(OBJS) $(BIN)/main.o -o game $(LIBS)	
-
 
 # networking game
 $(BIN)/gameState.o: $(SRC)/GameRunner/GameState.cpp
