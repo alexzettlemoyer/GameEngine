@@ -4,13 +4,14 @@
 #include "GraphicsObject.h"
 #include "SpawnPoint.h"
 #include "../Time/Timeline.h"
+#include <memory>
 
 
 class Character : public GraphicsObject
 {
     private:
         sf::Texture characterTexture;
-        bool isGrounded();
+        std::shared_ptr<GraphicsObject> isGrounded();
         bool checkBounds();
         void respawn();
         SpawnPoint *spawnPoint;

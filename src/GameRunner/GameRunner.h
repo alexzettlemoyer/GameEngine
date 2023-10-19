@@ -15,7 +15,8 @@ class GameRunner
         static GameRunner* instancePtr;
         std::atomic<bool> isGameRunning;
         sf::RenderWindow window;
-        sf::Sprite background;
+        // sf::Sprite background;
+        sf::RectangleShape background;
         sf::Texture backgroundTexture;
         int characterId;
             // create a view with its center and size

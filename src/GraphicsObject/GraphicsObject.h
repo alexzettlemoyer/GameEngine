@@ -19,6 +19,7 @@ class GraphicsObject : public sf::RectangleShape
         CollisionType collisionTypeX;
         CollisionType collisionTypeY;
         sf::Vector2f velocity;
+        sf::Vector2f previousVelocity;
         sf::Vector2f getPosition();
         sf::Vector2f getSize();
         sf::Vector2f getVelocity();

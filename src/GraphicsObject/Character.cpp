@@ -67,31 +67,30 @@ void Character::down()
     updateMovement();
 }
 
-bool Character::isGrounded()
+std::shared_ptr<GraphicsObject> Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
     for (std::shared_ptr<GraphicsObject> const& i : (GameState::getInstance() -> getGraphicsObjects()))
     {
         if (i -> isGround() && isCharacterGrounded(*this, *i))
-            return true;
+            return i;
     }
 
-    sf::FloatRect characterBounds = this -> getGlobalBounds();
-
-    // if bottom x coordinate of character is below top x coordinate of window
-    // and the character is within the x coordinates of the platform ( on top )
-    if (characterBounds.top + characterBounds.height >= wSize.y)
-            return true;
-
-    return false;
+    return nullptr;
 }
 
 void Character::updateMovement()
 {
-    if (!isGrounded())
+    std::shared_ptr<GraphicsObject> ground = isGrounded();
+    if (ground == nullptr)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
         velocity.y += (GRAVITY * timeline -> getDt()) * timeline -> getTicSize();
+    }
+    else 
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        velocity.x += ground -> getVelocity().x;
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);

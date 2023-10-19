@@ -19,6 +19,8 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     velocity.x = 0.f;
     velocity.y = 0.f;
 
+    previousVelocity = sf::Vector2f(0.f, 0.f);
+
     id = idNum;
 
     this -> timeline = timeline;
@@ -56,6 +58,8 @@ void GraphicsObject::move(float x, float y)
 
 sf::Vector2f GraphicsObject::getVelocity()
 {    
+    if (velocity == sf::Vector2f(0.f, 0.f) && previousVelocity != sf::Vector2f(0.f, 0.f))
+        return previousVelocity;
     return sf::Vector2f(velocity.x, velocity.y);
 }
 
@@ -107,6 +111,7 @@ void GraphicsObject::down()
 void GraphicsObject::blockMove()
 {
     std::lock_guard<std::mutex> lock(this->objMutex);
+    this -> previousVelocity = sf::Vector2f(velocity.x, velocity.y);
     velocity.x = 0.f;
     velocity.y = 0.f;
 }
