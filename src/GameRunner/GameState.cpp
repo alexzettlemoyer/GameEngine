@@ -19,10 +19,6 @@ std::mutex stateMutex;
 GameState* GameState::instancePtr = nullptr;
 Timeline* timeline;
 
-static const float SCROLL_SPEED = 4.f;
-static const float MIN_POSITION = 5.f;
-static const float MAX_POSITION = 1850.f;
-
 int objectId = 0;
 
 /**
@@ -263,42 +259,6 @@ std::shared_ptr<DeathZone> GameState::getDeathZone()
 std::list<std::shared_ptr<SideBoundary>> GameState::getSideBoundaries()
 {
     return sideBoundaries;
-}
-
-float GameState::getSideScrollSpeed()
-{
-    return sideScrollSpeed;
-}
-
-float GameState::getSideScrollDistance()
-{
-    return totalScrollDistance;
-}
-
-void GameState::scrollWindow(int direction)
-{
-    {
-        std::lock_guard<std::mutex> lock(stateMutex);
-
-        if (direction == SideBoundary::RIGHT && totalScrollDistance < MAX_POSITION)
-            sideScrollSpeed = SCROLL_SPEED;
-
-        if (direction == SideBoundary::LEFT && totalScrollDistance > MIN_POSITION)
-            sideScrollSpeed = -SCROLL_SPEED;
-
-        totalScrollDistance += sideScrollSpeed;
-    }
-    for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects)
-    {
-        if ( i -> getType() != GraphicsObject::CHARACTER_TYPE ) 
-        {
-            i -> move( -sideScrollSpeed, 0.0f );
-        }
-    }
-    {
-        std::lock_guard<std::mutex> lock(stateMutex);
-        sideScrollSpeed = 0.f;
-    }
 }
 
 /**

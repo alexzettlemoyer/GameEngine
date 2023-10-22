@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cmath>
 #include <mutex>
+#include "SideScroller.h"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/SideBoundary.h"
@@ -73,7 +74,7 @@ bool collisionResponse(GraphicsObject &obj, int dir)
                 break;
             case GraphicsObject::SCROLL:
                 // SideBoundary* sideBoundary = dynamic_cast<SideBoundary*>(&obj)
-                GameState::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
+                SideScroller::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
                 break;
             default:
                 std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;

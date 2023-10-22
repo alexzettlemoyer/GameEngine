@@ -2,7 +2,7 @@
 #include "Collider.hpp"
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
-#include "../GameRunner/GameState.h"
+#include "SideScroller.h"
 #include <iostream>
 
 int mvmntDirCW = 0;                     // movement direction for the clockwise movement
@@ -28,7 +28,7 @@ const float MOVE_DIST = 2.0f;           // movement amount for individual steps
  */
 bool movementClockwise(GraphicsObject& obj)
 {
-    originalPositionCW = obj.getOriginalPosition() - sf::Vector2f(GameState::getInstance() -> getSideScrollDistance(), 0);
+    originalPositionCW = obj.getOriginalPosition() - sf::Vector2f(SideScroller::getInstance() -> getSideScrollDistance(), 0);
 
     // get the difference to the original position
     float xDiff = originalPositionCW.x - obj.getPosition().x;
@@ -68,7 +68,7 @@ bool movementClockwise(GraphicsObject& obj)
 bool movementLeftRight(GraphicsObject& obj)
 {  
     // if the first time, get the original position
-    originalPositionLR = obj.getOriginalPosition() - sf::Vector2f(GameState::getInstance() -> getSideScrollDistance(), 0);
+    originalPositionLR = obj.getOriginalPosition() - sf::Vector2f(SideScroller::getInstance() -> getSideScrollDistance(), 0);
     float xDiff = originalPositionLR.x - obj.getPosition().x;
 
     if ( mvmntDirLR == 0  )  // left movement

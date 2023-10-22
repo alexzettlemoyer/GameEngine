@@ -3,6 +3,7 @@ SRC=src
 BIN=bin
 
 OBJ_FILES = $(BIN)/time.o \
+	   $(BIN)/sideScroller.o \
 	   $(BIN)/mover.o \
 	   $(BIN)/graphicsObject.o \
 	   $(BIN)/spawnPoint.o \
@@ -16,6 +17,9 @@ OBJ_FILES = $(BIN)/time.o \
 
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
+	g++ -c $< -o $@
+
+$(BIN)/sideScroller.o: $(SRC)/Movement/SideScroller.cpp
 	g++ -c $< -o $@
 
 # collider

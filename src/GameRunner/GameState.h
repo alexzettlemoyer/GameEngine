@@ -18,8 +18,6 @@ class GameState
         std::shared_ptr<DeathZone> deathZone;
         std::list<std::shared_ptr<SideBoundary>> sideBoundaries;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
-        float sideScrollSpeed = 0.f;
-        float totalScrollDistance = 0.f;
 
     public:
         static GameState* getInstance();
@@ -37,9 +35,6 @@ class GameState
         void deserialize(std::string data);
         void input(std::string objId, std::string i);
         std::shared_ptr<GraphicsObject> findObjById(int id);
-        float getSideScrollSpeed();
-        float getSideScrollDistance();
-        void scrollWindow(int direction);
 };
 
 #endif
