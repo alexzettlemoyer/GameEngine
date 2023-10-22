@@ -18,7 +18,7 @@ std::mutex stateMutex;
 GameState* GameState::instancePtr = nullptr;
 Timeline* timeline;
 
-int newCharacterId = 3;
+int objectId = 9;
 
 /**
  * Singleton game state instance
@@ -47,12 +47,18 @@ void GameState::setupGameState()
 
     timeline = new Timeline();
 
-    // setup graphics objects: platforms and item
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 0, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 1, timeline));
-    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 2, timeline));
+    deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), 0, timeline);
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(850.f, 0.f), 1, timeline));
 
-    deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), -1, timeline);
+    // setup graphics objects: platforms and item
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 2, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 3, timeline));
+    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 4, timeline));
+
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(900.f, 350.f), 5, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1400.f, 350.f), 6, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1800.f, 350.f), 7, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 350.f), 8, timeline));
 }
 
 /**
@@ -68,15 +74,15 @@ void GameState::updateGameState()
 {
     timeline -> updateDeltaTime();
 
-        // the item should move clockwise, id = 2
-    GraphicsObject* item = findObjById(2).get();
+        // the item should move clockwise, id = 4
+    GraphicsObject* item = findObjById(4).get();
     if (item != NULL )
-        movementClockwise(*findObjById(2));
+        movementClockwise(*item);
     
-        // platform2 should move left right, id = 1
-    GraphicsObject* platform2 = findObjById(1).get();
+        // platform2 should move left right, id = 3
+    GraphicsObject* platform2 = findObjById(3).get();
     if (platform2 != NULL )
-        movementLeftRight(*findObjById(1));
+        movementLeftRight(*platform2);
 
         // update all the character movements
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
@@ -96,8 +102,6 @@ void GameState::input(std::string objId, std::string in)
 {
     int charId = stoi(objId);
     int i = stoi(in);
-
-    // std::cout << in << std::endl;
 
     switch (i)
     {
@@ -250,6 +254,11 @@ std::shared_ptr<DeathZone> GameState::getDeathZone()
     return deathZone;
 }
 
+std::list<std::shared_ptr<SideBoundary>> GameState::getSideBoundaries()
+{
+    return sideBoundaries;
+}
+
 /**
  * creates a new character and adds it to the list of graphics objects
  * assigns the new character with the id of the client which connected to it
@@ -257,7 +266,7 @@ std::shared_ptr<DeathZone> GameState::getDeathZone()
 int GameState::newCharacter()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
-    int id = newCharacterId++;
+    int id = objectId++;
     SpawnPoint *sp = new SpawnPoint();
     graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
     delete sp;

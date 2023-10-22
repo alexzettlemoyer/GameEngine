@@ -28,7 +28,7 @@ class GameState
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
         std::list<Character*> getCharacters();
         std::shared_ptr<DeathZone> getDeathZone();
-        std::shared_ptr<SideBoundary> getSideBoundaries();
+        std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
         int newCharacter();
         void removeObject(int id);
         std::string serialize();

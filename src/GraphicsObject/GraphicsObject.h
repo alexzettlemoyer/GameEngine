@@ -23,9 +23,9 @@ class GraphicsObject : public sf::RectangleShape
         sf::Vector2f getPosition();
         sf::Vector2f getSize();
         sf::Vector2f getVelocity();
-        void left();
+        void left(bool scrolling);
         void up();
-        void right();
+        void right(bool scrolling);
         void down();
         void move(float x, float y);
         std::mutex objMutex;
@@ -38,8 +38,8 @@ class GraphicsObject : public sf::RectangleShape
         bool ground;
         int id;
         bool checkBounds();
-        void updateMovement();
-        void blockMove();
+        void updateMovement(bool scrolling);
+        void blockMove(bool scrolling);
         bool loadTexture(sf::Texture& texture, const std::string& image);
         Timeline *timeline;
 };

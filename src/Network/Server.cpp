@@ -85,6 +85,9 @@ int main()
         // maps client connection number to client loop counter
     std::unordered_map<std::string, int> connections;
 
+    // start the game state
+    // GameState::getInstance();
+
         // thread to handle server replies
     std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
 

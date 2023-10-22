@@ -63,7 +63,7 @@ sf::Vector2f GraphicsObject::getVelocity()
     return sf::Vector2f(velocity.x, velocity.y);
 }
 
-void GraphicsObject::left()
+void GraphicsObject::left(bool scrolling)
 {
     float dt = timeline -> getDt();
     if (dt != 0)
@@ -72,7 +72,7 @@ void GraphicsObject::left()
         velocity.x += (-displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement();
+    updateMovement(scrolling);
 }
 void GraphicsObject::up()
 {
@@ -83,9 +83,9 @@ void GraphicsObject::up()
         velocity.y += (-displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement();
+    updateMovement(false);
 }
-void GraphicsObject::right()
+void GraphicsObject::right(bool scrolling)
 {
     float dt = timeline -> getDt();
     if (dt != 0)
@@ -94,7 +94,7 @@ void GraphicsObject::right()
         velocity.x += (displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement();
+    updateMovement(scrolling);
 }
 void GraphicsObject::down()
 {
@@ -105,21 +105,22 @@ void GraphicsObject::down()
         velocity.y += (displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement();
+    updateMovement(false);
 }
 
-void GraphicsObject::blockMove()
+void GraphicsObject::blockMove(bool scrolling)
 {
     std::lock_guard<std::mutex> lock(this->objMutex);
-    this -> previousVelocity = sf::Vector2f(velocity.x, velocity.y);
+    if (!scrolling)
+        this -> previousVelocity = sf::Vector2f(velocity.x, velocity.y);
     velocity.x = 0.f;
     velocity.y = 0.f;
 }
 
-void GraphicsObject::updateMovement()
+void GraphicsObject::updateMovement(bool scrolling)
 {
     this -> move(velocity.x, velocity.y);
-    this -> blockMove();
+    this -> blockMove(scrolling);
 }
 
 bool GraphicsObject::checkBounds()

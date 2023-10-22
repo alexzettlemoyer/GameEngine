@@ -36,7 +36,7 @@ bool movementClockwise(GraphicsObject& obj)
 
     if ( mvmntDirCW == 0 )          // left movement
     {
-        obj.left();
+        obj.left(false);
         if ( xDiff >= CHANGE_DIFF_CW ) 
             mvmntDirCW = 1;
     }
@@ -48,7 +48,7 @@ bool movementClockwise(GraphicsObject& obj)
     }
     if ( mvmntDirCW == 2 )            // right movement
     {
-        obj.right();
+        obj.right(false);
         if ( xDiff <= 0 )
             mvmntDirCW = 3;
     }
@@ -75,13 +75,13 @@ bool movementLeftRight(GraphicsObject& obj)
 
     if ( mvmntDirLR == 0  )  // left movement
     {
-        obj.left();
+        obj.left(false);
         if ( xDiff >= CHANGE_DIFF_LR )
             mvmntDirLR = 2;
     }
     if ( mvmntDirLR == 2  )  // right movement
     {
-        obj.right();
+        obj.right(false);
         if ( xDiff <= 0 )
             mvmntDirLR = 0;
     }

@@ -95,7 +95,7 @@ void Character::updateMovement()
     if (!checkBounds())
         move(velocity.x, velocity.y);
 
-    this -> blockMove();
+    this -> blockMove(false);
 }
 
 void Character::respawn()
@@ -149,5 +149,12 @@ bool Character::checkBounds()
         respawn();
         return false;
     }
+
+        // check if we're colliding with any sideBoundaries
+    for (std::shared_ptr<SideBoundary> const& i : GameState::getInstance() -> getSideBoundaries())
+    {
+        checkCollision(*this, *i);
+    }
+
     return false;
 }

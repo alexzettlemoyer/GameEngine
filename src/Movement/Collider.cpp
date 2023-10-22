@@ -45,6 +45,17 @@ void eraseObj(GraphicsObject &obj)
     GameState::getInstance() -> removeObject(obj.identifier());
 }
 
+void scrollWindow()
+{
+    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+    {
+        if ( i -> getType() != GraphicsObject::CHARACTER_TYPE ) 
+        {
+            i -> left(true);
+        }
+    }
+}
+
 // x: 0
 // y: 1
 bool collisionResponse(GraphicsObject &obj, int dir)
@@ -55,25 +66,26 @@ bool collisionResponse(GraphicsObject &obj, int dir)
         switch (obj.collisionTypeX)
         {
             case GraphicsObject::STOP_MOVEMENT:
-                // std::cout << "Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 0);
                 break;
             case GraphicsObject::ERASE:
                 eraseObj(obj);
-                // std::cout << "Erase X: " << obj.identifier() << std::endl;
                 break;
             case GraphicsObject::PUSH:
                 break;
             case GraphicsObject::NONE: 
                 break;
             case GraphicsObject::CHAR:
-                stopMovement(obj, 0);
+                // stopMovement(obj, 0);
                 break;
             case GraphicsObject::DEATH:
                 std::cout << "DEATH X" << std::endl;
                 break;
+            case GraphicsObject::SCROLL:
+                scrollWindow();
+                break;
             default:
-                // std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
+                std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
                 stopMovement(obj, 0);
                 break;
         }
