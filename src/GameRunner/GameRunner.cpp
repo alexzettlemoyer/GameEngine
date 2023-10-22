@@ -27,17 +27,17 @@ GameRunner::GameRunner(int clientId)
 {
     this -> characterId = clientId = clientId;
     window.setFramerateLimit(100);
-    window.setView(view);
+    // window.setView(view);
 
         // setup background
-    // if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
-    //     {} // Handle error
-    // background.setScale(1.f, 1.f);
-    // background.setTexture(backgroundTexture);
+    if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
+        {} // Handle error
+    background.setScale(1.f, 1.f);
+    background.setTexture(backgroundTexture);
 
-    background.setFillColor(sf::Color(200, 252, 252));
-    background.setSize(sf::Vector2f(2000.f, 800.f));
-    background.setPosition(sf::Vector2f(-400.f, 0.f));
+    // background.setFillColor(sf::Color(200, 252, 252));
+    // background.setSize(sf::Vector2f(2000.f, 800.f));
+    // background.setPosition(sf::Vector2f(-400.f, 0.f));
 }
 
 GameRunner* GameRunner::getInstance(int id)
@@ -63,16 +63,16 @@ void GameRunner::drawGraphics()
 {
     window.clear();
 
-    std::shared_ptr<GraphicsObject> obj = GameState::getInstance() -> findObjById(characterId);
-    if ( obj )
-    {
-        std::shared_ptr<Character> character = std::dynamic_pointer_cast<Character>( obj );
-        if ( character )
-        {
-            view.setCenter(sf::Vector2f(character.get() -> getPosition().x, 400.f));
-        }
-    }
-    window.setView(view);
+    // std::shared_ptr<GraphicsObject> obj = GameState::getInstance() -> findObjById(characterId);
+    // if ( obj )
+    // {
+    //     std::shared_ptr<Character> character = std::dynamic_pointer_cast<Character>( obj );
+    //     if ( character )
+    //     {
+    //         view.setCenter(sf::Vector2f(character.get() -> getPosition().x, 400.f));
+    //     }
+    // }
+    // window.setView(view);
 
     window.draw(background);
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects()) {

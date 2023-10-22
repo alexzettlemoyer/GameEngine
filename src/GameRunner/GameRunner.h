@@ -15,12 +15,12 @@ class GameRunner
         static GameRunner* instancePtr;
         std::atomic<bool> isGameRunning;
         sf::RenderWindow window;
-        // sf::Sprite background;
-        sf::RectangleShape background;
+        sf::Sprite background;
+        // sf::RectangleShape background;
         sf::Texture backgroundTexture;
         int characterId;
             // create a view with its center and size
-        sf::View view = sf::View(sf::Vector2f(400.f, 500.f), sf::Vector2f(1000.f, 800.f));
+        // sf::View view = sf::View(sf::Vector2f(400.f, 500.f), sf::Vector2f(1000.f, 800.f));
 
     public:
         static GameRunner *getInstance(int id = 0);
