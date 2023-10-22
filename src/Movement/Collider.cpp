@@ -4,6 +4,7 @@
 #include <mutex>
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
+#include "../GraphicsObject/SideBoundary.h"
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
 #include "../GameRunner/GameState.h"
@@ -45,17 +46,6 @@ void eraseObj(GraphicsObject &obj)
     GameState::getInstance() -> removeObject(obj.identifier());
 }
 
-void scrollWindow()
-{
-    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
-    {
-        if ( i -> getType() != GraphicsObject::CHARACTER_TYPE ) 
-        {
-            i -> left(true);
-        }
-    }
-}
-
 // x: 0
 // y: 1
 bool collisionResponse(GraphicsObject &obj, int dir)
@@ -82,7 +72,8 @@ bool collisionResponse(GraphicsObject &obj, int dir)
                 std::cout << "DEATH X" << std::endl;
                 break;
             case GraphicsObject::SCROLL:
-                scrollWindow();
+                // SideBoundary* sideBoundary = dynamic_cast<SideBoundary*>(&obj)
+                GameState::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
                 break;
             default:
                 std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;

@@ -7,10 +7,14 @@
 class SideBoundary : public GraphicsObject
 {
     private:
-        
+        int direction;
+
     public:
-        SideBoundary(const sf::Vector2f& position, int idNum, Timeline* timeline);
+        SideBoundary(const sf::Vector2f& position, int idNum, Timeline* timeline, int direction);
         int getType() const override { return GraphicsObject::SIDE_BOUNDARY_TYPE; }
+        int getDirection();
+        static inline const int RIGHT = 0;
+        static inline const int LEFT = 1;
 };
 
 #endif

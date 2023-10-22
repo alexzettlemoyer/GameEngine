@@ -14,6 +14,7 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
 {
     this -> setSize(size);
     this -> setPosition(position);
+    originalPosition = position;
     ground = isGround;
 
     velocity.x = 0.f;
@@ -45,6 +46,12 @@ sf::Vector2f GraphicsObject::getPosition()
     return sf::RectangleShape::getPosition();
 }
 
+sf::Vector2f GraphicsObject::getOriginalPosition()
+{
+    std::lock_guard<std::mutex> lock(this->objMutex);
+    return originalPosition;
+}
+
 sf::Vector2f GraphicsObject::getSize()
 {
     return sf::RectangleShape::getSize();
@@ -63,7 +70,7 @@ sf::Vector2f GraphicsObject::getVelocity()
     return sf::Vector2f(velocity.x, velocity.y);
 }
 
-void GraphicsObject::left(bool scrolling)
+void GraphicsObject::left()
 {
     float dt = timeline -> getDt();
     if (dt != 0)
@@ -72,8 +79,9 @@ void GraphicsObject::left(bool scrolling)
         velocity.x += (-displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement(scrolling);
+    updateMovement();
 }
+
 void GraphicsObject::up()
 {
     float dt = timeline -> getDt();
@@ -83,9 +91,9 @@ void GraphicsObject::up()
         velocity.y += (-displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement(false);
+    updateMovement();
 }
-void GraphicsObject::right(bool scrolling)
+void GraphicsObject::right()
 {
     float dt = timeline -> getDt();
     if (dt != 0)
@@ -94,7 +102,7 @@ void GraphicsObject::right(bool scrolling)
         velocity.x += (displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement(scrolling);
+    updateMovement();
 }
 void GraphicsObject::down()
 {
@@ -105,22 +113,21 @@ void GraphicsObject::down()
         velocity.y += (displacement / dt) * timeline -> getTicSize();
     }
     (*this).checkBounds();
-    updateMovement(false);
+    updateMovement();
 }
 
-void GraphicsObject::blockMove(bool scrolling)
+void GraphicsObject::blockMove()
 {
     std::lock_guard<std::mutex> lock(this->objMutex);
-    if (!scrolling)
-        this -> previousVelocity = sf::Vector2f(velocity.x, velocity.y);
+    this -> previousVelocity = sf::Vector2f(velocity.x, velocity.y);
     velocity.x = 0.f;
     velocity.y = 0.f;
 }
 
-void GraphicsObject::updateMovement(bool scrolling)
+void GraphicsObject::updateMovement()
 {
     this -> move(velocity.x, velocity.y);
-    this -> blockMove(scrolling);
+    this -> blockMove();
 }
 
 bool GraphicsObject::checkBounds()

@@ -2,6 +2,8 @@
 #include "Collider.hpp"
 #include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
+#include "../GameRunner/GameState.h"
+#include <iostream>
 
 int mvmntDirCW = 0;                     // movement direction for the clockwise movement
 sf::Vector2f originalPositionCW;        // original position for the clockwise movement
@@ -26,9 +28,7 @@ const float MOVE_DIST = 2.0f;           // movement amount for individual steps
  */
 bool movementClockwise(GraphicsObject& obj)
 {
-    // if the first time, get the original position
-    if ( originalPositionCW == sf::Vector2f(0.f, 0.f) )
-        originalPositionCW = obj.getPosition();
+    originalPositionCW = obj.getOriginalPosition() - sf::Vector2f(GameState::getInstance() -> getSideScrollDistance(), 0);
 
     // get the difference to the original position
     float xDiff = originalPositionCW.x - obj.getPosition().x;
@@ -36,7 +36,7 @@ bool movementClockwise(GraphicsObject& obj)
 
     if ( mvmntDirCW == 0 )          // left movement
     {
-        obj.left(false);
+        obj.left();
         if ( xDiff >= CHANGE_DIFF_CW ) 
             mvmntDirCW = 1;
     }
@@ -48,7 +48,7 @@ bool movementClockwise(GraphicsObject& obj)
     }
     if ( mvmntDirCW == 2 )            // right movement
     {
-        obj.right(false);
+        obj.right();
         if ( xDiff <= 0 )
             mvmntDirCW = 3;
     }
@@ -66,22 +66,20 @@ bool movementClockwise(GraphicsObject& obj)
 // - left   0
 // - right  2
 bool movementLeftRight(GraphicsObject& obj)
-{    
+{  
     // if the first time, get the original position
-    if ( originalPositionLR == sf::Vector2f(0.f, 0.f) )
-        originalPositionLR = obj.getPosition();
-
+    originalPositionLR = obj.getOriginalPosition() - sf::Vector2f(GameState::getInstance() -> getSideScrollDistance(), 0);
     float xDiff = originalPositionLR.x - obj.getPosition().x;
 
     if ( mvmntDirLR == 0  )  // left movement
     {
-        obj.left(false);
+        obj.left();
         if ( xDiff >= CHANGE_DIFF_LR )
             mvmntDirLR = 2;
     }
     if ( mvmntDirLR == 2  )  // right movement
     {
-        obj.right(false);
+        obj.right();
         if ( xDiff <= 0 )
             mvmntDirLR = 0;
     }

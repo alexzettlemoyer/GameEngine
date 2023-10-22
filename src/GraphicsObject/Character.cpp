@@ -95,7 +95,7 @@ void Character::updateMovement()
     if (!checkBounds())
         move(velocity.x, velocity.y);
 
-    this -> blockMove(false);
+    this -> blockMove();
 }
 
 void Character::respawn()

@@ -8,6 +8,7 @@
 #include "GameState.h"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
+#include "../GraphicsObject/SideBoundary.h"
 #include "../GraphicsObject/SpawnPoint.h"
 #include "../GraphicsObject/Platform.h"
 #include "../GraphicsObject/Item.h"
@@ -18,7 +19,11 @@ std::mutex stateMutex;
 GameState* GameState::instancePtr = nullptr;
 Timeline* timeline;
 
-int objectId = 9;
+static const float SCROLL_SPEED = 4.f;
+static const float MIN_POSITION = 5.f;
+static const float MAX_POSITION = 1850.f;
+
+int objectId = 0;
 
 /**
  * Singleton game state instance
@@ -47,18 +52,19 @@ void GameState::setupGameState()
 
     timeline = new Timeline();
 
-    deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), 0, timeline);
-    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(850.f, 0.f), 1, timeline));
+    deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(750.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(100.f, 0.f), objectId++, timeline, SideBoundary::LEFT));
 
     // setup graphics objects: platforms and item
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), 2, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), 3, timeline));
-    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), 4, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), objectId++, timeline));
 
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(900.f, 350.f), 5, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1400.f, 350.f), 6, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1800.f, 350.f), 7, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 350.f), 8, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(900.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1400.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1800.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 500.f), objectId++, timeline));
 }
 
 /**
@@ -74,20 +80,20 @@ void GameState::updateGameState()
 {
     timeline -> updateDeltaTime();
 
-        // the item should move clockwise, id = 4
-    GraphicsObject* item = findObjById(4).get();
-    if (item != NULL )
-        movementClockwise(*item);
-    
-        // platform2 should move left right, id = 3
-    GraphicsObject* platform2 = findObjById(3).get();
-    if (platform2 != NULL )
-        movementLeftRight(*platform2);
-
         // update all the character movements
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
         if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
             dynamic_cast<Character*>(i.get()) -> updateMovement();
+
+        // the item should move clockwise, id = 4
+    GraphicsObject* item = findObjById(5).get();
+    if (item != NULL )
+        movementClockwise(*item);
+    
+        // platform2 should move left right, id = 3
+    GraphicsObject* platform2 = findObjById(4).get();
+    if (platform2 != NULL )
+        movementLeftRight(*platform2);
 }
 
 /**
@@ -257,6 +263,42 @@ std::shared_ptr<DeathZone> GameState::getDeathZone()
 std::list<std::shared_ptr<SideBoundary>> GameState::getSideBoundaries()
 {
     return sideBoundaries;
+}
+
+float GameState::getSideScrollSpeed()
+{
+    return sideScrollSpeed;
+}
+
+float GameState::getSideScrollDistance()
+{
+    return totalScrollDistance;
+}
+
+void GameState::scrollWindow(int direction)
+{
+    {
+        std::lock_guard<std::mutex> lock(stateMutex);
+
+        if (direction == SideBoundary::RIGHT && totalScrollDistance < MAX_POSITION)
+            sideScrollSpeed = SCROLL_SPEED;
+
+        if (direction == SideBoundary::LEFT && totalScrollDistance > MIN_POSITION)
+            sideScrollSpeed = -SCROLL_SPEED;
+
+        totalScrollDistance += sideScrollSpeed;
+    }
+    for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects)
+    {
+        if ( i -> getType() != GraphicsObject::CHARACTER_TYPE ) 
+        {
+            i -> move( -sideScrollSpeed, 0.0f );
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(stateMutex);
+        sideScrollSpeed = 0.f;
+    }
 }
 
 /**
