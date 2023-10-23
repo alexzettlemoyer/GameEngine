@@ -99,13 +99,11 @@ void Character::updateMovement()
         velocity.x += ground -> getVelocity().x;
         velocity.y += ground -> getVelocity().y;
 
-        if ( velocity.y > ground -> getVelocity().y )
-        {
-            velocity.y += 5.f;
-        }
-
-        if ( velocity.y != ground -> getVelocity().y )
-            std::cout << "grounded: " << velocity.y << " " << ground -> getVelocity().y << std::endl;
+        // sometimes the character moves along an up/down moving platform and add the platforms' velocity
+        // but the rendering is delayed, so it appears that the character is standing below the platform
+        // to fix this, keep the characters' velocity > the platforms'
+        if ( velocity.y > 1.f )
+            velocity.y -= 1.f;
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);
