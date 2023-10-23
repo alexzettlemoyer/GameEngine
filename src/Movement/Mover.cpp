@@ -11,10 +11,12 @@ sf::Vector2f originalPositionCW;        // original position for the clockwise m
 int mvmntDirLR = 0;                     // movement direction for the left/right movement
 sf::Vector2f originalPositionLR;        // original position for the left/right movement
 
+int mvmntDirUPDOWN = 0;                 // movement direction for the up/right movement
+sf::Vector2f originalPositionUPDOWN;    // original position for the up/down movement
+
 const float CHANGE_DIFF_CW = 100.f;     // movement amount for clockwise
 const float CHANGE_DIFF_LR = 200.f;     // movement amount for left/right
-
-const float MOVE_DIST = 2.0f;           // movement amount for individual steps
+const float CHANGE_DIFF_UPDOWN = 200.f;
 
 /**
  * Clockwise movement
@@ -75,13 +77,36 @@ bool movementLeftRight(GraphicsObject& obj)
     {
         obj.left();
         if ( xDiff >= CHANGE_DIFF_LR )
-            mvmntDirLR = 2;
+            mvmntDirLR = 1;
     }
-    if ( mvmntDirLR == 2  )  // right movement
+    if ( mvmntDirLR == 1  )  // right movement
     {
         obj.right();
         if ( xDiff <= 0 )
             mvmntDirLR = 0;
+    }
+    return true;
+}
+
+// Movement pattern:
+// - down   0
+// - up     1
+bool movementUpDown(GraphicsObject& obj)
+{
+    originalPositionUPDOWN = obj.getOriginalPosition() - sf::Vector2f(SideScroller::getInstance() -> getSideScrollDistance(), 0);
+    float yDiff = obj.getPosition().y - originalPositionUPDOWN.y;
+
+    if ( mvmntDirUPDOWN == 0 )  // down movement
+    {
+        obj.down();
+        if ( yDiff >= CHANGE_DIFF_UPDOWN )
+            mvmntDirUPDOWN = 1;
+    }
+    if ( mvmntDirUPDOWN == 1 )   // up movement
+    {
+        obj.up();
+        if ( yDiff <= 0 )
+            mvmntDirUPDOWN = 0;
     }
     return true;
 }

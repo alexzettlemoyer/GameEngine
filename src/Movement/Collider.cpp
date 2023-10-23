@@ -49,7 +49,7 @@ void eraseObj(GraphicsObject &obj)
 
 // x: 0
 // y: 1
-bool collisionResponse(GraphicsObject &obj, int dir)
+bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
 {
     // x collision
     if ( dir == 0 )
@@ -73,7 +73,6 @@ bool collisionResponse(GraphicsObject &obj, int dir)
                 std::cout << "DEATH X" << std::endl;
                 break;
             case GraphicsObject::SCROLL:
-                // SideBoundary* sideBoundary = dynamic_cast<SideBoundary*>(&obj)
                 SideScroller::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
                 break;
             default:
@@ -93,7 +92,7 @@ bool collisionResponse(GraphicsObject &obj, int dir)
             case GraphicsObject::ERASE:
                 eraseObj(obj);
                 break;
-            case GraphicsObject::PUSH:
+            case GraphicsObject::NONE:
                 break;
             case GraphicsObject::CHAR:
                 break;
@@ -162,8 +161,8 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
             collisionDir = 1;           // y collision - do nothing for now
         else { }                         // perfect x=y collision - do nothing for now
         
-        collisionResponse(obj, collisionDir);
-        collisionResponse(other, collisionDir);
+        collisionResponse(obj, other, collisionDir);
+        collisionResponse(other, obj, collisionDir);
 
         return true;
     }

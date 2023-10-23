@@ -6,6 +6,7 @@
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
 #include "../GameRunner/GameState.h"
+#include "../Movement/SideScroller.h"
 #include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
@@ -86,11 +87,25 @@ void Character::updateMovement()
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
         velocity.y += (GRAVITY * timeline -> getDt()) * timeline -> getTicSize();
+        // std::cout << "not" << std::endl;
     }
     else 
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
+
+        if ( velocity.y > 0 )   // character is moving down
+            velocity.y = 0;     // but they're on a ground -> do not allow
+
         velocity.x += ground -> getVelocity().x;
+        velocity.y += ground -> getVelocity().y;
+
+        if ( velocity.y > ground -> getVelocity().y )
+        {
+            velocity.y += 5.f;
+        }
+
+        if ( velocity.y != ground -> getVelocity().y )
+            std::cout << "grounded: " << velocity.y << " " << ground -> getVelocity().y << std::endl;
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);
@@ -101,6 +116,7 @@ void Character::updateMovement()
 void Character::respawn()
 {
     this -> spawnPoint = new SpawnPoint();
+    SideScroller::getInstance() -> reset();
     this -> setPosition(spawnPoint -> getPosition());
 }
 
@@ -110,25 +126,11 @@ bool Character::checkBounds()
     sf::Vector2f position = sf::RectangleShape::getPosition();
     sf::Rect<float> thisRect = (*this).getGlobalBounds();
 
-    // check left
-    if ( thisRect.left < 0.f )
-    {
-        std::lock_guard<std::mutex> lock(this->objMutex);
-        this -> velocity.x = 1.f;
-        return false;
-    }
     // check up
     if ( thisRect.top < 0.f )
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
         this -> setPosition(position.x, 0.1f);
-        return false;
-    }
-    // check right
-    if ( thisRect.left + thisRect.width + 1 >= wSize.x )
-    {
-        std::lock_guard<std::mutex> lock(this->objMutex);
-        this -> velocity.x = -1.f;
         return false;
     }
 
@@ -153,7 +155,15 @@ bool Character::checkBounds()
         // check if we're colliding with any sideBoundaries
     for (std::shared_ptr<SideBoundary> const& i : GameState::getInstance() -> getSideBoundaries())
     {
-        checkCollision(*this, *i);
+        if (checkCollision(*this, *i)) 
+        {
+            if ( dynamic_cast<SideBoundary*>(i.get()) -> getDirection() == SideBoundary::RIGHT 
+                && SideScroller::getInstance() -> getSideScrollDistance() <= SideScroller::MAX_POSITION )
+                this -> velocity.x = -0.4f;
+            if ( dynamic_cast<SideBoundary*>(i.get()) -> getDirection() == SideBoundary::LEFT 
+                && SideScroller::getInstance() -> getSideScrollDistance() >= SideScroller::MIN_POSITION )
+                this -> velocity.x = 0.4f;
+        }
     }
 
     return false;

@@ -62,18 +62,6 @@ void GameRunner::deserialize(std::string data)
 void GameRunner::drawGraphics()
 {
     window.clear();
-
-    // std::shared_ptr<GraphicsObject> obj = GameState::getInstance() -> findObjById(characterId);
-    // if ( obj )
-    // {
-    //     std::shared_ptr<Character> character = std::dynamic_pointer_cast<Character>( obj );
-    //     if ( character )
-    //     {
-    //         view.setCenter(sf::Vector2f(character.get() -> getPosition().x, 400.f));
-    //     }
-    // }
-    // window.setView(view);
-
     window.draw(background);
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects()) {
         window.draw(*i);

@@ -34,6 +34,7 @@ float Timeline::getDt()
 {
     if (anchor != NULL)
         return anchor -> getDt();
+
     return dt;
 }
 

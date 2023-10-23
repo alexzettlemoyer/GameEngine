@@ -49,7 +49,7 @@ void GameState::setupGameState()
     timeline = new Timeline();
 
     deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
-    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(750.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(650.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
     sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(100.f, 0.f), objectId++, timeline, SideBoundary::LEFT));
 
     // setup graphics objects: platforms and item
@@ -57,10 +57,10 @@ void GameState::setupGameState()
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), objectId++, timeline));
     graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), objectId++, timeline));
 
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(900.f, 500.f), objectId++, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1400.f, 500.f), objectId++, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1800.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1000.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1600.f, 400.f), objectId++, timeline));
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2700.f, 500.f), objectId++, timeline));
 }
 
 /**
@@ -76,11 +76,6 @@ void GameState::updateGameState()
 {
     timeline -> updateDeltaTime();
 
-        // update all the character movements
-    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
-        if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
-            dynamic_cast<Character*>(i.get()) -> updateMovement();
-
         // the item should move clockwise, id = 4
     GraphicsObject* item = findObjById(5).get();
     if (item != NULL )
@@ -90,6 +85,16 @@ void GameState::updateGameState()
     GraphicsObject* platform2 = findObjById(4).get();
     if (platform2 != NULL )
         movementLeftRight(*platform2);
+
+    GraphicsObject* platform3 = findObjById(7).get();
+    if (platform3 != NULL)
+        movementUpDown(*platform3);
+
+        // update all the character movements
+    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+        if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
+            dynamic_cast<Character*>(i.get()) -> updateMovement();
+
 }
 
 /**

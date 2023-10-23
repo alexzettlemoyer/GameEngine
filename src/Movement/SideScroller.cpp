@@ -3,9 +3,9 @@
 
 SideScroller* SideScroller::instancePtr = nullptr;
 
-static const float SCROLL_SPEED = 4.f;
-static const float MIN_POSITION = 5.f;
-static const float MAX_POSITION = 1850.f;
+static const float SCROLL_SPEED = 5.f;
+// const float SideScroller::MIN_POSITION = 5.f;
+// const float SideScroller::MAX_POSITION = 3000.f;
 
 SideScroller::SideScroller()
 { }
@@ -30,13 +30,13 @@ float SideScroller::getSideScrollDistance()
 void SideScroller::scrollWindow(int direction)
 {
     // first edit the side scroll speed to in the direction
-    // ??? Mutex lock
     if (direction == SideBoundary::RIGHT && totalScrollDistance < MAX_POSITION)
         sideScrollSpeed = SCROLL_SPEED;
 
     if (direction == SideBoundary::LEFT && totalScrollDistance > MIN_POSITION)
         sideScrollSpeed = -SCROLL_SPEED;
 
+    // track the total distance scrolled
     totalScrollDistance += sideScrollSpeed;
 
     // update all graphicsObjects' movement in the direction of the side scroll speed
@@ -49,5 +49,15 @@ void SideScroller::scrollWindow(int direction)
     }
 
     // reset the side scroll speed to 0
+    sideScrollSpeed = 0.f;
+}
+
+void SideScroller::reset()
+{
+    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+    {
+        i -> setPosition( i -> getOriginalPosition() );
+    }
+    totalScrollDistance = 0.f;
     sideScrollSpeed = 0.f;
 }
