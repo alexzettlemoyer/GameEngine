@@ -44,6 +44,7 @@ class GraphicsObject : public sf::RectangleShape
         void blockMove();
         bool loadTexture(sf::Texture& texture, const std::string& image);
         Timeline *timeline;
+        float distanceTravelled;
 };
 
 #endif

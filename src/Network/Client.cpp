@@ -28,7 +28,8 @@ std::mutex reqMutex;
  */
 void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<InputType>& events)
 {
-    while (true)
+    bool open = true;
+    while (open)
     {
         if (events.size() > 0)
         {
@@ -39,6 +40,12 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
                 {
                     inputData += " " + std::to_string(i);
                 }
+
+                // check if any of the inputs are WINDOW CLOSE
+                auto it = std::find(events.begin(), events.end(), CLOSE);
+                if (it != events.end())
+                    open = false;
+
                 events.clear();
             }
 
@@ -167,6 +174,7 @@ int main ()
             }
         }
     }
+    
     reqThread.join();
     return 0;
 }

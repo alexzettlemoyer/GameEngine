@@ -29,6 +29,7 @@ Character::Character(sf::Vector2f position, int idNum, Timeline* timeline, Spawn
     this -> collisionTypeX = CHAR;
     this -> collisionTypeY = CHAR;
     this -> spawnPoint = spawnPoint;
+    distanceTravelled = 0.f;
 }
 
 void Character::left()
@@ -115,6 +116,7 @@ void Character::respawn()
 {
     this -> spawnPoint = new SpawnPoint();
     SideScroller::getInstance() -> reset();
+    distanceTravelled = 0.f;
     this -> setPosition(spawnPoint -> getPosition());
 }
 
@@ -157,12 +159,18 @@ bool Character::checkBounds()
         {
             if ( dynamic_cast<SideBoundary*>(i.get()) -> getDirection() == SideBoundary::RIGHT 
                 && SideScroller::getInstance() -> getSideScrollDistance() <= SideScroller::MAX_POSITION )
+            {
+                std::lock_guard<std::mutex> lock(this->objMutex);
                 this -> velocity.x = -0.4f;
+            }
+                
             if ( dynamic_cast<SideBoundary*>(i.get()) -> getDirection() == SideBoundary::LEFT 
                 && SideScroller::getInstance() -> getSideScrollDistance() >= SideScroller::MIN_POSITION )
+             {
+                std::lock_guard<std::mutex> lock(this->objMutex);
                 this -> velocity.x = 0.4f;
+            }
         }
     }
-
     return false;
 }

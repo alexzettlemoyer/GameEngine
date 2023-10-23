@@ -4,8 +4,6 @@
 SideScroller* SideScroller::instancePtr = nullptr;
 
 static const float SCROLL_SPEED = 5.f;
-// const float SideScroller::MIN_POSITION = 5.f;
-// const float SideScroller::MAX_POSITION = 3000.f;
 
 SideScroller::SideScroller()
 { }

@@ -15,8 +15,8 @@ class SideScroller
         float getSideScrollDistance();
         void scrollWindow(int direction);
         void reset();
-        static constexpr float MIN_POSITION = 5.f;
-        static constexpr float MAX_POSITION = 3000.f;
+        static constexpr float MIN_POSITION = 100.f;
+        static constexpr float MAX_POSITION = 2500.f;
 };
 
 #endif
