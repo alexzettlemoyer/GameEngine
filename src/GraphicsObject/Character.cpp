@@ -147,6 +147,12 @@ bool Character::checkBounds()
         return false;
     }
 
+    if ( thisRect.left < 0.f )
+    {
+        std::lock_guard<std::mutex> lock(this->objMutex);
+        this -> setPosition(0.1f, position.y);
+    }
+
     //  if any of the objects collide
     for (std::shared_ptr<GraphicsObject> const& i : ServerGameState::getInstance() -> getGraphicsObjects())
     {
