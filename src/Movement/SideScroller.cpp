@@ -1,5 +1,6 @@
 #include "SideScroller.h"
 #include "../GameRunner/GameState.h"
+#include <iostream>
 
 SideScroller* SideScroller::instancePtr = nullptr;
 
@@ -25,28 +26,42 @@ float SideScroller::getSideScrollDistance()
     return totalScrollDistance;
 }
 
+bool SideScroller::checkSideCollision(GraphicsObject* character, GraphicsObject* sideBoundary)
+{
+    sf::FloatRect characterBounds = character -> getGlobalBounds();
+    sf::FloatRect sideBounds = sideBoundary -> getGlobalBounds();
+    sideBounds.left += totalScrollDistance;
+
+
+    int collisionDirection;
+    sf::FloatRect intersection;
+    if ( characterBounds.intersects(sideBounds, intersection))
+    {
+        if ( intersection.width < intersection.height  )    // x collision
+        {
+            std::cout << "Colliding in Side Scroller" << std::endl;
+            // scroll the window
+            
+            scrollWindow(dynamic_cast<SideBoundary*>(sideBoundary) -> getDirection());
+        }
+        else { }    // y collisions - do nothing
+        return true;
+    }
+    return false;
+}
+
 void SideScroller::scrollWindow(int direction)
 {
     // first edit the side scroll speed to in the direction
+    std::cout << "DIRECTION \t" << direction << std::endl;
+
+    // Right side boundary collision:
     if (direction == SideBoundary::RIGHT && totalScrollDistance < MAX_POSITION)
-        sideScrollSpeed = SCROLL_SPEED;
+        totalScrollDistance += SCROLL_SPEED;
 
     if (direction == SideBoundary::LEFT && totalScrollDistance > MIN_POSITION)
-        sideScrollSpeed = -SCROLL_SPEED;
+        totalScrollDistance -= SCROLL_SPEED;
 
-    // track the total distance scrolled
-    totalScrollDistance += sideScrollSpeed;
-
-    // update all graphicsObjects' movement in the direction of the side scroll speed
-    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
-    {
-        if ( i -> getType() != GraphicsObject::CHARACTER_TYPE ) 
-        {
-            i -> move( -sideScrollSpeed, 0.0f );
-        }
-    }
-
-    // reset the side scroll speed to 0
     sideScrollSpeed = 0.f;
 }
 

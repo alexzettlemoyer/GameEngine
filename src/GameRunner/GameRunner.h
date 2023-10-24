@@ -26,6 +26,7 @@ class GameRunner
         static GameRunner *getInstance(int id = 0);
         sf::RenderWindow *getWindow();
         void drawGraphics();
+        void checkWindowScroll();
         void deserialize(std::string data);
         std::string getState();
 };

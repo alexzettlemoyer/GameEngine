@@ -35,9 +35,7 @@ GameRunner::GameRunner(int clientId)
     background.setScale(1.f, 1.f);
     background.setTexture(backgroundTexture);
 
-    // background.setFillColor(sf::Color(200, 252, 252));
-    // background.setSize(sf::Vector2f(2000.f, 800.f));
-    // background.setPosition(sf::Vector2f(-400.f, 0.f));
+    GameState::getInstance();
 }
 
 GameRunner* GameRunner::getInstance(int id)
@@ -54,6 +52,11 @@ GameRunner* GameRunner::getInstance(int id)
 void GameRunner::deserialize(std::string data)
 {
     GameState::getInstance() -> deserialize( data );
+}
+
+void GameRunner::checkWindowScroll()
+{
+    GameState::getInstance() -> checkSideCollision( characterId );
 }
 
 /**

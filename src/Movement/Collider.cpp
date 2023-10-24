@@ -73,7 +73,7 @@ bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
                 std::cout << "DEATH X" << std::endl;
                 break;
             case GraphicsObject::SCROLL:
-                SideScroller::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
+                // SideScroller::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
                 break;
             default:
                 std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
@@ -163,7 +163,6 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
         
         collisionResponse(obj, other, collisionDir);
         collisionResponse(other, obj, collisionDir);
-
         return true;
     }
     

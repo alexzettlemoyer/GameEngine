@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <thread>
 #include "GraphicsObject.h"
 #include "Character.h"
 #include "../Draw/Draw.hpp"
@@ -88,7 +89,6 @@ void Character::updateMovement()
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
         velocity.y += (GRAVITY * timeline -> getDt()) * timeline -> getTicSize();
-        // std::cout << "not" << std::endl;
     }
     else 
     {
@@ -115,9 +115,10 @@ void Character::updateMovement()
 void Character::respawn()
 {
     this -> spawnPoint = new SpawnPoint();
-    SideScroller::getInstance() -> reset();
+    // SideScroller::getInstance() -> reset();
     distanceTravelled = 0.f;
     this -> setPosition(spawnPoint -> getPosition());
+    this -> velocity = sf::Vector2f(0.f, 0.f);
 }
 
 bool Character::checkBounds()
@@ -148,29 +149,9 @@ bool Character::checkBounds()
         // check if we're colliding with the death zone
     if (checkCollision(*this, *(GameState::getInstance() -> getDeathZone())))
     {
+        // GameState::getInstance() -> respawn( id );
         respawn();
         return false;
-    }
-
-        // check if we're colliding with any sideBoundaries
-    for (std::shared_ptr<SideBoundary> const& i : GameState::getInstance() -> getSideBoundaries())
-    {
-        if (checkCollision(*this, *i)) 
-        {
-            if ( dynamic_cast<SideBoundary*>(i.get()) -> getDirection() == SideBoundary::RIGHT 
-                && SideScroller::getInstance() -> getSideScrollDistance() <= SideScroller::MAX_POSITION )
-            {
-                std::lock_guard<std::mutex> lock(this->objMutex);
-                this -> velocity.x = -0.4f;
-            }
-                
-            if ( dynamic_cast<SideBoundary*>(i.get()) -> getDirection() == SideBoundary::LEFT 
-                && SideScroller::getInstance() -> getSideScrollDistance() >= SideScroller::MIN_POSITION )
-             {
-                std::lock_guard<std::mutex> lock(this->objMutex);
-                this -> velocity.x = 0.4f;
-            }
-        }
     }
     return false;
 }

@@ -14,6 +14,8 @@
 #include "../GraphicsObject/Item.h"
 #include "../Time/Timeline.h"
 #include "../Movement/Mover.hpp"
+#include "../Movement/Collider.hpp"
+#include "../Movement/SideScroller.h"
 
 std::mutex stateMutex;
 GameState* GameState::instancePtr = nullptr;
@@ -49,8 +51,8 @@ void GameState::setupGameState()
     timeline = new Timeline();
 
     deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
-    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(650.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
-    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(100.f, 0.f), objectId++, timeline, SideBoundary::LEFT));
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(750.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(0.f, 0.f), objectId++, timeline, SideBoundary::LEFT));
 
     // setup graphics objects: platforms and item
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), objectId++, timeline));
@@ -61,6 +63,10 @@ void GameState::setupGameState()
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1600.f, 400.f), objectId++, timeline));
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 500.f), objectId++, timeline));
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2700.f, 500.f), objectId++, timeline));
+
+    std::cout << "successfully added " << graphicsObjects.size() << " Graphics Objects..." << std::endl;
+    std::cout << "successfully added " << sideBoundaries.size() << " Side Boundaries..." << std::endl;
+
 }
 
 /**
@@ -92,9 +98,11 @@ void GameState::updateGameState()
 
         // update all the character movements
     for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+        {
         if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
-            dynamic_cast<Character*>(i.get()) -> updateMovement();
-
+         {   dynamic_cast<Character*>(i.get()) -> updateMovement();}
+        std::cout << i -> identifier() << ": " << i -> getPosition().x << " " << i -> getPosition().y << std::endl;
+        }
 }
 
 /**
@@ -226,7 +234,13 @@ void GameState::deserialize(std::string data)
             }
         }
         else
+        {
             currentObj.get() -> setPosition( sf::Vector2f(stof(objData[2]), stof(objData[3])) );
+            // if ( data.size() > 4 )
+            // {
+            //     data[ 5 ] // extra message
+            // }
+        }
     }
 
         // compare the ids given by the server to the current ids we have in our graphics object list
@@ -239,6 +253,31 @@ void GameState::deserialize(std::string data)
                 removeObject(i -> identifier());
         }
     }
+}
+
+void GameState::checkSideCollision(int characterId)
+{
+    std::shared_ptr<GraphicsObject> thisCharacter = findObjById( characterId );
+    if ( thisCharacter == NULL )
+        return;
+    for (std::shared_ptr<SideBoundary> const& i : getSideBoundaries())
+    {
+        if (SideScroller::getInstance() -> checkSideCollision(thisCharacter.get(), i.get()))
+            break;
+    }
+    scrollObjects();
+}
+
+void GameState::scrollObjects()
+{
+    float totalScrollDistance = SideScroller::getInstance() -> getSideScrollDistance();
+    for (std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects()) 
+    {
+        sf::Vector2f currentCoords = i -> getPosition();
+        i -> setPosition(currentCoords - sf::Vector2f( totalScrollDistance, 0.f ));
+    }
+
+
 }
 
 std::shared_ptr<GraphicsObject> GameState::findObjById(int id)
@@ -279,6 +318,22 @@ int GameState::newCharacter()
     delete sp;
     return id;
 }
+
+// void GameState::respawn( int id )
+// {
+//     std::lock_guard<std::mutex> lock(stateMutex);
+//     SpawnPoint *sp = new
+//     findObjById( id )
+// }
+
+// void Character::respawn()
+// {
+//     this -> spawnPoint = new SpawnPoint();
+//     // SideScroller::getInstance() -> reset();
+//     distanceTravelled = 0.f;
+//     this -> setPosition(spawnPoint -> getPosition());
+//     this -> velocity = sf::Vector2f(0.f, 0.f);
+// }
 
 void GameState::removeObject(int id)
 {

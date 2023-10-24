@@ -20,21 +20,33 @@ class GameState
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
 
     public:
+            // raw game state: used by both client and server
         static GameState* getInstance();
-        static std::vector<std::string> split(const std::string& str, char delimiter);
-        void updateGameState();
         void setupGameState();
-        void getState();
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
         std::list<Character*> getCharacters();
-        std::shared_ptr<DeathZone> getDeathZone();
-        std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
         int newCharacter();
         void removeObject(int id);
-        std::string serialize();
-        void deserialize(std::string data);
-        void input(std::string objId, std::string i);
         std::shared_ptr<GraphicsObject> findObjById(int id);
+
+            // server game state
+
+        void updateGameState();
+        std::string serialize();
+        static std::vector<std::string> split(const std::string& str, char delimiter);
+        std::shared_ptr<DeathZone> getDeathZone();
+        void input(std::string objId, std::string i);
+
+
+            // client game state
+        void deserialize(std::string data);
+        std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
+        void checkSideCollision(int characterId);
+        void scrollObjects();
+
+        
+            // ?
+        void getState();
 };
 
 #endif
