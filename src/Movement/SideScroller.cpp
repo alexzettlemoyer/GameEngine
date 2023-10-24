@@ -1,10 +1,10 @@
 #include "SideScroller.h"
-#include "../GameRunner/GameState.h"
+#include "../GameRunner/ClientGameState.h"
 #include <iostream>
 
 SideScroller* SideScroller::instancePtr = nullptr;
 
-static const float SCROLL_SPEED = 5.f;
+static const float SCROLL_SPEED = 7.f;
 
 SideScroller::SideScroller()
 { }
@@ -39,9 +39,7 @@ bool SideScroller::checkSideCollision(GraphicsObject* character, GraphicsObject*
     {
         if ( intersection.width < intersection.height  )    // x collision
         {
-            std::cout << "Colliding in Side Scroller" << std::endl;
             // scroll the window
-            
             scrollWindow(dynamic_cast<SideBoundary*>(sideBoundary) -> getDirection());
         }
         else { }    // y collisions - do nothing
@@ -53,12 +51,12 @@ bool SideScroller::checkSideCollision(GraphicsObject* character, GraphicsObject*
 void SideScroller::scrollWindow(int direction)
 {
     // first edit the side scroll speed to in the direction
-    std::cout << "DIRECTION \t" << direction << std::endl;
 
     // Right side boundary collision:
     if (direction == SideBoundary::RIGHT && totalScrollDistance < MAX_POSITION)
         totalScrollDistance += SCROLL_SPEED;
 
+    // Left side boundary collision:
     if (direction == SideBoundary::LEFT && totalScrollDistance > MIN_POSITION)
         totalScrollDistance -= SCROLL_SPEED;
 
@@ -67,7 +65,7 @@ void SideScroller::scrollWindow(int direction)
 
 void SideScroller::reset()
 {
-    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+    for (std::shared_ptr<GraphicsObject> const& i : ClientGameState::getInstance() -> getGraphicsObjects())
     {
         i -> setPosition( i -> getOriginalPosition() );
     }

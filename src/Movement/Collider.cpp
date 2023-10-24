@@ -6,9 +6,8 @@
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/SideBoundary.h"
-#include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
-#include "../GameRunner/GameState.h"
+#include "../GameRunner/ServerGameState.h"
 #include <iostream>
 
 sf::FloatRect nextPosition;
@@ -44,7 +43,7 @@ void stopMovement(GraphicsObject &obj, int dir = -1)
 void eraseObj(GraphicsObject &obj)
 {   
     // remove drawn pointer from list
-    GameState::getInstance() -> removeObject(obj.identifier());
+    ServerGameState::getInstance() -> removeObject(obj.identifier());
 }
 
 // x: 0
@@ -71,9 +70,6 @@ bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
                 break;
             case GraphicsObject::DEATH:
                 std::cout << "DEATH X" << std::endl;
-                break;
-            case GraphicsObject::SCROLL:
-                // SideScroller::getInstance() -> scrollWindow(dynamic_cast<SideBoundary*>(&obj) -> getDirection());
                 break;
             default:
                 std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;

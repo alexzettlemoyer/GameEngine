@@ -1,8 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Collider.hpp"
-#include "../Draw/Draw.hpp"
 #include "../Time/Timeline.h"
-#include "SideScroller.h"
 #include <iostream>
 
 int mvmntDirCW = 0;                     // movement direction for the clockwise movement
@@ -30,7 +28,7 @@ const float CHANGE_DIFF_UPDOWN = 200.f;
  */
 bool movementClockwise(GraphicsObject& obj)
 {
-    originalPositionCW = obj.getOriginalPosition() - sf::Vector2f(SideScroller::getInstance() -> getSideScrollDistance(), 0);
+    originalPositionCW = obj.getOriginalPosition();
 
     // get the difference to the original position
     float xDiff = originalPositionCW.x - obj.getPosition().x;
@@ -70,7 +68,7 @@ bool movementClockwise(GraphicsObject& obj)
 bool movementLeftRight(GraphicsObject& obj)
 {  
     // if the first time, get the original position
-    originalPositionLR = obj.getOriginalPosition() - sf::Vector2f(SideScroller::getInstance() -> getSideScrollDistance(), 0);
+    originalPositionLR = obj.getOriginalPosition();
     float xDiff = originalPositionLR.x - obj.getPosition().x;
 
     if ( mvmntDirLR == 0  )  // left movement
@@ -93,7 +91,7 @@ bool movementLeftRight(GraphicsObject& obj)
 // - up     1
 bool movementUpDown(GraphicsObject& obj)
 {
-    originalPositionUPDOWN = obj.getOriginalPosition() - sf::Vector2f(SideScroller::getInstance() -> getSideScrollDistance(), 0);
+    originalPositionUPDOWN = obj.getOriginalPosition();
     float yDiff = obj.getPosition().y - originalPositionUPDOWN.y;
 
     if ( mvmntDirUPDOWN == 0 )  // down movement

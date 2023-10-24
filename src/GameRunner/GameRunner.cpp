@@ -1,10 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "GameRunner.h"
-#include "GameState.h"
-#include "../Draw/Draw.hpp"
-#include "../io/ioHandler.h"
+#include "ClientGameState.h"
 #include "../Time/Timeline.h"
-#include "../Time/Thread.cpp"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include <functional>
@@ -35,7 +32,7 @@ GameRunner::GameRunner(int clientId)
     background.setScale(1.f, 1.f);
     background.setTexture(backgroundTexture);
 
-    GameState::getInstance();
+    ClientGameState::getInstance();
 }
 
 GameRunner* GameRunner::getInstance(int id)
@@ -51,12 +48,12 @@ GameRunner* GameRunner::getInstance(int id)
  */
 void GameRunner::deserialize(std::string data)
 {
-    GameState::getInstance() -> deserialize( data );
+    ClientGameState::getInstance() -> deserialize( data );
 }
 
 void GameRunner::checkWindowScroll()
 {
-    GameState::getInstance() -> checkSideCollision( characterId );
+    ClientGameState::getInstance() -> checkSideCollision( characterId );
 }
 
 /**
@@ -66,7 +63,7 @@ void GameRunner::drawGraphics()
 {
     window.clear();
     window.draw(background);
-    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects()) {
+    for (std::shared_ptr<GraphicsObject> const& i : ClientGameState::getInstance() -> getGraphicsObjects()) {
         window.draw(*i);
     }
     window.display();

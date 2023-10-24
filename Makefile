@@ -3,7 +3,6 @@ SRC=src
 BIN=bin
 
 OBJ_FILES = $(BIN)/time.o \
-	   $(BIN)/sideScroller.o \
 	   $(BIN)/mover.o \
 	   $(BIN)/graphicsObject.o \
 	   $(BIN)/spawnPoint.o \
@@ -13,7 +12,13 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
 	   $(BIN)/collider.o \
-	   $(BIN)/gameState.o
+	   $(BIN)/gameState.o \
+	   $(BIN)/sideScroller.o \
+	   $(BIN)/gameRunner.o \
+	   $(BIN)/clientGameState.o \
+	   $(BIN)/serverGameState.o
+
+CLIENT_OBJ_FILES = 
 
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
@@ -62,6 +67,12 @@ $(BIN)/item.o: $(SRC)/GraphicsObject/Item.cpp
 $(BIN)/gameState.o: $(SRC)/GameRunner/GameState.cpp
 	g++ -c $< -o $@
 
+$(BIN)/serverGameState.o: $(SRC)/GameRunner/ServerGameState.cpp
+	g++ -c $< -o $@
+
+$(BIN)/clientGameState.o: $(SRC)/GameRunner/ClientGameState.cpp
+	g++ -c $< -o $@
+
 $(BIN)/gameRunner.o: $(SRC)/GameRunner/GameRunner.cpp
 	g++ -c $< -o $@
 
@@ -71,13 +82,11 @@ $(BIN)/server.o: $(SRC)/Network/Server.cpp
 gameServer: $(OBJ_FILES) $(BIN)/server.o
 	g++ $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
 
-
 $(BIN)/client.o: $(SRC)/Network/Client.cpp
 	g++ -c $< -o $@
 
-gameClient: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
-	g++ $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o gameClient $(LIBS)
-
+gameClient: $(OBJ_FILES) $(BIN)/client.o
+	g++ $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS)
 
 debugServer: $(OBJ_FILES) $(BIN)/server.o
 	g++ -pg $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)

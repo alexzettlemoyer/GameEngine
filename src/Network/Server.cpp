@@ -4,7 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-#include "../GameRunner/GameState.h"
+#include "../GameRunner/ServerGameState.h"
 
 std::mutex repMutex;
 
@@ -39,13 +39,13 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
         // if clients have already connected, they start all messages with their clientID
         // which is assigned to them on first connection
         std::string clientMessage = std::string(static_cast<char*>(request.data()), request.size());
-        std::vector<std::string> dataVector = GameState::split(clientMessage, ' ');
+        std::vector<std::string> dataVector = ServerGameState::getInstance() -> split(clientMessage, ' ');
         std::string clientID = dataVector[0];
 
         if (clientID == "REQ" || connections.find(clientID) == connections.end()) 
         {
             // Assign a connection number to the client
-            int idNum = GameState::getInstance() -> newCharacter();
+            int idNum = ServerGameState::getInstance() -> newCharacter();
             clientID = std::to_string(idNum);
             {
                 std::lock_guard<std::mutex> lock(repMutex);
@@ -61,7 +61,7 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
         else
         {
             for (int i = 1; i < dataVector.size(); i++)
-                GameState::getInstance() -> input(clientID, dataVector[i]);
+                ServerGameState::getInstance() -> input(clientID, dataVector[i]);
 
             // tell the client we received their update
             std::string response = "R";
@@ -94,8 +94,8 @@ int main()
         if ( connections.size() > 0 )
         {
                 // update the gameState each iteration
-            GameState::getInstance() -> updateGameState();
-            std::string data = GameState::getInstance() -> serialize();
+            ServerGameState::getInstance() -> updateGameState();
+            std::string data = ServerGameState::getInstance() -> serialize();
 
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);

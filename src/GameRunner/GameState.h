@@ -11,12 +11,13 @@
 
 class GameState
 {
-    private:
+    protected:
         GameState();
-        static GameState *instancePtr;
+        // static GameState *instancePtr;
+        static int objectId;
+        Timeline* timeline;
+        std::mutex stateMutex;
         float timescale;
-        std::shared_ptr<DeathZone> deathZone;
-        std::list<std::shared_ptr<SideBoundary>> sideBoundaries;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
 
     public:
@@ -24,29 +25,11 @@ class GameState
         static GameState* getInstance();
         void setupGameState();
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();
+        std::shared_ptr<GraphicsObject> findObjById(int id);
         std::list<Character*> getCharacters();
+        std::vector<std::string> split(const std::string& str, char delimiter);
         int newCharacter();
         void removeObject(int id);
-        std::shared_ptr<GraphicsObject> findObjById(int id);
-
-            // server game state
-
-        void updateGameState();
-        std::string serialize();
-        static std::vector<std::string> split(const std::string& str, char delimiter);
-        std::shared_ptr<DeathZone> getDeathZone();
-        void input(std::string objId, std::string i);
-
-
-            // client game state
-        void deserialize(std::string data);
-        std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
-        void checkSideCollision(int characterId);
-        void scrollObjects();
-
-        
-            // ?
-        void getState();
 };
 
 #endif

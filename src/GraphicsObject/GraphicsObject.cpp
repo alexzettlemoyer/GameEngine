@@ -2,10 +2,9 @@
 #include <SFML/System/Clock.hpp>
 #include <mutex>
 #include "GraphicsObject.h"
-#include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
-#include "../GameRunner/GameState.h"
+#include "../GameRunner/ServerGameState.h"
 #include <iostream>
 
 const float displacement = .025f;
@@ -132,7 +131,7 @@ void GraphicsObject::updateMovement()
 
 bool GraphicsObject::checkBounds()
 {
-    for (Character* i : GameState::getInstance() -> getCharacters())
+    for (Character* i : ServerGameState::getInstance() -> getCharacters())
     {
         if (checkCollision(*this, *i))
             return false;

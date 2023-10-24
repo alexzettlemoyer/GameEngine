@@ -3,10 +3,9 @@
 #include <thread>
 #include "GraphicsObject.h"
 #include "Character.h"
-#include "../Draw/Draw.hpp"
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
-#include "../GameRunner/GameState.h"
+#include "../GameRunner/ServerGameState.h"
 #include "../Movement/SideScroller.h"
 #include <iostream>
 
@@ -73,7 +72,7 @@ void Character::down()
 std::shared_ptr<GraphicsObject> Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
-    for (std::shared_ptr<GraphicsObject> const& i : (GameState::getInstance() -> getGraphicsObjects()))
+    for (std::shared_ptr<GraphicsObject> const& i : (ServerGameState::getInstance() -> getGraphicsObjects()))
     {
         if (i -> isGround() && isCharacterGrounded(*this, *i))
             return i;
@@ -136,7 +135,7 @@ bool Character::checkBounds()
     }
 
     //  if any of the objects collide
-    for (std::shared_ptr<GraphicsObject> const& i : GameState::getInstance() -> getGraphicsObjects())
+    for (std::shared_ptr<GraphicsObject> const& i : ServerGameState::getInstance() -> getGraphicsObjects())
     {
         // check if the graphicsObject is this character
         // if its not the same character (has the same ID), check for collisions
@@ -147,7 +146,7 @@ bool Character::checkBounds()
     }
 
         // check if we're colliding with the death zone
-    if (checkCollision(*this, *(GameState::getInstance() -> getDeathZone())))
+    if (checkCollision(*this, *(ServerGameState::getInstance() -> getDeathZone())))
     {
         // GameState::getInstance() -> respawn( id );
         respawn();
