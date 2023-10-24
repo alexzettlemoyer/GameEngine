@@ -106,8 +106,7 @@ void ServerGameState::input(std::string objId, std::string in)
             removeObject(charId);
             break;
         default:
-            // do nothing
-            break;
+            break;  // do nothing
     }
 }
 
@@ -129,7 +128,21 @@ std::string ServerGameState::serialize()
 
         // add all graphics objects
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects)
-        s << "[ " << i -> identifier() << " " << i -> getPosition().x << " " << i -> getPosition().y << " " << i -> getType() << " ]";
+    {
+        s << "[ " << i -> identifier() << " " << i -> getPosition().x << " " << i -> getPosition().y;
+        s << " " << i -> getType() << " ";
+
+        if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
+        {
+            bool respawned = dynamic_cast<Character*>(i.get()) -> wasRespawned();
+            if ( respawned )
+            {
+                std::cout << "respawned" << std::endl;
+                s << respawned << " ";
+            }
+        }
+        s << " ]";
+    }
 
         // convert the buffer into a string
     return s.str();

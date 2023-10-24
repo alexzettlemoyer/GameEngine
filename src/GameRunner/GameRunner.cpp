@@ -42,13 +42,18 @@ GameRunner* GameRunner::getInstance(int id)
     return instancePtr;
 }
 
+int GameRunner::getCharacterId()
+{
+    return characterId;
+}
+
 /**
  * deserializes game state data using the gameState deserialize function
  * used by the client to deserialize game state data (object positions)
  */
 void GameRunner::deserialize(std::string data)
 {
-    ClientGameState::getInstance() -> deserialize( data );
+    ClientGameState::getInstance() -> deserialize( data, characterId );
 }
 
 void GameRunner::checkWindowScroll()

@@ -20,7 +20,6 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     velocity.y = 0.f;
 
     previousVelocity = sf::Vector2f(0.f, 0.f);
-
     id = idNum;
 
     this -> timeline = timeline;

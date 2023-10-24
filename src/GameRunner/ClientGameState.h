@@ -13,7 +13,7 @@ class ClientGameState : public GameState
     public:
         static ClientGameState* getInstance();
         void setupClientGameState();
-        void deserialize(std::string data);
+        void deserialize(std::string data, int characterId);
         std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
         void checkSideCollision(int characterId);
         void scrollObjects();

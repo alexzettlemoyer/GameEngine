@@ -39,7 +39,7 @@ void ClientGameState::setupClientGameState()
  * sets up the GameState using the data
  * add any unrecognized objects
  */
-void ClientGameState::deserialize(std::string data)
+void ClientGameState::deserialize(std::string data, int characterId)
 {
     std::vector<std::string> objs = split(data, ']');
     std::set<int> currentGameIds;
@@ -75,10 +75,21 @@ void ClientGameState::deserialize(std::string data)
         else
         {
             currentObj.get() -> setPosition( sf::Vector2f(stof(objData[2]), stof(objData[3])) );
-            // if ( data.size() > 4 )
-            // {
-            //     data[ 5 ] // extra message
-            // }
+
+            if ( currentObj.get() -> identifier() == characterId )
+            {
+                float characterX = currentObj.get() -> getPosition().x;
+                float distTravelled = SideScroller::getInstance() -> getSideScrollDistance();
+
+                // the character's position is less than the distance travelled by scrolling
+                if ( characterX < distTravelled )
+                {
+                    // this means the character respawned
+                    // so reset the side scroller
+                    SideScroller::getInstance() -> reset();
+                    std::cout << "RESPAWN" << std::endl;
+                }
+            }
         }
     }
 

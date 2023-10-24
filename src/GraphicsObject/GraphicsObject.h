@@ -34,7 +34,6 @@ class GraphicsObject : public sf::RectangleShape
         int identifier();
         virtual int getType() const = 0;
 
-
     protected:
         bool ground;
         int id;

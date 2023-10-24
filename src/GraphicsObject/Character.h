@@ -13,8 +13,8 @@ class Character : public GraphicsObject
         sf::Texture characterTexture;
         std::shared_ptr<GraphicsObject> isGrounded();
         bool checkBounds();
-        void respawn();
         SpawnPoint *spawnPoint;
+        bool respawned;
 
     public:
         Character(sf::Vector2f position, int idNum, Timeline* timeline, SpawnPoint *spawnPoint = NULL);
@@ -23,6 +23,8 @@ class Character : public GraphicsObject
         void up();
         void right();
         void down();
+        void respawn();
+        bool wasRespawned();
         sf::Vector2f getVelocity();
         int getType() const override { return GraphicsObject::CHARACTER_TYPE; }
 };

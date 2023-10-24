@@ -92,22 +92,6 @@ int GameState::newCharacter()
     return id;
 }
 
-// void GameState::respawn( int id )
-// {
-//     std::lock_guard<std::mutex> lock(stateMutex);
-//     SpawnPoint *sp = new
-//     findObjById( id )
-// }
-
-// void Character::respawn()
-// {
-//     this -> spawnPoint = new SpawnPoint();
-//     // SideScroller::getInstance() -> reset();
-//     distanceTravelled = 0.f;
-//     this -> setPosition(spawnPoint -> getPosition());
-//     this -> velocity = sf::Vector2f(0.f, 0.f);
-// }
-
 void GameState::removeObject(int id)
 {
     std::lock_guard<std::mutex> lock(stateMutex);

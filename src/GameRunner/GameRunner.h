@@ -16,7 +16,6 @@ class GameRunner
         std::atomic<bool> isGameRunning;
         sf::RenderWindow window;
         sf::Sprite background;
-        // sf::RectangleShape background;
         sf::Texture backgroundTexture;
         int characterId;
             // create a view with its center and size
@@ -29,6 +28,7 @@ class GameRunner
         void checkWindowScroll();
         void deserialize(std::string data);
         std::string getState();
+        int getCharacterId();
 };
 
 #endif
