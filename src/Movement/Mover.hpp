@@ -1,8 +1,8 @@
 #ifndef MOVER_H
 #define MOVER_H
 
-    bool movementClockwise(GraphicsObject& obj);
-    bool movementLeftRight(GraphicsObject& obj);
-    bool movementUpDown(GraphicsObject& obj);
+    void movementClockwise(GraphicsObject& obj);
+    void movementLeftRight(GraphicsObject& obj);
+    void movementUpDown(GraphicsObject& obj);
 
 #endif

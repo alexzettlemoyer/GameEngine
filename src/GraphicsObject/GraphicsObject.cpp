@@ -25,6 +25,14 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     this -> timeline = timeline;
 }
 
+void GraphicsObject::setMovementFunction(MovementFunction func) {
+    movementFunction = func;
+}
+
+GraphicsObject::MovementFunction GraphicsObject::getMovementFunction()
+{
+    return movementFunction;
+}
 
 bool GraphicsObject::loadTexture(sf::Texture& texture, const std::string& image)
 {

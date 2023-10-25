@@ -26,7 +26,7 @@ const float CHANGE_DIFF_UPDOWN = 200.f;
  * @param &obj the address of the object to move
  * @return the boolean result of the movement
  */
-bool movementClockwise(GraphicsObject& obj)
+void movementClockwise(GraphicsObject& obj)
 {
     originalPositionCW = obj.getOriginalPosition();
 
@@ -58,14 +58,13 @@ bool movementClockwise(GraphicsObject& obj)
         if ( yDiff <= 0 )
             mvmntDirCW = 0;
     }
-    return true;
 }
 
 
 // Movement pattern:
 // - left   0
 // - right  2
-bool movementLeftRight(GraphicsObject& obj)
+void movementLeftRight(GraphicsObject& obj)
 {  
     // if the first time, get the original position
     originalPositionLR = obj.getOriginalPosition();
@@ -83,13 +82,12 @@ bool movementLeftRight(GraphicsObject& obj)
         if ( xDiff <= 0 )
             mvmntDirLR = 0;
     }
-    return true;
 }
 
 // Movement pattern:
 // - down   0
 // - up     1
-bool movementUpDown(GraphicsObject& obj)
+void movementUpDown(GraphicsObject& obj)
 {
     originalPositionUPDOWN = obj.getOriginalPosition();
     float yDiff = obj.getPosition().y - originalPositionUPDOWN.y;
@@ -106,5 +104,4 @@ bool movementUpDown(GraphicsObject& obj)
         if ( yDiff <= 0 )
             mvmntDirUPDOWN = 0;
     }
-    return true;
 }

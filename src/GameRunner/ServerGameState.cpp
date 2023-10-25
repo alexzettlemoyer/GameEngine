@@ -22,6 +22,11 @@ ServerGameState* ServerGameState::getInstance()
 void ServerGameState::setupServerGameState()
 {
     deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
+
+    findObjById(2) -> setMovementFunction( &movementClockwise );
+    findObjById(1) -> setMovementFunction( &movementLeftRight );
+    findObjById(4) -> setMovementFunction( &movementUpDown );
+
 }
 
 /**
@@ -37,19 +42,27 @@ void ServerGameState::updateGameState()
 {
     timeline -> updateDeltaTime();
 
-        // the item should move clockwise, id = 2
-    GraphicsObject* item = findObjById(2).get();
-    if (item != NULL )
-        movementClockwise(*item);
-    
-        // platform2 should move left right, id = 1
-    GraphicsObject* platform2 = findObjById(1).get();
-    if (platform2 != NULL )
-        movementLeftRight(*platform2);
 
-    GraphicsObject* platform3 = findObjById(4).get();
-    if (platform3 != NULL)
-        movementUpDown(*platform3);
+    for ( std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects() )
+    {
+        if ( i -> getMovementFunction() != nullptr )
+            i -> getMovementFunction()(*(i.get()));
+
+    }
+
+    //     // the item should move clockwise, id = 2
+    // GraphicsObject* item = findObjById(2).get();
+    // if (item != NULL )
+    //     movementClockwise(*item);
+    
+    //     // platform2 should move left right, id = 1
+    // GraphicsObject* platform2 = findObjById(1).get();
+    // if (platform2 != NULL )
+    //     movementLeftRight(*platform2);
+
+    // GraphicsObject* platform3 = findObjById(4).get();
+    // if (platform3 != NULL)
+    //     movementUpDown(*platform3);
 
         // update all the character movements
     for (std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects())

@@ -4,10 +4,13 @@
 #include <SFML/Graphics.hpp>
 #include <mutex>
 #include "../Time/Timeline.h"
+#include "GraphicsObject.h"
 
 
 class GraphicsObject : public sf::RectangleShape
 {
+    typedef void (*MovementFunction)(GraphicsObject&);
+
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline* timeline);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, DEATH, SCROLL, NONE };
@@ -33,6 +36,8 @@ class GraphicsObject : public sf::RectangleShape
         bool isGround();
         int identifier();
         virtual int getType() const = 0;
+        void setMovementFunction(MovementFunction func);
+        MovementFunction getMovementFunction();
 
     protected:
         bool ground;
@@ -43,7 +48,8 @@ class GraphicsObject : public sf::RectangleShape
         void blockMove();
         bool loadTexture(sf::Texture& texture, const std::string& image);
         Timeline *timeline;
-        float distanceTravelled;
+        MovementFunction movementFunction = nullptr;
+
 };
 
 #endif
