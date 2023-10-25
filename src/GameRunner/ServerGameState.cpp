@@ -42,31 +42,14 @@ void ServerGameState::updateGameState()
 {
     timeline -> updateDeltaTime();
 
-
+    // update movements for all objects
     for ( std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects() )
     {
+            // if the object has a movement function ( moves in a pattern ), call it
         if ( i -> getMovementFunction() != nullptr )
             i -> getMovementFunction()(*(i.get()));
 
-    }
-
-    //     // the item should move clockwise, id = 2
-    // GraphicsObject* item = findObjById(2).get();
-    // if (item != NULL )
-    //     movementClockwise(*item);
-    
-    //     // platform2 should move left right, id = 1
-    // GraphicsObject* platform2 = findObjById(1).get();
-    // if (platform2 != NULL )
-    //     movementLeftRight(*platform2);
-
-    // GraphicsObject* platform3 = findObjById(4).get();
-    // if (platform3 != NULL)
-    //     movementUpDown(*platform3);
-
-        // update all the character movements
-    for (std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects())
-    {
+            // update the movement of all characters
         if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
             dynamic_cast<Character*>(i.get()) -> updateMovement();
     }

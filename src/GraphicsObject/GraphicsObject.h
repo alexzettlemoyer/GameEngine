@@ -6,7 +6,6 @@
 #include "../Time/Timeline.h"
 #include "GraphicsObject.h"
 
-
 class GraphicsObject : public sf::RectangleShape
 {
     typedef void (*MovementFunction)(GraphicsObject&);
@@ -14,11 +13,15 @@ class GraphicsObject : public sf::RectangleShape
     public:
         GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline* timeline);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, DEATH, SCROLL, NONE };
+
+        // GraphicsObject types
         static const int CHARACTER_TYPE = 1;
         static const int PLATFORM_TYPE = 2;
         static const int ITEM_TYPE = 3;
         static const int DEATHZONE_TYPE = 4;
         static const int SIDE_BOUNDARY_TYPE = 5;
+
+        // some properties
         CollisionType collisionTypeX;
         CollisionType collisionTypeY;
         sf::Vector2f velocity;
@@ -27,15 +30,21 @@ class GraphicsObject : public sf::RectangleShape
         sf::Vector2f getPosition();
         sf::Vector2f getSize();
         sf::Vector2f getVelocity();
+
+        // movement functions
         void left();
         void up();
         void right();
         void down();
         void move(float x, float y);
         std::mutex objMutex;
+
+        // attribute getters
         bool isGround();
         int identifier();
         virtual int getType() const = 0;
+
+        // movement pattern functions
         void setMovementFunction(MovementFunction func);
         MovementFunction getMovementFunction();
 
