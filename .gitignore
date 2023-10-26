@@ -30,6 +30,8 @@
 *.exe
 *.out
 *.app
+gameServer
+gameClient
 
 .DS_Store
 /bin/

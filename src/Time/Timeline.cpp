@@ -30,6 +30,7 @@ void Timeline::updateDeltaTime()
         anchor -> updateDeltaTime();
 }
 
+// return the delta time in seconds
 float Timeline::getDt()
 {
     if (anchor != NULL)

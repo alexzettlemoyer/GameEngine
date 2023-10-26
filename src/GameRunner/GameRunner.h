@@ -27,7 +27,6 @@ class GameRunner
         void drawGraphics();
         void checkWindowScroll();
         void deserialize(std::string data);
-        std::string getState();
         int getCharacterId();
 };
 

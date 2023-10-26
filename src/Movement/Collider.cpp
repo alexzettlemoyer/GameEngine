@@ -93,7 +93,6 @@ bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
             case GraphicsObject::CHAR:
                 break;
             case GraphicsObject::DEATH:
-                std::cout << "DEATH Y " << obj.identifier() << std::endl;
                 break;
             default:
                 // std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;

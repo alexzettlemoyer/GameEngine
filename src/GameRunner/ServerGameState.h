@@ -17,6 +17,7 @@ class ServerGameState : public GameState
         std::string serialize();
         std::shared_ptr<DeathZone> getDeathZone();
         void input(std::string objId, std::string i);
+        float getDt();
 };
 
 #endif

@@ -1,6 +1,6 @@
 LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq
-SRC=src
 BIN=bin
+SRC=src
 
 OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/mover.o \
@@ -17,8 +17,6 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/gameRunner.o \
 	   $(BIN)/clientGameState.o \
 	   $(BIN)/serverGameState.o
-
-CLIENT_OBJ_FILES = 
 
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
@@ -89,10 +87,10 @@ gameClient: $(OBJ_FILES) $(BIN)/client.o
 	g++ $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS)
 
 debugServer: $(OBJ_FILES) $(BIN)/server.o
-	g++ -pg $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
+	g++ -g $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
 
-debugClient: $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o
-	g++ -g $(OBJ_FILES) $(BIN)/gameRunner.o $(BIN)/client.o -o gameClient $(LIBS)
+debugClient: $(OBJ_FILES) $(BIN)/client.o
+	g++ -g $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS)
 
 # debugging game
 # game -d: $(OBJS)

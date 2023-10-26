@@ -162,6 +162,11 @@ int main ()
         std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
 
         game -> deserialize(data);
+
+        // handle input
+
+        // move character
+
         game -> checkWindowScroll();
         game -> drawGraphics();
 
