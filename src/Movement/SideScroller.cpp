@@ -4,7 +4,7 @@
 
 SideScroller* SideScroller::instancePtr = nullptr;
 
-static const float SCROLL_SPEED = 7.f;
+static const float SCROLL_SPEED = 8.5f;
 
 SideScroller::SideScroller()
 { }
