@@ -30,7 +30,6 @@ Character::Character(sf::Vector2f position, int idNum, Timeline* timeline, Spawn
     this -> collisionTypeY = CHAR;
     this -> spawnPoint = spawnPoint;
     this -> respawned = false;
-    distanceTravelled = 0.f;
 }
 
 void Character::left()
@@ -119,7 +118,6 @@ void Character::respawn()
     this -> spawnPoint = new SpawnPoint();
     this -> setPosition(spawnPoint -> getPosition());
     this -> velocity = sf::Vector2f(0.f, 0.f);
-    this -> distanceTravelled = 0.f;
 }
 
 bool Character::wasRespawned()
