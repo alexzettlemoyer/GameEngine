@@ -1,9 +1,7 @@
 #include "SideBoundary.h"
 
     // window size = 1000x, 800y
-const static sf::Vector2f SIZE_SIDE_BOUNDARY = sf::Vector2f(250.f, 800.f);
-// const int SideBoundary::RIGHT = 0;
-// const int SideBoundary::LEFT = 1;
+const static sf::Vector2f SIZE_SIDE_BOUNDARY = sf::Vector2f(500.f, 800.f);
 
 SideBoundary::SideBoundary(const sf::Vector2f& position, int idNum, Timeline* timeline, int direction)
     : GraphicsObject(SIZE_SIDE_BOUNDARY, position, false, idNum, timeline)

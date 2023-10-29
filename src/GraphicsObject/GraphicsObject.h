@@ -20,6 +20,7 @@ class GraphicsObject : public sf::RectangleShape
         static const int ITEM_TYPE = 3;
         static const int DEATHZONE_TYPE = 4;
         static const int SIDE_BOUNDARY_TYPE = 5;
+        static const int SPAWN_POINT_TYPE = 6;
 
         // some properties
         CollisionType collisionTypeX;

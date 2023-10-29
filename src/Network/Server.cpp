@@ -8,6 +8,41 @@
 
 std::mutex repMutex;
 
+void handleDisconnects(std::unordered_map<std::string, int>& connections)
+{
+    while (true)
+    {
+        if ( connections.size() > 0)
+        {
+            std::vector<std::string> clientsToRemove;
+
+            // sleep for 5 seconds
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+
+            for ( auto& i : connections )
+            {
+                if ( i.second == 0 )  // client disconnected
+                {
+                    clientsToRemove.push_back( i.first );
+                }
+                i.second = 0;
+            }
+
+            // remove any clients with 0 new messages
+            for ( std::string key : clientsToRemove )
+            {
+                std::cout << "Client " << key << " disconnected." << std::endl;
+                ServerGameState::getInstance() -> removeObject( stoi(key) );
+
+                std::lock_guard<std::mutex> lock(repMutex);
+                connections.erase( key );
+            }
+        }
+    }
+}
+
+
+
 /**
  * reply-request socket function
  * thread is started in the main function that runs the replySocket function
@@ -38,18 +73,20 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
 
         // if clients have already connected, they start all messages with their clientID
         // which is assigned to them on first connection
-        std::string clientMessage = std::string(static_cast<char*>(request.data()), request.size());
+        std::string clientMessage = std::string(static_cast<char*>(request.data()), request.size());        
         std::vector<std::string> dataVector = ServerGameState::getInstance() -> split(clientMessage, ' ');
         std::string clientID = dataVector[0];
+
+        ServerGameState* game = ServerGameState::getInstance();
 
         if (clientID == "REQ" || connections.find(clientID) == connections.end()) 
         {
             // Assign a connection number to the client
-            int idNum = ServerGameState::getInstance() -> newCharacter();
+            int idNum = game -> newCharacter();
             clientID = std::to_string(idNum);
             {
                 std::lock_guard<std::mutex> lock(repMutex);
-                connections[clientID] = 0;
+                connections[clientID] = 1;
             }
             std::cout << "Client " << idNum << " connected." << std::endl;
 
@@ -60,8 +97,23 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
         }
         else
         {
-            for (int i = 1; i < dataVector.size(); i++)
-                ServerGameState::getInstance() -> input(clientID, dataVector[i]);
+            {
+                std::lock_guard<std::mutex> lock(repMutex);
+                connections[clientID] += 1;
+            }
+
+            game -> updateCharacterPosition(clientID, stof(dataVector[2]), stof(dataVector[3]));
+
+            for (int i = 5; i < dataVector.size(); i++)
+            {
+                game -> input( clientID, dataVector[ i ] );
+                if ( dataVector[ i ] == "8" )
+                {
+                    std::cout << "Client " << clientID << " disconnected." << std::endl;
+                    std::lock_guard<std::mutex> lock(repMutex);
+                    connections.erase( clientID );
+                }
+            }
 
             // tell the client we received their update
             std::string response = "R";
@@ -88,6 +140,9 @@ int main()
         // thread to handle server replies
     std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
 
+        // thread to check if any clients disconnected
+    std::thread disconnectThread(handleDisconnects, std::ref(connections));
+
         // Publish loop to all clients
     while(true)
     {
@@ -97,12 +152,15 @@ int main()
             ServerGameState::getInstance() -> updateGameState();
             std::string data = ServerGameState::getInstance() -> serialize();
 
+            // std::cout << data << std::endl;
+
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
+    disconnectThread.join();
     repThread.join();
     return 0;
 }

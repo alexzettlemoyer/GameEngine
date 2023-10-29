@@ -21,12 +21,9 @@ ServerGameState* ServerGameState::getInstance()
 
 void ServerGameState::setupServerGameState()
 {
-    deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
-
     findObjById(2) -> setMovementFunction( &movementClockwise );
     findObjById(1) -> setMovementFunction( &movementLeftRight );
     findObjById(4) -> setMovementFunction( &movementUpDown );
-
 }
 
 /**
@@ -48,42 +45,16 @@ void ServerGameState::updateGameState()
             // if the object has a movement function ( moves in a pattern ), call it
         if ( i -> getMovementFunction() != nullptr )
             i -> getMovementFunction()(*(i.get()));
-
-            // update the movement of all characters
-        if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
-            dynamic_cast<Character*>(i.get()) -> updateMovement();
     }
 }
 
-/**
- *  input function handles input from clients
- *  this function is called by the server, to apply client input to the game state
- *  
- *  parameters:
- *      objId - the id of the object to apply input to (the character/clients' id)
- *      in - the input string ( a number 1-9 denoted by clients' InputType enum )
- */
-void ServerGameState::input(std::string objId, std::string in)
+void ServerGameState::input(std::string objId, std::string i)
 {
-    int charId = stoi(objId);
-    int i = stoi(in);
-
-    switch (i)
+    int in = stoi( i );
+    switch( in )    
     {
-        case 0:             // character jump
-            dynamic_cast<Character*>(findObjById(charId).get()) -> up();
-            break;
-        case 1:             // character down
-            dynamic_cast<Character*>(findObjById(charId).get()) -> down();
-            break;
-        case 2:             // character left
-            dynamic_cast<Character*>(findObjById(charId).get()) -> left();
-            break;
-        case 3:             // character right
-            dynamic_cast<Character*>(findObjById(charId).get()) -> right();
-            break;
         case 4:
-            timeline -> editTicSize(Timeline::SCALE_HALF);
+            timeline -> editTicSize( Timeline::SCALE_HALF );
             std::cout << "HALF" << std::endl;
             break;
         case 5:
@@ -99,19 +70,41 @@ void ServerGameState::input(std::string objId, std::string in)
             std::cout << (timeline->isPaused() ? "PAUSING" : "UNPAUSING") << std::endl;
             break;
         case 8:     // CLIENT WINDOW CLOSED -> remove their character
-            removeObject(charId);
+            removeObject(stoi( objId ));
             break;
-        default:
-            break;  // do nothing
     }
 }
+
+void ServerGameState::updateCharacterPosition(std::string charId, float x, float y )
+{
+    std::lock_guard<std::mutex> lock(stateMutex);
+    std::shared_ptr<GraphicsObject> character = findObjById( stoi(charId) );
+    character -> setPosition(sf::Vector2f(x, y));
+}
+
+
+/**
+ * creates a new character and adds it to the list of graphics objects
+ * assigns the new character with the id of the client which connected to it
+ */
+int ServerGameState::newCharacter()
+{
+    std::lock_guard<std::mutex> lock(stateMutex);
+    int id = objectId++;
+    SpawnPoint *sp = new SpawnPoint();
+    graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
+    delete sp;
+    return id;
+}
+
 
 /**
  * serialize is used by the server
  * to compress relevant data about graphics objects needed by clients
  * format is:
+ *      [ dt ][ graphicsObjects ... ]
  *      each graphicsObject is contained in []
- *      [ id position.x position.y type ]
+ *      [ id position.x position.y velocity.x velocity.y type ]
  *      where type is either
  *          1: character
  *          2: platform
@@ -122,29 +115,17 @@ std::string ServerGameState::serialize()
     std::lock_guard<std::mutex> lock(stateMutex);
     std::stringstream s;
 
+    s << "[ " << timeline -> getDt() << " " << timeline -> getTicSize() << " ]";
+
         // add all graphics objects
     for (std::shared_ptr<GraphicsObject> const& i : graphicsObjects)
     {
         s << "[ " << i -> identifier() << " " << i -> getPosition().x << " " << i -> getPosition().y;
-        s << " " << i -> getType() << " ";
-
-        if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
-        {
-            bool respawned = dynamic_cast<Character*>(i.get()) -> wasRespawned();
-            if ( respawned )
-            {
-                std::cout << "respawned" << std::endl;
-                s << respawned << " ";
-            }
-        }
-        s << " ]";
+        s << " " << i -> getVelocity().x << " " << i -> getVelocity().y;
+        s << " " << i -> getType() << " ]";
     }
 
         // convert the buffer into a string
     return s.str();
 }
 
-std::shared_ptr<DeathZone> ServerGameState::getDeathZone()
-{
-    return deathZone;
-}

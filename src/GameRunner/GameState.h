@@ -13,15 +13,13 @@ class GameState
 {
     protected:
         GameState();
-        // static GameState *instancePtr;
         static int objectId;
         Timeline* timeline;
         std::mutex stateMutex;
         float timescale;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;
 
-    public:
-            // raw game state: used by both client and server
+    public: // raw game state: used by both client and server
         static GameState* getInstance();
         void setupGameState();
         std::list<std::shared_ptr<GraphicsObject>> getGraphicsObjects();

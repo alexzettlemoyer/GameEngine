@@ -140,7 +140,7 @@ bool GraphicsObject::checkBounds()
 {
     for (Character* i : ServerGameState::getInstance() -> getCharacters())
     {
-        if (checkCollision(*this, *i))
+        if (checkCollision(*this, *i, true))
             return false;
     }
     return true;

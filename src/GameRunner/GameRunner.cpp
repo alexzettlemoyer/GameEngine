@@ -1,9 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "GameRunner.h"
-#include "ClientGameState.h"
-#include "../Time/Timeline.h"
-#include "../GraphicsObject/GraphicsObject.h"
-#include "../GraphicsObject/Character.h"
+#include "../Movement/Collider.hpp"
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -22,17 +19,20 @@ static const std::string IMG_BACKGROUND = "images/background.jpeg";
 GameRunner::GameRunner(int clientId)
     : window(sf::VideoMode(1000, 800), "Glennwood Mania", sf::Style::Default)
 {
-    this -> characterId = clientId = clientId;
+    this -> characterId = clientId;
     window.setFramerateLimit(100);
-    // window.setView(view);
+    window.setView(view);
 
-        // setup background
-    if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
-        {} // Handle error
-    background.setScale(1.f, 1.f);
-    background.setTexture(backgroundTexture);
+    //     // setup background
+    // if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))
+    //     {} // Handle error
+    // background.setScale(1.f, 1.f);
+    // background.setTexture(backgroundTexture);
+    background.setFillColor(sf::Color(200, 252, 252));
+    background.setSize(sf::Vector2f(3000.f, 800.f));
+    background.setPosition(sf::Vector2f(0.f, 0.f));
 
-    ClientGameState::getInstance();
+    game = ClientGameState::getInstance( characterId );
 }
 
 GameRunner* GameRunner::getInstance(int id)
@@ -53,12 +53,20 @@ int GameRunner::getCharacterId()
  */
 void GameRunner::deserialize(std::string data)
 {
-    ClientGameState::getInstance() -> deserialize( data, characterId );
+    game -> deserialize( data, characterId );
 }
 
-void GameRunner::checkWindowScroll()
+void GameRunner::adjustView()
 {
-    ClientGameState::getInstance() -> checkSideCollision( characterId );
+    std::shared_ptr<Character> character = game -> getCharacter();
+    sf::Vector2f characterPosition = character -> getPosition();
+
+    if ( characterPosition.x < 500.f )
+        characterPosition.x = 500.f;
+    if ( characterPosition.x > 2500.f )
+        characterPosition.x = 2500.f;
+
+    view.setCenter(characterPosition.x - 2.f, 400);
 }
 
 /**
@@ -71,6 +79,11 @@ void GameRunner::drawGraphics()
     for (std::shared_ptr<GraphicsObject> const& i : ClientGameState::getInstance() -> getGraphicsObjects()) {
         window.draw(*i);
     }
+
+    adjustView();
+    window.setView(view);
+    // for ( std::shared_ptr<SideBoundary> const& i : ClientGameState::getInstance() -> getSideBoundaries() )
+    //     window.draw(*i);
     window.display();
 }
 

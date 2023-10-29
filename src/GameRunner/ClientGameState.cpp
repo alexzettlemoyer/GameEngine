@@ -4,38 +4,92 @@
 #include "../GraphicsObject/Platform.h"
 #include "../GraphicsObject/Item.h"
 #include "../GraphicsObject/Character.h"
-#include "../Movement/SideScroller.h"
 #include <set>
 #include <iostream>
 
 
 ClientGameState* ClientGameState::instancePtr = nullptr;
 
-ClientGameState::ClientGameState()
-{ 
-    setupClientGameState();
+ClientGameState::ClientGameState(int id)
+{
+    setupClientGameState(id);
 }
 
-ClientGameState* ClientGameState::getInstance()
+ClientGameState* ClientGameState::getInstance(int id)
 {
     if (instancePtr == NULL)
-        { instancePtr = new ClientGameState(); }
+        { instancePtr = new ClientGameState(id); }
     return instancePtr;
 }
 
-void ClientGameState::setupClientGameState()
+void ClientGameState::setupClientGameState(int id)
 {
-    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(750.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
-    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(0.f, 0.f), objectId++, timeline, SideBoundary::LEFT));
+    std::lock_guard<std::mutex> lock(stateMutex);
 
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(-500.f, 0.f), objectId++, timeline, SideBoundary::LEFT));
+    sideBoundaries.push_back(std::make_shared<SideBoundary>(sf::Vector2f(3000.f, 0.f), objectId++, timeline, SideBoundary::RIGHT));
+
+    deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
+    dt = 0.01;
+
+    SpawnPoint *sp = new SpawnPoint();
+    graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
+    thisCharacter = std::dynamic_pointer_cast<Character>(findObjById(id));
+}
+
+void ClientGameState::updateGameState()
+{
+    thisCharacter -> updateMovement();
+}
+
+sf::Vector2f ClientGameState::getCharacterPosition()
+{
+    return sf::Vector2f(thisCharacter -> getPosition());
+}
+
+std::shared_ptr<Character> ClientGameState::getCharacter()
+{
+    return thisCharacter;
+}
+
+/**
+ *  input function handles input from clients
+ *  this function is called by the server, to apply client input to the game state
+ *  
+ *  parameters:
+ *      objId - the id of the object to apply input to (the character/clients' id)
+ *      in - the input string ( a number 1-9 denoted by clients' InputType enum )
+ */
+void ClientGameState::input(std::string objId, int in)
+{
+    // int charId = stoi(objId);
+
+    switch (in)
+    {
+        case 0:             // character jump
+            thisCharacter -> up();
+            break;
+        case 1:             // character down
+            thisCharacter -> down();
+            break;
+        case 2:             // character left
+            thisCharacter -> left();
+            break;
+        case 3:             // character right
+            thisCharacter -> right();
+            break;
+        default:
+            break;  // do nothing
+    }
 }
 
 /**
  * deserialize is used by clients
  * to process the graphics object data sent by the client
  * format is:
+ *      [ dt ][ graphicsObjects ... ]
  *      each graphicsObject is contained in []
- *      [ id position.x position.y type ]
+ *      [ id position.x position.y velocity.x velocity.y type ]
  * sets up the GameState using the data
  * add any unrecognized objects
  */
@@ -44,28 +98,33 @@ void ClientGameState::deserialize(std::string data, int characterId)
     std::vector<std::string> objs = split(data, ']');
     std::set<int> currentGameIds;
 
-    for ( std::string const& obj : objs )
-    {
-        std::vector<std::string> objData = split(obj, ' ');
+    // get delta time
+    std::vector<std::string> timelineInfo = split(objs[ 0 ], ' ');
+    dt = stof(timelineInfo[ 1 ]);
+    ticSize = stof(timelineInfo[2]);
 
-        // ignore objData[0] -> '['
+    for ( int i = 1; i < objs.size(); i++ )
+    {
+        std::vector<std::string> objData = split(objs[ i ], ' ');
+
         int id = stoi(objData[1]);
-        currentGameIds.insert(id);
+        {
+            std::lock_guard<std::mutex> lock(stateMutex);
+            currentGameIds.insert(id);
+        }
+
         std::shared_ptr<GraphicsObject> currentObj = findObjById( id );
 
         // there is a new graphics object that this client hasn't stored yet
         if ( currentObj == NULL )
         {
-            switch(stoi(objData[4]))
+            switch(stoi(objData[6]))
             {
                 case GraphicsObject::CHARACTER_TYPE:
-                    graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
-                    break;
-                case GraphicsObject::PLATFORM_TYPE:
-                    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
-                    break;
-                case GraphicsObject::ITEM_TYPE:
-                    graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
+                    {
+                        std::lock_guard<std::mutex> lock(stateMutex);
+                        graphicsObjects.push_back(std::make_shared<Character>(sf::Vector2f(stof(objData[2]), stof(objData[3])), id, timeline));
+                    }
                     break;
                 default:
                     std::cout << "Error in deserialization: object cannot be created. id: " << id << std::endl;
@@ -74,21 +133,13 @@ void ClientGameState::deserialize(std::string data, int characterId)
         }
         else
         {
-            currentObj.get() -> setPosition( sf::Vector2f(stof(objData[2]), stof(objData[3])) );
-
-            if ( currentObj.get() -> identifier() == characterId )
+            if ( currentObj.get() -> identifier() != characterId )
             {
-                float characterX = currentObj.get() -> getPosition().x;
-                float distTravelled = SideScroller::getInstance() -> getSideScrollDistance();
+                sf::Vector2f newCoords = sf::Vector2f(stof(objData[2]), stof(objData[3]));
 
-                // the character's position is less than the distance travelled by scrolling
-                if ( characterX < distTravelled )
-                {
-                    // this means the character respawned
-                    // so reset the side scroller
-                    SideScroller::getInstance() -> reset();
-                    std::cout << "RESPAWN" << std::endl;
-                }
+                std::lock_guard<std::mutex> lock(stateMutex);
+                currentObj.get() -> setPosition( newCoords );
+                currentObj.get() -> velocity = sf::Vector2f(stof(objData[4]), stof(objData[5]));
             }
         }
     }
@@ -105,30 +156,22 @@ void ClientGameState::deserialize(std::string data, int characterId)
     }
 }
 
-void ClientGameState::checkSideCollision(int characterId)
-{
-    std::shared_ptr<GraphicsObject> thisCharacter = findObjById( characterId );
-    if ( thisCharacter == NULL )
-        return;
-    for (std::shared_ptr<SideBoundary> const& i : getSideBoundaries())
-    {
-        if (SideScroller::getInstance() -> checkSideCollision(thisCharacter.get(), i.get()))
-            break;
-    }
-    scrollObjects();
-}
-
-void ClientGameState::scrollObjects()
-{
-    float totalScrollDistance = SideScroller::getInstance() -> getSideScrollDistance();
-    for (std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects()) 
-    {
-        sf::Vector2f currentCoords = i -> getPosition();
-        i -> setPosition(currentCoords - sf::Vector2f( totalScrollDistance, 0.f ));
-    }
-}
-
 std::list<std::shared_ptr<SideBoundary>> ClientGameState::getSideBoundaries()
 {
     return sideBoundaries;
+}
+
+float ClientGameState::getDt()
+{
+    return dt;
+}
+
+float ClientGameState::getTicSize()
+{
+    return ticSize;
+}
+
+std::shared_ptr<DeathZone> ClientGameState::getDeathZone()
+{
+    return deathZone;
 }

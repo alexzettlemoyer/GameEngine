@@ -2,19 +2,19 @@
 #include <chrono>
 #include <cmath>
 #include <mutex>
-#include "SideScroller.h"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../GraphicsObject/Character.h"
 #include "../GraphicsObject/SideBoundary.h"
 #include "../Time/Timeline.h"
 #include "../GameRunner/ServerGameState.h"
+#include "../GameRunner/ClientGameState.h"
 #include <iostream>
 
 sf::FloatRect nextPosition;
-std::mutex characterMutex;
 
 bool isCharacterGrounded(Character &character, GraphicsObject &ground)
 {
+
     sf::FloatRect characterBounds = character.getGlobalBounds();
     sf::FloatRect otherBounds = ground.getGlobalBounds();
 
@@ -40,10 +40,20 @@ void stopMovement(GraphicsObject &obj, int dir = -1)
         obj.velocity.y = 0.f;  
 }
 
+/*
+ * TODO: handle with event
+ */
 void eraseObj(GraphicsObject &obj)
 {   
     // remove drawn pointer from list
-    ServerGameState::getInstance() -> removeObject(obj.identifier());
+    try {
+        ServerGameState::getInstance() -> removeObject(obj.identifier());
+    }
+    catch(...) {}
+    // try {
+    //     ClientGameState::getInstance() -> removeObject(obj.identifier());
+    // }
+    // catch(...) {}
 }
 
 // x: 0
@@ -124,7 +134,7 @@ bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
  *  AABB : axis-aligned line bounding box
  */
 
-bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
+bool checkCollision(GraphicsObject &obj, GraphicsObject &other, bool withResponse)
 {
     sf::FloatRect characterBounds = obj.getGlobalBounds();
     sf::FloatRect otherBounds = other.getGlobalBounds();
@@ -156,8 +166,11 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other)
             collisionDir = 1;           // y collision - do nothing for now
         else { }                         // perfect x=y collision - do nothing for now
         
-        collisionResponse(obj, other, collisionDir);
-        collisionResponse(other, obj, collisionDir);
+        if ( withResponse )
+        {
+            collisionResponse(obj, other, collisionDir);
+            collisionResponse(other, obj, collisionDir);
+        }
         return true;
     }
     

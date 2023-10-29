@@ -15,7 +15,6 @@
 #include "../Time/Timeline.h"
 #include "../Movement/Mover.hpp"
 #include "../Movement/Collider.hpp"
-#include "../Movement/SideScroller.h"
 
 // int objectId = 0;
 int GameState::objectId = 0;
@@ -41,14 +40,14 @@ void GameState::setupGameState()
     timeline = new Timeline();
 
     // setup graphics objects: platforms and item
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), objectId++, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), objectId++, timeline, 0));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(525.f, 650.f), objectId++, timeline, 1));
     graphicsObjects.push_back(std::make_shared<Item>(sf::Vector2f(800.f, 150.f), objectId++, timeline));
 
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1000.f, 500.f), objectId++, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1600.f, 400.f), objectId++, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 500.f), objectId++, timeline));
-    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2700.f, 500.f), objectId++, timeline));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1000.f, 500.f), objectId++, timeline, 2));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(1600.f, 400.f), objectId++, timeline, 0));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2200.f, 500.f), objectId++, timeline, 1));
+    graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(2700.f, 500.f), objectId++, timeline, 2));
 
     std::cout << "Successfully added " << graphicsObjects.size() << " Graphics Objects..." << std::endl;
 }
@@ -76,20 +75,6 @@ std::shared_ptr<GraphicsObject> GameState::findObjById(int id)
 std::list<std::shared_ptr<GraphicsObject>> GameState::getGraphicsObjects()
 {
     return graphicsObjects;
-}
-
-/**
- * creates a new character and adds it to the list of graphics objects
- * assigns the new character with the id of the client which connected to it
- */
-int GameState::newCharacter()
-{
-    std::lock_guard<std::mutex> lock(stateMutex);
-    int id = objectId++;
-    SpawnPoint *sp = new SpawnPoint();
-    graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
-    delete sp;
-    return id;
 }
 
 void GameState::removeObject(int id)

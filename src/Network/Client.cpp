@@ -4,7 +4,10 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <sstream>
 #include "../GameRunner/GameRunner.h"
+#include "../GameRunner/ClientGameState.h"
+
 
 // 60 fps
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
@@ -31,32 +34,38 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
     bool open = true;
     while (open)
     {
-        if (events.size() > 0)
+        std::stringstream inputData;
+        inputData << clientId << " ";
         {
-            std::string inputData = clientId;
+            std::lock_guard<std::mutex> lock(reqMutex);
+
+            sf::Vector2f charPosition = ClientGameState::getInstance() -> getCharacterPosition();
+            inputData << "[ " << charPosition.x << " " << charPosition.y << " ]";
+
+            for (InputType const& i: events)
             {
-                std::lock_guard<std::mutex> lock(reqMutex);
-                for (InputType const& i: events)
-                {
-                    inputData += " " + std::to_string(i);
-                }
-
-                // check if any of the inputs are WINDOW CLOSE
-                auto it = std::find(events.begin(), events.end(), CLOSE);
-                if (it != events.end())
-                    open = false;
-
-                events.clear();
+                if ( i == UP || i == DOWN || i == LEFT || i == RIGHT )
+                    ClientGameState::getInstance() -> input(clientId, static_cast<int>( i ));
+                else
+                    inputData << " " + std::to_string(i);
             }
 
-                // send input request
-            zmq::message_t inputRequest(inputData.data(), inputData.size());
-            reqSocket.send(inputRequest, zmq::send_flags::none);
+            // check if any of the inputs are WINDOW CLOSE
+            auto it = std::find(events.begin(), events.end(), CLOSE);
+            if (it != events.end())
+                open = false;
 
-                // wait to confirm the client received the request
-            zmq::message_t confirm;
-            zmq::recv_result_t result = reqSocket.recv(confirm, zmq::recv_flags::none);
+            events.clear();
         }
+
+        std::string inputString = inputData.str();
+            // send input request
+        zmq::message_t inputRequest(inputString.data(), inputString.size());
+        reqSocket.send(inputRequest, zmq::send_flags::none);
+
+            // wait to confirm the client received the request
+        zmq::message_t confirm;
+        zmq::recv_result_t result = reqSocket.recv(confirm, zmq::recv_flags::none);
     }
 }
 
@@ -156,18 +165,15 @@ int main ()
         // wait for server messages
     while (game -> getWindow() -> isOpen())
     {
-        zmq::message_t reply;
-        zmq::recv_result_t result = subSocket.recv(reply, zmq::recv_flags::none);
+        zmq::message_t publishedMsg;
+        zmq::recv_result_t result = subSocket.recv(publishedMsg, zmq::recv_flags::none);
+        std::string data = std::string(static_cast<char*>(publishedMsg.data()), publishedMsg.size());
 
-        std::string data = std::string(static_cast<char*>(reply.data()), reply.size());
-
-        game -> deserialize(data);
-
-        // handle input
+        if ( !data.empty() )
+            game -> deserialize(data);
 
         // move character
-
-        game -> checkWindowScroll();
+        ClientGameState::getInstance() -> updateGameState();
         game -> drawGraphics();
 
             // handle input

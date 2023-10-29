@@ -4,13 +4,11 @@
 #include "SpawnPoint.h"
 #include "GraphicsObject.h"
 
-class SpawnPoint
+class SpawnPoint : public GraphicsObject
 {
-    private:
-        sf::Vector2f position;
-
     public:
         SpawnPoint();
+        int getType() const override { return GraphicsObject::SPAWN_POINT_TYPE; }
         sf::Vector2f getPosition();
 };
 

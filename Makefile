@@ -13,7 +13,6 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/character.o \
 	   $(BIN)/collider.o \
 	   $(BIN)/gameState.o \
-	   $(BIN)/sideScroller.o \
 	   $(BIN)/gameRunner.o \
 	   $(BIN)/clientGameState.o \
 	   $(BIN)/serverGameState.o

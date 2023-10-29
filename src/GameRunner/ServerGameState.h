@@ -8,16 +8,16 @@ class ServerGameState : public GameState
     private:
         ServerGameState();
         static ServerGameState* instancePtr;
-        std::shared_ptr<DeathZone> deathZone;
 
     public:
         static ServerGameState* getInstance();
         void setupServerGameState();
         void updateGameState();
         std::string serialize();
-        std::shared_ptr<DeathZone> getDeathZone();
-        void input(std::string objId, std::string i);
         float getDt();
+        void input(std::string objId, std::string i);
+        int newCharacter();
+        void updateCharacterPosition(std::string charId, float x, float y );
 };
 
 #endif

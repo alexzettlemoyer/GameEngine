@@ -6,17 +6,26 @@
 class ClientGameState : public GameState
 {
     private: 
-        ClientGameState();
+        ClientGameState(int id);
         static ClientGameState* instancePtr;
         std::list<std::shared_ptr<SideBoundary>> sideBoundaries;
+        std::shared_ptr<DeathZone> deathZone;
+        std::shared_ptr<Character> thisCharacter;
+        float dt;
+        float ticSize;
 
     public:
-        static ClientGameState* getInstance();
-        void setupClientGameState();
+        static ClientGameState* getInstance(int id = 0);
+        void setupClientGameState(int id);
+        void updateGameState();
+        void input(std::string objId, int i);
         void deserialize(std::string data, int characterId);
         std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
-        void checkSideCollision(int characterId);
-        void scrollObjects();
+        float getDt();
+        float getTicSize();
+        std::shared_ptr<DeathZone> getDeathZone();
+        sf::Vector2f getCharacterPosition();
+        std::shared_ptr<Character> getCharacter();
 };
 
 #endif

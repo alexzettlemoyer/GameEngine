@@ -5,17 +5,18 @@
 #include "Character.h"
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
-#include "../GameRunner/ServerGameState.h"
-#include "../Movement/SideScroller.h"
+#include "../GameRunner/ClientGameState.h"
 #include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(116.f, 256.f);
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .085f;
-static const float acceleration = -1600.f;
-static const float GRAVITY = 300.f;
+static const float displacement = .15f;          // .085f
+static const float acceleration = -2500.f;      // -1600.f
+static const float GRAVITY = 700.f;             // 300.f
+
+static const float FRICTION = 3.2f;
 
 sf::Vector2f initialPosition;
 
@@ -34,37 +35,41 @@ Character::Character(sf::Vector2f position, int idNum, Timeline* timeline, Spawn
 
 void Character::left()
 {
-    float dt = timeline -> getDt();
+    float dt = ClientGameState::getInstance() -> getDt();
+    float ticSize = ClientGameState::getInstance() -> getTicSize();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (-displacement / dt) * timeline -> getTicSize();
+        velocity.x += (-displacement / dt) * ticSize;
     }
     updateMovement();
 }
 void Character::up()
 {
-    float dt = timeline -> getDt();
+    float dt = ClientGameState::getInstance() -> getDt();
+    float ticSize = ClientGameState::getInstance() -> getTicSize();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y = (acceleration * dt) * timeline -> getTicSize();
+        velocity.y = (acceleration * dt) * ticSize;
     }
     updateMovement();
 }
 void Character::right()
 {
-    float dt = timeline -> getDt();
+    float dt = ClientGameState::getInstance() -> getDt();
+    float ticSize = ClientGameState::getInstance() -> getTicSize();
     { 
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.x += (displacement / dt) * timeline -> getTicSize();
+        velocity.x += (displacement / dt) * ticSize;
     }
     updateMovement();
 }
 void Character::down()
 {
-    float dt = timeline -> getDt();
+    float dt = ClientGameState::getInstance() -> getDt();
+    float ticSize = ClientGameState::getInstance() -> getTicSize();
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (displacement / dt) * timeline -> getTicSize();
+        velocity.y += (displacement / dt) * ticSize;
     }
     updateMovement();
 }
@@ -72,22 +77,24 @@ void Character::down()
 std::shared_ptr<GraphicsObject> Character::isGrounded()
 {
     //  if the character is on top of any of the platforms
-    for (std::shared_ptr<GraphicsObject> const& i : (ServerGameState::getInstance() -> getGraphicsObjects()))
+    for (std::shared_ptr<GraphicsObject> const& i : (ClientGameState::getInstance() -> getGraphicsObjects()))
     {
         if (i -> isGround() && isCharacterGrounded(*this, *i))
             return i;
     }
-
     return nullptr;
 }
 
 void Character::updateMovement()
 {
     std::shared_ptr<GraphicsObject> ground = isGrounded();
+    float dt = ClientGameState::getInstance() -> getDt();
+    float ticSize = ClientGameState::getInstance() -> getTicSize();
+
     if (ground == nullptr)
     {
         std::lock_guard<std::mutex> lock(this->objMutex);
-        velocity.y += (GRAVITY * timeline -> getDt()) * timeline -> getTicSize();
+        velocity.y += (GRAVITY * dt) * ticSize;
     }
     else 
     {
@@ -96,14 +103,16 @@ void Character::updateMovement()
         if ( velocity.y > 0 )   // character is moving down
             velocity.y = 0;     // but they're on a ground -> do not allow
 
-        velocity.x += ground -> getVelocity().x;
-        velocity.y += ground -> getVelocity().y;
+        velocity.x += (ground -> getVelocity().x) * FRICTION;
+        velocity.y += (ground -> getVelocity().y) * FRICTION;
+        
 
         // sometimes the character moves along an up/down moving platform and add the platforms' velocity
         // but the rendering is delayed, so it appears that the character is standing below the platform
         // to fix this, keep the characters' velocity > the platforms'
         if ( velocity.y > 1.f )
-            velocity.y -= 1.f;
+            velocity.y -= 5.f;
+
     }
     if (!checkBounds())
         move(velocity.x, velocity.y);
@@ -113,6 +122,9 @@ void Character::updateMovement()
 
 void Character::respawn()
 {
+    if (this->spawnPoint)
+        delete this->spawnPoint;
+
     this -> respawned = true;
 
     this -> spawnPoint = new SpawnPoint();
@@ -145,29 +157,33 @@ bool Character::checkBounds()
         return false;
     }
 
-    if ( thisRect.left < 0.f )
+    // check if we're beyond any side boundaries
+    for ( auto& i : ClientGameState::getInstance() -> getSideBoundaries() )
     {
-        std::lock_guard<std::mutex> lock(this->objMutex);
-        this -> setPosition(0.1f, position.y);
-    }
-
-    //  if any of the objects collide
-    for (std::shared_ptr<GraphicsObject> const& i : ServerGameState::getInstance() -> getGraphicsObjects())
-    {
-        // check if the graphicsObject is this character
-        // if its not the same character (has the same ID), check for collisions
-        if (i.get() -> identifier() != this -> identifier())
+        if ( checkCollision( *this, *(i.get()), false))
         {
-            checkCollision(*this, *i);
+            if ( i -> getDirection() == SideBoundary::RIGHT )
+            {
+                std::lock_guard<std::mutex> lock(this->objMutex);
+                this -> setPosition(i -> getPosition().x - 0.1f - thisRect.width, position.y);
+            }
+
+            if ( i -> getDirection() == SideBoundary::LEFT )
+            {
+                std::lock_guard<std::mutex> lock(this->objMutex);
+                this -> setPosition(0.1f, position.y);
+            }
         }
     }
-
         // check if we're colliding with the death zone
-    if (checkCollision(*this, *(ServerGameState::getInstance() -> getDeathZone())))
+    if (checkCollision(*this, *(ClientGameState::getInstance() -> getDeathZone()), false))
     {
         // GameState::getInstance() -> respawn( id );
         respawn();
         return false;
     }
+
+
+
     return false;
 }
