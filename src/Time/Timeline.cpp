@@ -30,6 +30,12 @@ void Timeline::updateDeltaTime()
         anchor -> updateDeltaTime();
 }
 
+float Timeline::getTimeStamp()
+{
+    std::chrono::duration<float> elapsed = std::chrono::system_clock::now() - startTime;
+    return elapsed.count();
+}
+
 // return the delta time in seconds
 float Timeline::getDt()
 {

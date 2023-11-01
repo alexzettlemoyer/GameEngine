@@ -21,6 +21,7 @@ class Timeline
         static constexpr double SCALE_REAL = 1.0;
         static constexpr double SCALE_DOUBLE = 2.0;
         static Timeline *getInstance();
+        float getTimeStamp();
         void pause();
         bool isPaused();
         float getDt();

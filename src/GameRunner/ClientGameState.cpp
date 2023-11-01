@@ -7,7 +7,6 @@
 #include <set>
 #include <iostream>
 
-
 ClientGameState* ClientGameState::instancePtr = nullptr;
 
 ClientGameState::ClientGameState(int id)

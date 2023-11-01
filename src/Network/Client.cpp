@@ -7,7 +7,8 @@
 #include <sstream>
 #include "../GameRunner/GameRunner.h"
 #include "../GameRunner/ClientGameState.h"
-
+#include "../Time/Timeline.h"
+#include "../Events/EventHandler.h"
 
 // 60 fps
 enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
@@ -31,6 +32,14 @@ std::mutex reqMutex;
  */
 void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<InputType>& events)
 {
+    Timeline* t = new Timeline();
+
+    Event e;
+    e.addTimeVariant(t -> getTimeStamp());
+
+    EventHandler::getInstance() -> onEvent(e);
+
+
     bool open = true;
     while (open)
     {

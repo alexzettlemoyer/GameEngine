@@ -37,6 +37,8 @@ void ServerGameState::setupServerGameState()
  */
 void ServerGameState::updateGameState()
 {
+    timeline -> getTimeStamp();
+
     timeline -> updateDeltaTime();
 
     // update movements for all objects
