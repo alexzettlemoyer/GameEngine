@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <mutex>
+#include <memory>
 #include "../Time/Timeline.h"
 #include "GraphicsObject.h"
 
@@ -11,7 +12,7 @@ class GraphicsObject : public sf::RectangleShape
     typedef void (*MovementFunction)(GraphicsObject&);
 
     public:
-        GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline* timeline);
+        GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, std::shared_ptr<Timeline> timeline);
         enum CollisionType { STOP_MOVEMENT, ERASE, PUSH, CHAR, DEATH, SCROLL, NONE };
 
         // GraphicsObject types
@@ -57,7 +58,7 @@ class GraphicsObject : public sf::RectangleShape
         void updateMovement();
         void blockMove();
         bool loadTexture(sf::Texture& texture, const std::string& image);
-        Timeline *timeline;
+        std::shared_ptr<Timeline> timeline;
         MovementFunction movementFunction = nullptr;
 
 };

@@ -14,7 +14,7 @@ class GameState
     protected:
         GameState();
         static int objectId;
-        Timeline* timeline;
+        std::shared_ptr<Timeline> timeline;
         std::mutex stateMutex;
         float timescale;
         std::list<std::shared_ptr<GraphicsObject>> graphicsObjects;

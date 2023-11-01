@@ -8,6 +8,7 @@
 #include "../GameRunner/GameRunner.h"
 #include "../GameRunner/ClientGameState.h"
 #include "../Time/Timeline.h"
+#include "../Events/Event.h"
 #include "../Events/EventHandler.h"
 
 // 60 fps
@@ -32,13 +33,8 @@ std::mutex reqMutex;
  */
 void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<InputType>& events)
 {
-    Timeline* t = new Timeline();
-
-    Event e;
-    e.addTimeVariant(t -> getTimeStamp());
-
-    EventHandler::getInstance() -> onEvent(e);
-
+    // Timeline* t = new Timeline();
+    // EventHandler::getInstance( t );
 
     bool open = true;
     while (open)
@@ -53,7 +49,16 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
 
             for (InputType const& i: events)
             {
-                if ( i == UP || i == DOWN || i == LEFT || i == RIGHT )
+                if ( i == UP )
+                {
+                    // Event e;
+                    // e.setEventType(Event::C_UP);
+                    // e.addTimeVariant(t -> getTimeStamp());
+                    // e.addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+
+                    // EventHandler::getInstance() -> onEvent(e);
+                }
+                if ( i == DOWN || i == LEFT || i == RIGHT )
                     ClientGameState::getInstance() -> input(clientId, static_cast<int>( i ));
                 else
                     inputData << " " + std::to_string(i);
@@ -166,6 +171,7 @@ int main ()
 
         // start the game window!
     GameRunner *game = GameRunner::getInstance(std::stoi(clientId));
+    ClientGameState *gameState = ClientGameState::getInstance();
     game -> drawGraphics();
 
     // start thread for io handling
@@ -182,7 +188,7 @@ int main ()
             game -> deserialize(data);
 
         // move character
-        ClientGameState::getInstance() -> updateGameState();
+        gameState -> updateGameState();
         game -> drawGraphics();
 
             // handle input
@@ -195,7 +201,8 @@ int main ()
             }
         }
     }
-    
+    delete game;
+    delete gameState;
     reqThread.join();
     return 0;
 }

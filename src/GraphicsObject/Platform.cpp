@@ -8,7 +8,7 @@ const float movementSpeed = 200.f;
 
 std::vector<sf::Color> colors = { sf::Color(210, 250, 212), sf::Color(sf::Color(210, 211, 250)), sf::Color(247, 210, 250) };
 
-Platform::Platform(const sf::Vector2f& position, int idNum, Timeline* timeline, int colorNum)
+Platform::Platform(const sf::Vector2f& position, int idNum, std::shared_ptr<Timeline> timeline, int colorNum)
     : GraphicsObject(SIZE_PLATFORM, position, true, idNum, timeline)
 {
     // if (!loadTexture(platformTexture, IMG_PLATFORM.c_str()))

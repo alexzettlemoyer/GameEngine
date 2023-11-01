@@ -21,12 +21,13 @@ static const float FRICTION = 3.2f;
 sf::Vector2f initialPosition;
 
 // Constructor
-Character::Character(sf::Vector2f position, int idNum, Timeline* timeline, SpawnPoint *spawnPoint)
+Character::Character(sf::Vector2f position, int idNum, std::shared_ptr<Timeline> timeline, std::shared_ptr<SpawnPoint> spawnPoint)
     : GraphicsObject(SIZE_CHARACTER, position, false, idNum, timeline)
 {
-    if (!loadTexture(characterTexture, IMG_CHARACTER.c_str()))
+    characterTexture = std::make_shared<sf::Texture>();
+    if (!loadTexture(*characterTexture, IMG_CHARACTER.c_str()))
         {}          // TODO: handle error
-    this -> setTexture(&characterTexture);
+    this -> setTexture(characterTexture.get());
     this -> collisionTypeX = CHAR;
     this -> collisionTypeY = CHAR;
     this -> spawnPoint = spawnPoint;
@@ -122,12 +123,12 @@ void Character::updateMovement()
 
 void Character::respawn()
 {
-    if (this->spawnPoint)
-        delete this->spawnPoint;
+    // if (this->spawnPoint)
+    //     delete this->spawnPoint;
 
     this -> respawned = true;
 
-    this -> spawnPoint = new SpawnPoint();
+    this -> spawnPoint = std::make_shared<SpawnPoint>();
     this -> setPosition(spawnPoint -> getPosition());
     this -> velocity = sf::Vector2f(0.f, 0.f);
 }

@@ -37,7 +37,7 @@ void GameState::setupGameState()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
 
-    timeline = new Timeline();
+    timeline = std::make_shared<Timeline>();
 
     // setup graphics objects: platforms and item
     graphicsObjects.push_back(std::make_shared<Platform>(sf::Vector2f(25.f, 520.f), objectId++, timeline, 0));

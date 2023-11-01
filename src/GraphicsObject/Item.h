@@ -7,10 +7,10 @@
 class Item : public GraphicsObject
 {
     private:
-        sf::Texture moneyTexture;
+        std::shared_ptr<sf::Texture> moneyTexture;
         
     public:
-        Item(const sf::Vector2f& position, int idNum, Timeline* timeline);
+        Item(const sf::Vector2f& position, int idNum, std::shared_ptr<Timeline> timeline);
         int getType() const override { return GraphicsObject::ITEM_TYPE; }
 };
 

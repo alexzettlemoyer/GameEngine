@@ -10,14 +10,14 @@
 class Character : public GraphicsObject
 {
     private:
-        sf::Texture characterTexture;
+        std::shared_ptr<sf::Texture> characterTexture;
         std::shared_ptr<GraphicsObject> isGrounded();
+        std::shared_ptr<SpawnPoint> spawnPoint;
         bool checkBounds();
-        SpawnPoint *spawnPoint;
         bool respawned;
 
     public:
-        Character(sf::Vector2f position, int idNum, Timeline* timeline, SpawnPoint *spawnPoint = NULL);
+        Character(sf::Vector2f position, int idNum, std::shared_ptr<Timeline> timeline, std::shared_ptr<SpawnPoint> spawnPoint = nullptr);
         void updateMovement();
         void left();
         void up();

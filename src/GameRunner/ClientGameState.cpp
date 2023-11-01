@@ -4,6 +4,7 @@
 #include "../GraphicsObject/Platform.h"
 #include "../GraphicsObject/Item.h"
 #include "../GraphicsObject/Character.h"
+#include "../Events/EventHandler.h"
 #include <set>
 #include <iostream>
 
@@ -31,13 +32,15 @@ void ClientGameState::setupClientGameState(int id)
     deathZone = std::make_shared<DeathZone>(sf::Vector2f(0.f, 700.f), objectId++, timeline);
     dt = 0.01;
 
-    SpawnPoint *sp = new SpawnPoint();
+    std::shared_ptr<SpawnPoint> sp = std::make_shared<SpawnPoint>();
+
     graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
     thisCharacter = std::dynamic_pointer_cast<Character>(findObjById(id));
 }
 
 void ClientGameState::updateGameState()
 {
+    EventHandler::getInstance() -> handleEvents();
     thisCharacter -> updateMovement();
 }
 
@@ -65,9 +68,9 @@ void ClientGameState::input(std::string objId, int in)
 
     switch (in)
     {
-        case 0:             // character jump
-            thisCharacter -> up();
-            break;
+        // case 0:             // character jump
+        //     thisCharacter -> up();
+        //     break;
         case 1:             // character down
             thisCharacter -> down();
             break;

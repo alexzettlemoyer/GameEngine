@@ -93,9 +93,11 @@ int ServerGameState::newCharacter()
 {
     std::lock_guard<std::mutex> lock(stateMutex);
     int id = objectId++;
-    SpawnPoint *sp = new SpawnPoint();
+    // SpawnPoint *sp = new SpawnPoint();
+
+    std::shared_ptr<SpawnPoint> sp = std::make_shared<SpawnPoint>();
     graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
-    delete sp;
+    // delete sp;
     return id;
 }
 

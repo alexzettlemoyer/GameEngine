@@ -143,14 +143,15 @@ int main()
         // thread to check if any clients disconnected
     std::thread disconnectThread(handleDisconnects, std::ref(connections));
 
+    ServerGameState* game = ServerGameState::getInstance();
         // Publish loop to all clients
     while(true)
     {
         if ( connections.size() > 0 )
         {
                 // update the gameState each iteration
-            ServerGameState::getInstance() -> updateGameState();
-            std::string data = ServerGameState::getInstance() -> serialize();
+            game -> updateGameState();
+            std::string data = game -> serialize();
 
             // std::cout << data << std::endl;
 
@@ -162,5 +163,6 @@ int main()
     }
     disconnectThread.join();
     repThread.join();
+    delete game;
     return 0;
 }

@@ -10,7 +10,7 @@ class SideBoundary : public GraphicsObject
         int direction;
 
     public:
-        SideBoundary(const sf::Vector2f& position, int idNum, Timeline* timeline, int direction);
+        SideBoundary(const sf::Vector2f& position, int idNum, std::shared_ptr<Timeline> timeline, int direction);
         int getType() const override { return GraphicsObject::SIDE_BOUNDARY_TYPE; }
         int getDirection();
         static inline const int RIGHT = 0;

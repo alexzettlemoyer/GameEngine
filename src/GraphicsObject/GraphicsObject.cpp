@@ -9,7 +9,7 @@
 
 const float displacement = .025f;
 
-GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, Timeline *timeline)
+GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, std::shared_ptr<Timeline> timeline)
 {
     this -> setSize(size);
     this -> setPosition(position);

@@ -9,7 +9,7 @@ class DeathZone : public GraphicsObject
     private:
         
     public:
-        DeathZone(const sf::Vector2f& position, int idNum, Timeline* timeline);
+        DeathZone(const sf::Vector2f& position, int idNum, std::shared_ptr<Timeline> timeline);
         int getType() const override { return GraphicsObject::DEATHZONE_TYPE; }
 };
 

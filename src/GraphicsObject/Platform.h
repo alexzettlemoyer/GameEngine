@@ -10,7 +10,7 @@ class Platform : public GraphicsObject
         sf::Texture platformTexture;
     
     public: 
-        Platform(const sf::Vector2f& position, int idNum, Timeline* timeline, int colorNum = 0);
+        Platform(const sf::Vector2f& position, int idNum, std::shared_ptr<Timeline> timeline, int colorNum = 0);
         int getType() const override { return GraphicsObject::PLATFORM_TYPE; }
 };
 

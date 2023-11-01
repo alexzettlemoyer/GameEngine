@@ -6,14 +6,16 @@
 class EventHandler
 {
     private:
-        EventHandler();
+        EventHandler(Timeline *t);
         static EventHandler* instancePtr;
-        std::map<float, Event e> queue;
+        std::map<float, Event> queue;
         Timeline* timeline;
+
+        void processEvent(Event e);
+        void handleCharacterInput(Event::EventType type, Event e);
 
     public:
         static EventHandler* getInstance(Timeline* t = NULL);
-        enum EventType { C_UP, C_DOWN, C_LEFT, C_RIGHT, C_DEATH, C_SPAWN, PAUSE, TIC_CHANGE };
         void onEvent( Event e );
         void handleEvents();
 };
