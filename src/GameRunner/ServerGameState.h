@@ -2,12 +2,14 @@
 #define SERVER_GAME_STATE_H
 
 #include "GameState.h"
+#include "../Events/Eventhandler.h"
 
 class ServerGameState : public GameState
 {
     private:
         ServerGameState();
         static ServerGameState* instancePtr;
+        EventHandler* eventHandler;
 
     public:
         static ServerGameState* getInstance();

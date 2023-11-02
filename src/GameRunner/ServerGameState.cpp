@@ -2,6 +2,8 @@
 #include "ServerGameState.h"
 #include "../GraphicsObject/GraphicsObject.h"
 #include "../Movement/Mover.hpp"
+#include "../Events/Event.h"
+#include "../Events/EventHandler.h"
 #include <sstream>
 #include <iostream>
 
@@ -21,6 +23,7 @@ ServerGameState* ServerGameState::getInstance()
 
 void ServerGameState::setupServerGameState()
 {
+    eventHandler = EventHandler::getInstance( timeline.get() );
     findObjById(2) -> setMovementFunction( &movementClockwise );
     findObjById(1) -> setMovementFunction( &movementLeftRight );
     findObjById(4) -> setMovementFunction( &movementUpDown );
@@ -37,7 +40,7 @@ void ServerGameState::setupServerGameState()
  */
 void ServerGameState::updateGameState()
 {
-    timeline -> getTimeStamp();
+    EventHandler::getInstance() -> handleEvents();
 
     timeline -> updateDeltaTime();
 
@@ -53,27 +56,35 @@ void ServerGameState::updateGameState()
 void ServerGameState::input(std::string objId, std::string i)
 {
     int in = stoi( i );
-    switch( in )    
+
+    // if the input is tic size HALF, REAL, DOUBLE
+    if ( in == 4 || in == 5 || in == 6 )
     {
-        case 4:
-            timeline -> editTicSize( Timeline::SCALE_HALF );
-            std::cout << "HALF" << std::endl;
-            break;
-        case 5:
-            timeline -> editTicSize(Timeline::SCALE_REAL);
-            std::cout << "REAL" << std::endl;
-            break;
-        case 6:
-            timeline -> editTicSize(Timeline::SCALE_DOUBLE);
-            std::cout << "DOUBLE" << std::endl;
-            break;
-        case 7:
-            timeline -> pause();
-            std::cout << (timeline->isPaused() ? "PAUSING" : "UNPAUSING") << std::endl;
-            break;
-        case 8:     // CLIENT WINDOW CLOSED -> remove their character
-            removeObject(stoi( objId ));
-            break;
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::TIC_CHANGE, timeline -> getTimeStamp());
+        e -> addTimelineVariant(timeline.get());
+
+        if ( in == 4 )
+            e -> addTicScaleVariant(Timeline::SCALE_HALF);
+        if ( in == 5 )
+            e -> addTicScaleVariant(Timeline::SCALE_REAL);
+        if ( in == 6 )
+            e -> addTicScaleVariant(Timeline::SCALE_DOUBLE);
+
+        EventHandler::getInstance() -> onEvent(e);
+    }
+    else if ( in == 7 )         // timeline paused
+    {
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::PAUSE, timeline -> getTimeStamp());
+        e -> addTimelineVariant(timeline.get());
+
+        EventHandler::getInstance() -> onEvent(e);
+    }
+    else if ( in == 8 )         // client window closed -> removes their character
+    {
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::WINDOW_CLOSE, timeline -> getTimeStamp());
+        e -> addCharacterIdVariant( stoi(objId));
+
+        EventHandler::getInstance() -> onEvent(e);
     }
 }
 

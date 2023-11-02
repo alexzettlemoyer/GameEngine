@@ -140,7 +140,7 @@ bool GraphicsObject::checkBounds()
 {
     for (Character* i : ServerGameState::getInstance() -> getCharacters())
     {
-        if (checkCollision(*this, *i, true))
+        if (checkCollision(*i, *this, true))
             return false;
     }
     return true;
@@ -149,4 +149,9 @@ bool GraphicsObject::checkBounds()
 bool GraphicsObject::isGround()
 {
     return ground;
+}
+
+std::shared_ptr<Timeline> GraphicsObject::getTimeline()
+{
+    return timeline;
 }

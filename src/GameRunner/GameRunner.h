@@ -26,7 +26,6 @@ class GameRunner
 
     public:
         static GameRunner *getInstance(int id = 0);
-        ~GameRunner();
         sf::RenderWindow *getWindow();
         void drawGraphics();
         void deserialize(std::string data);

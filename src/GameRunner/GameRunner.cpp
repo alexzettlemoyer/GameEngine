@@ -42,11 +42,6 @@ GameRunner* GameRunner::getInstance(int id)
     return instancePtr;
 }
 
-GameRunner::~GameRunner()
-{
-    delete game;
-}
-
 int GameRunner::getCharacterId()
 {
     return characterId;

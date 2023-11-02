@@ -50,6 +50,8 @@ class GraphicsObject : public sf::RectangleShape
         void setMovementFunction(MovementFunction func);
         MovementFunction getMovementFunction();
 
+        std::shared_ptr<Timeline> getTimeline();
+
     protected:
         bool ground;
         int id;

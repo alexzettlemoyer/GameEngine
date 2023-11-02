@@ -28,90 +28,6 @@ bool isCharacterGrounded(Character &character, GraphicsObject &ground)
     return false;
 }
 
-// STOP_MOVEMENT, ERASE, PUSH
-// dir = 0: x axis
-// dir = 1: y axis
-void stopMovement(GraphicsObject &obj, int dir = -1)
-{
-    std::lock_guard<std::mutex> lock(obj.objMutex);
-    if ( dir == 0 || dir == -1 )
-        obj.velocity.x = 0.f;
-    if ( dir == 1 || dir == -1 )
-        obj.velocity.y = 0.f;  
-}
-
-/*
- * TODO: handle with event
- */
-void eraseObj(GraphicsObject &obj)
-{   
-    // remove drawn pointer from list
-    try {
-        ServerGameState::getInstance() -> removeObject(obj.identifier());
-    }
-    catch(...) {}
-    // try {
-    //     ClientGameState::getInstance() -> removeObject(obj.identifier());
-    // }
-    // catch(...) {}
-}
-
-// x: 0
-// y: 1
-bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
-{
-    // x collision
-    if ( dir == 0 )
-    {
-        switch (obj.collisionTypeX)
-        {
-            case GraphicsObject::STOP_MOVEMENT:
-                stopMovement(obj, 0);
-                break;
-            case GraphicsObject::ERASE:
-                eraseObj(obj);
-                break;
-            case GraphicsObject::PUSH:
-                break;
-            case GraphicsObject::NONE: 
-                break;
-            case GraphicsObject::CHAR:
-                // stopMovement(obj, 0);
-                break;
-            case GraphicsObject::DEATH:
-                std::cout << "DEATH X" << std::endl;
-                break;
-            default:
-                std::cout << "Default ?? Stop movement X: " << obj.identifier() << std::endl;
-                stopMovement(obj, 0);
-                break;
-        }
-    }
-    // y collision
-    else if ( dir == 1 )
-    {
-        switch (obj.collisionTypeY)
-        {
-            case GraphicsObject::STOP_MOVEMENT:
-                stopMovement(obj, 1);
-                break;
-            case GraphicsObject::ERASE:
-                eraseObj(obj);
-                break;
-            case GraphicsObject::NONE:
-                break;
-            case GraphicsObject::CHAR:
-                break;
-            case GraphicsObject::DEATH:
-                break;
-            default:
-                // std::cout << "Deafault ?? Stop Movement Y: " << obj.identifier() << std::endl;
-                stopMovement(obj, 1);
-                break;
-        }
-    }
-    return true;
-}
 
 /**
  * Check Collision
@@ -134,7 +50,7 @@ bool collisionResponse(GraphicsObject &obj, GraphicsObject &obj2, int dir)
  *  AABB : axis-aligned line bounding box
  */
 
-bool checkCollision(GraphicsObject &obj, GraphicsObject &other, bool withResponse)
+bool checkCollision(Character &obj, GraphicsObject &other, bool withResponse)
 {
     sf::FloatRect characterBounds = obj.getGlobalBounds();
     sf::FloatRect otherBounds = other.getGlobalBounds();
@@ -168,8 +84,12 @@ bool checkCollision(GraphicsObject &obj, GraphicsObject &other, bool withRespons
         
         if ( withResponse )
         {
-            collisionResponse(obj, other, collisionDir);
-            collisionResponse(other, obj, collisionDir);
+            std::shared_ptr<Event> e = std::make_shared<Event>(Event::COLLISION, obj.getTimeline() -> getTimeStamp());
+            e -> addCharacterVariant(&obj);
+            e -> addGraphicsObjectVariant(&other);
+            e -> addCollisionDirectionVariant( collisionDir );
+
+            EventHandler::getInstance() -> onEvent(e);
         }
         return true;
     }

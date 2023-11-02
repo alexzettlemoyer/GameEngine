@@ -33,9 +33,6 @@ std::mutex reqMutex;
  */
 void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<InputType>& events)
 {
-    // Timeline* t = new Timeline();
-    // EventHandler::getInstance( t );
-
     bool open = true;
     while (open)
     {
@@ -49,19 +46,7 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
 
             for (InputType const& i: events)
             {
-                if ( i == UP )
-                {
-                    // Event e;
-                    // e.setEventType(Event::C_UP);
-                    // e.addTimeVariant(t -> getTimeStamp());
-                    // e.addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
-
-                    // EventHandler::getInstance() -> onEvent(e);
-                }
-                if ( i == DOWN || i == LEFT || i == RIGHT )
-                    ClientGameState::getInstance() -> input(clientId, static_cast<int>( i ));
-                else
-                    inputData << " " + std::to_string(i);
+                inputData << " " + std::to_string(i);
             }
 
             // check if any of the inputs are WINDOW CLOSE
@@ -83,27 +68,9 @@ void requestSocket(zmq::socket_t& reqSocket, std::string clientId, std::list<Inp
     }
 }
 
-/**
- * handles keyboard input from the user
- * checks for keypresses: up/space, down, left, right
- * polls the window for keypressed events: close, P, 1, 2, 3
- *
- * parameter: the window to poll for events
- * returns: the InputType found, or NONE
- */
-std::list<InputType> handleInput(sf::RenderWindow *window)
+std::list<InputType> handleInputToServer(sf::RenderWindow *window)
 {
     std::list<InputType> list;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        list.push_back(UP);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        list.push_back(DOWN);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        list.push_back(LEFT);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        list.push_back(RIGHT);
-
     sf::Event localEvent;
     while (window -> pollEvent(localEvent))
     {
@@ -134,6 +101,42 @@ std::list<InputType> handleInput(sf::RenderWindow *window)
     }
     list.unique();
     return list;
+}
+
+/**
+ * handles keyboard input from the user
+ * checks for keypresses: up/space, down, left, right
+ * polls the window for keypressed events: close, P, 1, 2, 3
+ *
+ * parameter: the window to poll for events
+ * returns: the InputType found, or NONE
+ */
+void handleInput(EventHandler* eventHandler, Timeline* t)
+{
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_UP, t -> getTimeStamp()); 
+        e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        eventHandler -> onEvent(e);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    {
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_DOWN, t -> getTimeStamp()); 
+        e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        eventHandler -> onEvent(e);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    {
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_LEFT, t -> getTimeStamp()); 
+        e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        eventHandler -> onEvent(e);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    {
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_RIGHT, t -> getTimeStamp()); 
+        e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        eventHandler -> onEvent(e);    
+    }
 }
 
 int main ()
@@ -171,11 +174,15 @@ int main ()
 
         // start the game window!
     GameRunner *game = GameRunner::getInstance(std::stoi(clientId));
-    ClientGameState *gameState = ClientGameState::getInstance();
     game -> drawGraphics();
+
+    Timeline* t = new Timeline();
+    EventHandler* eventHandler = EventHandler::getInstance( t );
 
     // start thread for io handling
     std::thread reqThread(requestSocket, std::ref(reqSocket), clientId, std::ref(events));
+
+    ClientGameState *gameState = ClientGameState::getInstance();
 
         // wait for server messages
     while (game -> getWindow() -> isOpen())
@@ -194,15 +201,19 @@ int main ()
             // handle input
         if ( game -> getWindow() -> hasFocus())
         {
-            std::list inputList = handleInput(game -> getWindow());
+            handleInput(eventHandler, t);
+            std::list inputList = handleInputToServer(game -> getWindow());
             {
                 std::lock_guard<std::mutex> lock(reqMutex);
                 events = inputList;
             }
         }
     }
+    reqThread.join();
+
     delete game;
     delete gameState;
-    reqThread.join();
+    delete eventHandler;
+    delete t;
     return 0;
 }

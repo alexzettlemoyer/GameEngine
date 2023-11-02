@@ -6,6 +6,8 @@
 #include "../Movement/Collider.hpp"
 #include "../Time/Timeline.h"
 #include "../GameRunner/ClientGameState.h"
+#include "../Events/EventHandler.h"
+#include "../Events/Event.h"
 #include <iostream>
 
 static const std::string IMG_CHARACTER = "images/girl.png";
@@ -32,6 +34,11 @@ Character::Character(sf::Vector2f position, int idNum, std::shared_ptr<Timeline>
     this -> collisionTypeY = CHAR;
     this -> spawnPoint = spawnPoint;
     this -> respawned = false;
+}
+
+sf::Vector2f Character::getVelocity()
+{
+    return GraphicsObject::getVelocity();
 }
 
 void Character::left()
@@ -123,9 +130,6 @@ void Character::updateMovement()
 
 void Character::respawn()
 {
-    // if (this->spawnPoint)
-    //     delete this->spawnPoint;
-
     this -> respawned = true;
 
     this -> spawnPoint = std::make_shared<SpawnPoint>();
@@ -179,12 +183,12 @@ bool Character::checkBounds()
         // check if we're colliding with the death zone
     if (checkCollision(*this, *(ClientGameState::getInstance() -> getDeathZone()), false))
     {
-        // GameState::getInstance() -> respawn( id );
-        respawn();
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_DEATH, timeline -> getTimeStamp());
+        e -> addCharacterVariant(this);
+
+        EventHandler::getInstance() -> onEvent(e);
         return false;
     }
-
-
 
     return false;
 }
