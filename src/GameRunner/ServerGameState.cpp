@@ -70,6 +70,7 @@ void ServerGameState::input(std::string objId, std::string i)
         if ( in == 6 )
             e -> addTicScaleVariant(Timeline::SCALE_DOUBLE);
 
+        e -> addMetaData("ServerGameState, from client input " + i);
         EventHandler::getInstance() -> onEvent(e);
     }
     else if ( in == 7 )         // timeline paused
@@ -77,13 +78,15 @@ void ServerGameState::input(std::string objId, std::string i)
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::PAUSE, timeline -> getTimeStamp());
         e -> addTimelineVariant(timeline.get());
 
+        e -> addMetaData("ServerGameState, from client input " + i);
         EventHandler::getInstance() -> onEvent(e);
     }
     else if ( in == 8 )         // client window closed -> removes their character
     {
-        std::shared_ptr<Event> e = std::make_shared<Event>(Event::WINDOW_CLOSE, timeline -> getTimeStamp());
-        e -> addCharacterIdVariant( stoi(objId));
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::CLIENT_DISCONNECT, timeline -> getTimeStamp());
+        e -> addCharacterIdVariant(stoi(objId));
 
+        e -> addMetaData("ServerGameState, from client input " + i);
         EventHandler::getInstance() -> onEvent(e);
     }
 }

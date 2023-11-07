@@ -12,6 +12,8 @@ class EventHandler
         std::map<float, std::shared_ptr<Event>> queue;
         Timeline* timeline;
 
+        std::mutex eventMutex;
+
         void processEvent(std::shared_ptr<Event> e);
 
         // functions used on the client side
@@ -22,7 +24,7 @@ class EventHandler
         // functions used on the server side
         void handleCharacterSpawn(std::shared_ptr<Event> e);
         void handleTicSizeChange(std::shared_ptr<Event> e);
-        void handleWindowClose(std::shared_ptr<Event> e);
+        void handleClientDisconnect(std::shared_ptr<Event> e);
         void handlePause(std::shared_ptr<Event> e);
         void handleCollision(std::shared_ptr<Event> e);
 

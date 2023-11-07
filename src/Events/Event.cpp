@@ -14,6 +14,11 @@ void Event::setEventType(EventType t)
     this -> eventType = t;
 }
 
+void Event::addMetaData(std::string data)
+{
+    this -> metaData = data;
+}
+
 void Event::addTimeVariant(float timeStamp)
 {
     Variant v;

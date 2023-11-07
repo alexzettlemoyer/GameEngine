@@ -89,6 +89,7 @@ bool checkCollision(Character &obj, GraphicsObject &other, bool withResponse)
             e -> addGraphicsObjectVariant(&other);
             e -> addCollisionDirectionVariant( collisionDir );
 
+            e -> addMetaData("Collider, character " + std::to_string(obj.identifier()) + ", object " + std::to_string(other.identifier()) + ", direction " + std::to_string(collisionDir));
             EventHandler::getInstance() -> onEvent(e);
         }
         return true;

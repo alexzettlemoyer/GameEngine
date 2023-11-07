@@ -18,7 +18,6 @@ class ClientGameState : public GameState
         static ClientGameState* getInstance(int id = 0);
         void setupClientGameState(int id);
         void updateGameState();
-        void input(std::string objId, int i);
         void deserialize(std::string data, int characterId);
         std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
         float getDt();

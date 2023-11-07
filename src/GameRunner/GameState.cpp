@@ -86,6 +86,7 @@ void GameState::removeObject(int id)
 std::list<Character*> GameState::getCharacters()
 {
     std::list<Character*> characters;
+    std::lock_guard<std::mutex> lock(stateMutex);
     for (std::shared_ptr<GraphicsObject> const& i : getGraphicsObjects())
         if ( i -> getType() == GraphicsObject::CHARACTER_TYPE )
             characters.push_back((dynamic_cast<Character*>((i.get()))));

@@ -32,7 +32,7 @@ void handleDisconnects(std::unordered_map<std::string, int>& connections)
             for ( std::string key : clientsToRemove )
             {
                 std::cout << "Client " << key << " disconnected." << std::endl;
-                ServerGameState::getInstance() -> removeObject( stoi(key) );
+                ServerGameState::getInstance() -> input( key, "8" );
 
                 std::lock_guard<std::mutex> lock(repMutex);
                 connections.erase( key );

@@ -20,7 +20,10 @@ EventHandler* EventHandler::getInstance(Timeline* t)
 
 void EventHandler::onEvent(std::shared_ptr<Event> e)
 {
+    // std::cout << "Registered event " << e -> metaData << std::endl;
     Event::Variant timeStampVariant = e -> parameters[ Event::Variant::TYPE_TIME_STAMP ];
+
+    std::lock_guard<std::mutex> lock(eventMutex);
     queue[ timeStampVariant.timeStamp ] = e;
 }
 
@@ -89,8 +92,9 @@ void EventHandler::handlePause(std::shared_ptr<Event> e)
     timeline -> pause();
 }
 
-void EventHandler::handleWindowClose(std::shared_ptr<Event> e)
+void EventHandler::handleClientDisconnect(std::shared_ptr<Event> e)
 {
+      std::lock_guard<std::mutex> lock(eventMutex);
     Event::Variant characterIdVariant = e -> parameters[ Event::Variant::TYPE_CHAR_ID ];
     int characterId = characterIdVariant.characterId;
 
@@ -110,12 +114,10 @@ void EventHandler::handleCollision(std::shared_ptr<Event> e)
     {
         if ( obj -> collisionTypeX == GraphicsObject::ERASE )
             ServerGameState::getInstance() -> removeObject(obj -> identifier());
-
     }
         // y collision
     else if ( collisionDirection == 1 )
     { }
-
 }
 
 void EventHandler::processEvent(std::shared_ptr<Event> e)
@@ -139,10 +141,12 @@ void EventHandler::processEvent(std::shared_ptr<Event> e)
         case Event::TIC_CHANGE:
             handleTicSizeChange(e);
             break;
-        case Event::WINDOW_CLOSE:
-            handleWindowClose(e);
+        case Event::CLIENT_DISCONNECT:
+            handleClientDisconnect(e);
+            break;
         case Event::COLLISION:
             handleCollision(e);
+            break;
         default:
             break;
     }
@@ -160,12 +164,14 @@ void EventHandler::handleEvents()
         {
             // process it!
             processEvent( event.second );
+            std::lock_guard<std::mutex> lock(eventMutex);
             handledEvents.push_back( event.first );
         }
     }
 
     for ( const auto &i : handledEvents )
     {
+        std::lock_guard<std::mutex> lock(eventMutex);
         queue.erase( i );
     }
 }

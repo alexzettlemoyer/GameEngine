@@ -186,6 +186,7 @@ bool Character::checkBounds()
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_DEATH, timeline -> getTimeStamp());
         e -> addCharacterVariant(this);
 
+        e -> addMetaData("Character " + std::to_string(this -> identifier()) + " death");
         EventHandler::getInstance() -> onEvent(e);
         return false;
     }

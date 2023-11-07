@@ -55,37 +55,6 @@ std::shared_ptr<Character> ClientGameState::getCharacter()
 }
 
 /**
- *  input function handles input from clients
- *  this function is called by the server, to apply client input to the game state
- *  
- *  parameters:
- *      objId - the id of the object to apply input to (the character/clients' id)
- *      in - the input string ( a number 1-9 denoted by clients' InputType enum )
- */
-void ClientGameState::input(std::string objId, int in)
-{
-    // int charId = stoi(objId);
-
-    switch (in)
-    {
-        // case 0:             // character jump
-        //     thisCharacter -> up();
-        //     break;
-        case 1:             // character down
-            thisCharacter -> down();
-            break;
-        case 2:             // character left
-            thisCharacter -> left();
-            break;
-        case 3:             // character right
-            thisCharacter -> right();
-            break;
-        default:
-            break;  // do nothing
-    }
-}
-
-/**
  * deserialize is used by clients
  * to process the graphics object data sent by the client
  * format is:

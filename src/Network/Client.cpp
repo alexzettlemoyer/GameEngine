@@ -117,24 +117,31 @@ void handleInput(EventHandler* eventHandler, Timeline* t)
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_UP, t -> getTimeStamp()); 
         e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        e -> addMetaData("Client from input up");
         eventHandler -> onEvent(e);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_DOWN, t -> getTimeStamp()); 
         e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        e -> addMetaData("Client from input down");
+
         eventHandler -> onEvent(e);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_LEFT, t -> getTimeStamp()); 
         e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        e -> addMetaData("Client from input left");
+
         eventHandler -> onEvent(e);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_RIGHT, t -> getTimeStamp()); 
         e -> addCharacterVariant(ClientGameState::getInstance() -> getCharacter().get());
+        e -> addMetaData("Client from input right");
+
         eventHandler -> onEvent(e);    
     }
 }
