@@ -81,10 +81,15 @@ bool checkCollision(Character &obj, GraphicsObject &other, bool withResponse)
         else if ( width > height ) 
             collisionDir = 1;           // y collision - do nothing for now
         else { }                         // perfect x=y collision - do nothing for now
-        
+
+        // This block is only called from the server
+        // when moving graphics objects (platforms), which are handled by the server
+        // check for their collisions
+        // obj is the character, for which they don't have all the data (it's missing a timeline, etc)
+        // other is the platform / graphics object, which is managed by the server and has a timeline
         if ( withResponse )
         {
-            std::shared_ptr<Event> e = std::make_shared<Event>(Event::COLLISION, obj.getTimeline() -> getTimeStamp());
+            std::shared_ptr<Event> e = std::make_shared<Event>(Event::COLLISION, other.getTimeline() -> getTimeStamp());
             e -> addCharacterVariant(&obj);
             e -> addGraphicsObjectVariant(&other);
             e -> addCollisionDirectionVariant( collisionDir );

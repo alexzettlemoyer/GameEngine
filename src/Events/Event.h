@@ -42,7 +42,7 @@ class Event
         std::map<Variant::Type, struct Variant> parameters;
         std::string metaData;
 
-        Timeline *handlerTimeline;
+        // std::shared_ptr<Timeline> *handlerTimeline;
 
         // some utility functions
         void setEventType(EventType t);

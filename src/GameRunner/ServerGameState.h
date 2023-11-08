@@ -19,6 +19,7 @@ class ServerGameState : public GameState
         float getDt();
         void input(std::string objId, std::string i);
         int newCharacter();
+        void addCharacter(std::shared_ptr<Character> newCharacter);
         void updateCharacterPosition(std::string charId, float x, float y );
 };
 

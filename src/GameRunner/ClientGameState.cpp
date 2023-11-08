@@ -142,6 +142,11 @@ float ClientGameState::getTicSize()
     return ticSize;
 }
 
+float ClientGameState::getTimeStamp()
+{
+    return timeline -> getTimeStamp();
+}
+
 std::shared_ptr<DeathZone> ClientGameState::getDeathZone()
 {
     return deathZone;

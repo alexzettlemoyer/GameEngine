@@ -73,6 +73,15 @@ void EventHandler::handleCharacterRespawn(std::shared_ptr<Event> e)
     charRef -> respawn();
 }
 
+void EventHandler::handleCharacterSpawn(std::shared_ptr<Event> e)
+{
+    Event::Variant characterIdVariant = e -> parameters[ Event::Variant::TYPE_CHAR_ID ];
+    int id = characterIdVariant.characterId;
+
+    std::shared_ptr<SpawnPoint> sp = std::make_shared<SpawnPoint>();
+    ServerGameState::getInstance() -> addCharacter( std::make_shared<Character>(sp -> getPosition(), id, nullptr, sp) );
+}
+
 void EventHandler::handleTicSizeChange(std::shared_ptr<Event> e)
 {
     Event::Variant timelineVariant = e -> parameters[ Event::Variant::TYPE_TIMELINE ];
@@ -94,7 +103,6 @@ void EventHandler::handlePause(std::shared_ptr<Event> e)
 
 void EventHandler::handleClientDisconnect(std::shared_ptr<Event> e)
 {
-      std::lock_guard<std::mutex> lock(eventMutex);
     Event::Variant characterIdVariant = e -> parameters[ Event::Variant::TYPE_CHAR_ID ];
     int characterId = characterIdVariant.characterId;
 
@@ -134,6 +142,9 @@ void EventHandler::processEvent(std::shared_ptr<Event> e)
             break;
         case Event::C_RESPAWN:
             handleCharacterRespawn(e);
+            break;
+        case Event::C_SPAWN:
+            handleCharacterSpawn(e);
             break;
         case Event::PAUSE:
             handlePause(e);

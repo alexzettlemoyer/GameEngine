@@ -22,6 +22,7 @@ class ClientGameState : public GameState
         std::list<std::shared_ptr<SideBoundary>> getSideBoundaries();
         float getDt();
         float getTicSize();
+        float getTimeStamp();
         std::shared_ptr<DeathZone> getDeathZone();
         sf::Vector2f getCharacterPosition();
         std::shared_ptr<Character> getCharacter();

@@ -183,7 +183,7 @@ bool Character::checkBounds()
         // check if we're colliding with the death zone
     if (checkCollision(*this, *(ClientGameState::getInstance() -> getDeathZone()), false))
     {
-        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_DEATH, timeline -> getTimeStamp());
+        std::shared_ptr<Event> e = std::make_shared<Event>(Event::C_DEATH, ClientGameState::getInstance() -> getTimeStamp());
         e -> addCharacterVariant(this);
 
         e -> addMetaData("Character " + std::to_string(this -> identifier()) + " death");
