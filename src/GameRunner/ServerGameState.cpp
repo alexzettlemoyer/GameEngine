@@ -8,6 +8,7 @@
 #include <iostream>
 
 ServerGameState* ServerGameState::instancePtr = nullptr;
+enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE };
 
 ServerGameState::ServerGameState()
 { 
@@ -58,22 +59,22 @@ void ServerGameState::input(std::string objId, std::string i)
     int in = stoi( i );
 
     // if the input is tic size HALF, REAL, DOUBLE
-    if ( in == 4 || in == 5 || in == 6 )
+    if ( in == HALF || in == REAL || in == DOUBLE )
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::TIC_CHANGE, timeline -> getTimeStamp());
         e -> addTimelineVariant(timeline.get());
 
-        if ( in == 4 )
+        if ( in == HALF )
             e -> addTicScaleVariant(Timeline::SCALE_HALF);
-        if ( in == 5 )
+        if ( in == REAL )
             e -> addTicScaleVariant(Timeline::SCALE_REAL);
-        if ( in == 6 )
+        if ( in == DOUBLE )
             e -> addTicScaleVariant(Timeline::SCALE_DOUBLE);
 
         e -> addMetaData("ServerGameState, from client input " + i);
         EventHandler::getInstance() -> onEvent(e);
     }
-    else if ( in == 7 )         // timeline paused
+    else if ( in == PAUSE )         // timeline paused
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::PAUSE, timeline -> getTimeStamp());
         e -> addTimelineVariant(timeline.get());
@@ -81,7 +82,7 @@ void ServerGameState::input(std::string objId, std::string i)
         e -> addMetaData("ServerGameState, from client input " + i);
         EventHandler::getInstance() -> onEvent(e);
     }
-    else if ( in == 8 )         // client window closed -> removes their character
+    else if ( in == CLOSE )         // client window closed -> removes their character
     {
         std::shared_ptr<Event> e = std::make_shared<Event>(Event::CLIENT_DISCONNECT, timeline -> getTimeStamp());
         e -> addCharacterIdVariant(stoi(objId));
@@ -117,10 +118,6 @@ int ServerGameState::newCharacter()
 
     e -> addMetaData("ServerGameState, new client connected " + id );
     EventHandler::getInstance() -> onEvent(e);
-
-    // std::shared_ptr<SpawnPoint> sp = std::make_shared<SpawnPoint>();
-    // graphicsObjects.push_back(std::make_shared<Character>(sp -> getPosition(), id, timeline, sp)); // 100, 180
-    // delete sp;
     return id;
 }
 

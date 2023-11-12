@@ -107,7 +107,7 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
             for (int i = 5; i < dataVector.size(); i++)
             {
                 game -> input( clientID, dataVector[ i ] );
-                if ( dataVector[ i ] == "8" )
+                if ( dataVector[ i ] == "4" )
                 {
                     std::cout << "Client " << clientID << " disconnected." << std::endl;
                     std::lock_guard<std::mutex> lock(repMutex);

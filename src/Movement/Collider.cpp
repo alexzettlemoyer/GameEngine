@@ -79,7 +79,7 @@ bool checkCollision(Character &obj, GraphicsObject &other, bool withResponse)
             collisionDir = 0;
         // y axis collision
         else if ( width > height ) 
-            collisionDir = 1;           // y collision - do nothing for now
+            collisionDir = 1;            // y collision - do nothing for now
         else { }                         // perfect x=y collision - do nothing for now
 
         // This block is only called from the server
@@ -94,7 +94,8 @@ bool checkCollision(Character &obj, GraphicsObject &other, bool withResponse)
             e -> addGraphicsObjectVariant(&other);
             e -> addCollisionDirectionVariant( collisionDir );
 
-            e -> addMetaData("Collider, character " + std::to_string(obj.identifier()) + ", object " + std::to_string(other.identifier()) + ", direction " + std::to_string(collisionDir));
+            e -> addMetaData("Collider, character " + std::to_string(obj.identifier()) + 
+                ", object " + std::to_string(other.identifier()) + ", direction " + std::to_string(collisionDir));
             EventHandler::getInstance() -> onEvent(e);
         }
         return true;

@@ -8,9 +8,8 @@
 class Event
 {
     public:
-        // Event();
-
-        enum EventType { C_UP, C_DOWN, C_LEFT, C_RIGHT, C_DEATH, C_RESPAWN, C_SPAWN, COLLISION, PAUSE, TIC_CHANGE, CLIENT_DISCONNECT };
+        enum EventType { C_UP, C_DOWN, C_LEFT, C_RIGHT, C_DEATH, C_RESPAWN, 
+            C_SPAWN, COLLISION, PAUSE, TIC_CHANGE, CLIENT_DISCONNECT };
         struct Variant
         {
             enum Type
@@ -41,8 +40,6 @@ class Event
         EventType eventType;
         std::map<Variant::Type, struct Variant> parameters;
         std::string metaData;
-
-        // std::shared_ptr<Timeline> *handlerTimeline;
 
         // some utility functions
         void setEventType(EventType t);

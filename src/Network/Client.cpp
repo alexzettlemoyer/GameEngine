@@ -12,7 +12,7 @@
 #include "../Events/EventHandler.h"
 
 // 60 fps
-enum InputType { UP, DOWN, LEFT, RIGHT, HALF, REAL, DOUBLE, PAUSE, CLOSE, NONE };
+enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE };
 std::mutex reqMutex;
 
 /**
