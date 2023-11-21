@@ -1,4 +1,4 @@
-LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq
+LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq -lv8
 BIN=bin
 SRC=src
 
@@ -17,7 +17,8 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/gameState.o \
 	   $(BIN)/gameRunner.o \
 	   $(BIN)/clientGameState.o \
-	   $(BIN)/serverGameState.o
+	   $(BIN)/serverGameState.o \
+	   $(BIN)/scriptManager.o
 
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
@@ -81,6 +82,9 @@ $(BIN)/gameRunner.o: $(SRC)/GameRunner/GameRunner.cpp
 	g++ -c $< -o $@
 
 $(BIN)/server.o: $(SRC)/Network/Server.cpp
+	g++ -c $< -o $@
+
+$(BIN)/scriptManager.o: $(SRC)/Scripting/ScriptManager.cpp
 	g++ -c $< -o $@
 
 gameServer: $(OBJ_FILES) $(BIN)/server.o
