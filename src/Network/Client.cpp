@@ -12,7 +12,7 @@
 #include "../Events/EventHandler.h"
 
 // 60 fps
-enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE };
+enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE, MODIFY };
 std::mutex reqMutex;
 
 /**
@@ -95,6 +95,9 @@ std::list<InputType> handleInputToServer(sf::RenderWindow *window)
                     break;
                 case sf::Keyboard::Key::Num3:
                     list.push_back(DOUBLE);
+                    break;
+                case sf::Keyboard::Key::M:
+                    list.push_back(MODIFY);
                     break;
             }
         }

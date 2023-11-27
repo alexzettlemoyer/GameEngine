@@ -144,6 +144,7 @@ int main()
     std::thread disconnectThread(handleDisconnects, std::ref(connections));
 
     ServerGameState* game = ServerGameState::getInstance();
+
         // Publish loop to all clients
     while(true)
     {
@@ -152,8 +153,6 @@ int main()
                 // update the gameState each iteration
             game -> updateGameState();
             std::string data = game -> serialize();
-
-            // std::cout << data << std::endl;
 
             zmq::message_t publishData(data.data(), data.size());
             pubSocket.send(publishData, zmq::send_flags::none);

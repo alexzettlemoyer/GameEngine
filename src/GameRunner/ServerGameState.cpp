@@ -8,11 +8,12 @@
 #include <iostream>
 
 ServerGameState* ServerGameState::instancePtr = nullptr;
-enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE };
+enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE, MODIFY };
 
 ServerGameState::ServerGameState()
 { 
     setupServerGameState();
+    // scriptRunner = ScriptRunner::getInstance();
 }
 
 ServerGameState* ServerGameState::getInstance()
@@ -81,6 +82,11 @@ void ServerGameState::input(std::string objId, std::string i)
 
         e -> addMetaData("ServerGameState, from client input " + i);
         EventHandler::getInstance() -> onEvent(e);
+    }
+    else if ( in == MODIFY )
+    {
+        // std::shared_ptr<ScriptRunner> sr = std::make_shared<ScriptRunner>(findObjById(2));
+        runOnObj(findObjById(2));
     }
     else if ( in == CLOSE )         // client window closed -> removes their character
     {

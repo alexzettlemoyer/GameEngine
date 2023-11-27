@@ -1,4 +1,39 @@
 LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq -lv8
+
+INTELMAC_INCLUDE=-I/usr/local/include							# Intel mac
+APPLESILICON_INCLUDE=-I/opt/homebrew/include					# Apple Silicon
+UBUNTU_APPLESILICON_INCLUDE=-I/usr/include -I/usr/include/v8	# Apple Silicon Ubuntu VM
+UBUNTU_INTEL_INCLUDE=-I/usr/include -I/usr/include/v8			# Intel Ubuntu VM
+
+INTELMAC_LIB=-L/usr/local/lib									# Intel mac
+APPLESILICON_LIB=-L/opt/homebrew/lib							# Apple Silicon
+UBUNTU_APPLESILICON_LIB=-L/usr/lib/aarch64-linux-gnu			# Apple Silicon Ubuntu VM
+UBUNTU_INTEL_LIB=-L/usr/lib/x86_64-linux-gnu					# Intel Ubuntu VM
+
+MACOS_INCLUDE=$(APPLESILICON_INCLUDE)
+MACOS_LIB=$(APPLESILICON_LIB)
+UBUNTU_INCLUDE=$(UBUNTU_APPLESILICON_INCLUDE)
+UBUNTU_LIB=$(UBUNTU_APPLESILICON_LIB)
+
+MACOS_COMPILER=/usr/bin/clang++
+UBUNTU_COMPILER=/usr/bin/g++
+
+INCLUDE = -I/usr/include -I/usr/include/v8
+
+uname_s := $(shell uname -s)
+ifeq ($(uname_s),Darwin)
+	INCLUDE =  $(MACOS_LIB)
+else ifeq ($(uname_s),Linux)
+	INCLUDE = $(UBUNTU_LIB)
+endif
+
+ifeq ($(uname_s),Darwin)
+	INCLUDE = $(MACOS_INCLUDE)
+else ifeq ($(uname_s),Linux)
+	INCLUDE = $(UBUNTU_INCLUDE)
+endif
+
+
 BIN=bin
 SRC=src
 
@@ -18,7 +53,9 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/gameRunner.o \
 	   $(BIN)/clientGameState.o \
 	   $(BIN)/serverGameState.o \
-	   $(BIN)/scriptManager.o
+	   $(BIN)/v8helpers.o \
+	   $(BIN)/scriptManager.o \
+	   $(BIN)/scriptRunner.o
 
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
@@ -84,17 +121,23 @@ $(BIN)/gameRunner.o: $(SRC)/GameRunner/GameRunner.cpp
 $(BIN)/server.o: $(SRC)/Network/Server.cpp
 	g++ -c $< -o $@
 
+$(BIN)/v8helpers.o: $(SRC)/Scripting/v8helpers.cpp
+	g++ -c $< -o $@
+
 $(BIN)/scriptManager.o: $(SRC)/Scripting/ScriptManager.cpp
 	g++ -c $< -o $@
 
+$(BIN)/scriptRunner.o: $(SRC)/Scripting/ScriptRunner.cpp
+	g++ -c $< -o $@ $(INCLUDE)
+
 gameServer: $(OBJ_FILES) $(BIN)/server.o
-	g++ $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
+	g++ $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS) $(INCLUDE)
 
 $(BIN)/client.o: $(SRC)/Network/Client.cpp
 	g++ -c $< -o $@
 
 gameClient: $(OBJ_FILES) $(BIN)/client.o
-	g++ $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS)
+	g++ $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS) $(INCLUDE)
 
 debugServer: $(OBJ_FILES) $(BIN)/server.o
 	g++ -g $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
