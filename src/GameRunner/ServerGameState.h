@@ -3,7 +3,6 @@
 
 #include "GameState.h"
 #include "../Events/Eventhandler.h"
-#include "../Scripting/ScriptRunner.h"
 
 class ServerGameState : public GameState
 {
@@ -11,7 +10,6 @@ class ServerGameState : public GameState
         ServerGameState();
         static ServerGameState* instancePtr;
         EventHandler* eventHandler;
-        std::shared_ptr<ScriptRunner> scriptRunner;
 
     public:
         static ServerGameState* getInstance();

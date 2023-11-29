@@ -7,9 +7,6 @@
 #include "../GameRunner/ServerGameState.h"
 #include <iostream>
 
-/** Definitions of static class members */
-std::vector<GraphicsObject*> GraphicsObject::game_objects;
-
 const float displacement = .025f;
 
 GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool isGround, int idNum, std::shared_ptr<Timeline> timeline)
@@ -30,11 +27,6 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     guid = "gameobject" + std::to_string(id);
 }
 
-GraphicsObject::~GraphicsObject()
-{
-	context->Reset();
-}
-
 /**
  * IMPORTANT: Pay close attention to the definition of the std::vector in this
  * example implementation. The v8helpers::expostToV8 will assume you have
@@ -48,7 +40,6 @@ v8::Local<v8::Object> GraphicsObject::exposeToV8(v8::Isolate *isolate, v8::Local
 
     if (context.IsEmpty())
         std::cout << "Invalid or empty context!" << std::endl;
-
 
 	std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
 	v.push_back(v8helpers::ParamContainer("x", getGameObjectX, setGameObjectX));

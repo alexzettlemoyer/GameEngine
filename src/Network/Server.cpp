@@ -5,9 +5,12 @@
 #include <thread>
 #include <mutex>
 #include "../GameRunner/ServerGameState.h"
-#include "../Scripting/ScriptRunner.h"
+#include <v8/v8.h>
+#include <libplatform/libplatform.h>
 
 std::mutex repMutex;
+v8::Isolate *isolate;
+std::shared_ptr<ScriptManager> scriptManager;
 
 void handleDisconnects(std::unordered_map<std::string, int>& connections)
 {
@@ -124,6 +127,40 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
     }
 }
 
+void setupScripting()
+{
+    std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
+    v8::V8::InitializePlatform(platform.release());
+    v8::V8::InitializeICU();
+    v8::V8::Initialize();
+    v8::Isolate::CreateParams create_params;
+    create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    isolate = v8::Isolate::New(create_params);
+
+    { // anonymous scope for managing handle scope
+        v8::Isolate::Scope isolate_scope(isolate); // must enter the virtual machine to do stuff
+        v8::HandleScope handle_scope(isolate);
+
+		// Best practice to isntall all global functions in the context ahead of time.
+        v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
+        // Bind the global 'print' function to the C++ Print callback.
+        global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, v8helpers::Print));
+
+        v8::Local<v8::Context> default_context =  v8::Context::New(isolate, NULL, global);
+		v8::Context::Scope default_context_scope(default_context); // enter the context
+
+        scriptManager = std::make_shared<ScriptManager>(isolate, default_context); 
+
+		// Create a new context
+		v8::Local<v8::Context> object_context = v8::Context::New(isolate, NULL, global);
+		scriptManager->addContext(isolate, object_context, "object_context");
+        
+        scriptManager->addScript("modify_position", "src/Scripting/scripts/modify_position.js", "object_context");
+    
+        ServerGameState::getInstance() -> findObjById(2) -> exposeToV8(isolate, object_context);
+        scriptManager->runOne("modify_position", false, "object_context");
+    }
+}
 
 int main() 
 {
@@ -144,7 +181,14 @@ int main()
         // thread to check if any clients disconnected
     std::thread disconnectThread(handleDisconnects, std::ref(connections));
 
+    // std::shared_ptr<ScriptRunner> scriptRunner = std::make_shared<ScriptRunner>();
     ServerGameState* game = ServerGameState::getInstance();
+
+    setupScripting();
+    // std::shared_ptr<ScriptRunner> scriptRunner = std::make_shared<ScriptRunner>();
+    // scriptRunner -> addScriptManager( scriptManager );
+    // game -> addScriptRunner( scriptRunner );
+    // game -> addScriptRunner(scriptRunner);
 
         // Publish loop to all clients
     while(true)
@@ -163,6 +207,10 @@ int main()
     }
     disconnectThread.join();
     repThread.join();
+
+    isolate->Dispose();
+    v8::V8::Dispose();
+    v8::V8::ShutdownPlatform();
     delete game;
     return 0;
 }

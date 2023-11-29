@@ -52,7 +52,6 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/character.o \
 	   $(BIN)/v8helpers.o \
 	   $(BIN)/scriptManager.o \
-	   $(BIN)/scriptRunner.o \
 	   $(BIN)/collider.o \
 	   $(BIN)/gameState.o \
 	   $(BIN)/gameRunner.o \
@@ -127,9 +126,6 @@ $(BIN)/v8helpers.o: $(SRC)/Scripting/v8helpers.cpp
 	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/scriptManager.o: $(SRC)/Scripting/ScriptManager.cpp
-	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
-
-$(BIN)/scriptRunner.o: $(SRC)/Scripting/ScriptRunner.cpp
 	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 gameServer: $(OBJ_FILES) $(BIN)/server.o

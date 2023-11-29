@@ -57,13 +57,6 @@ class GraphicsObject : public sf::RectangleShape
 
         std::string guid;
 
-
-		/**
-		 * Shared list of all instances of game objects...auto populated by the
-		 * constructor.
-		 */
-		static std::vector<GraphicsObject*> game_objects;
-
         /**
 		 * This function will make this class instance accessible to scripts in
 		 * the given context. 
@@ -74,30 +67,6 @@ class GraphicsObject : public sf::RectangleShape
 		 * convinience. 
 		 */
 		v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
-        
-        /**
-		 * Static function to keep track of current total number of
-		 * gameobjects, to facilitate creating GUIDs by incrementing a counter.
-		 */
-		static int getCurrentGUID();
-
-		// /**
-		//  * Shared list of all instances of game objects...auto populated by the
-		//  * constructor.
-		//  */
-		// static std::vector<GameObject*> game_objects;
-
-		/**
-		 * Factor methods for creating new instances of GameObjects.
-		 *
-		 * This is primarily a demonstration of how you can create new objects
-		 * in javascript. NOTE: this is embedded in this GameObject class, but
-		 * could (and likely should) be used for other functionality as well
-		 * (i.e., Events). 
-		 */
-		static GraphicsObject* GameObjectFactory(std::string context_name="default");
-		static void ScriptedGameObjectFactory(const v8::FunctionCallbackInfo<v8::Value>& args);
-
 
     protected:
         bool ground;
@@ -109,12 +78,6 @@ class GraphicsObject : public sf::RectangleShape
         bool loadTexture(sf::Texture& texture, const std::string& image);
         std::shared_ptr<Timeline> timeline;
         MovementFunction movementFunction = nullptr;
-
-        v8::Isolate* isolate;
-		v8::Global<v8::Context>* context;
-
-		/** Static variable to keep count of current number of GameObject instances */
-		static int current_guid;
 
         /**
 		 * NOTE: These "Accessors" have to be **static**

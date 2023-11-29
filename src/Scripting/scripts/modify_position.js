@@ -7,5 +7,5 @@ function move(x, y) {
 
 print("Starting position for " << gameobject2.guid << ": " + gameobject2.x + ", " + gameobject2.y + "\nUpdating...");
 
-move(-2,-5);
+move(200,-5);
 print("Ending position for " << gameobject2.guid << ": " + gameobject2.x + ", " + gameobject2.y + "\nDone...");
