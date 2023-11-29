@@ -43,10 +43,18 @@ GraphicsObject::~GraphicsObject()
  */
 v8::Local<v8::Object> GraphicsObject::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
 {
+    if (!isolate || isolate->IsDead() || isolate->IsExecutionTerminating())
+        std::cout << "Isolate is inactive or terminated!" << std::endl;
+
+    if (context.IsEmpty())
+        std::cout << "Invalid or empty context!" << std::endl;
+
+
 	std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
 	v.push_back(v8helpers::ParamContainer("x", getGameObjectX, setGameObjectX));
 	v.push_back(v8helpers::ParamContainer("y", getGameObjectY, setGameObjectY));
 	v.push_back(v8helpers::ParamContainer("guid", getGameObjectGUID, setGameObjectGUID));
+
 	return v8helpers::exposeToV8(guid, this, v, isolate, context, context_name);
 }
 

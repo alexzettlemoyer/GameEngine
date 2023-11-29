@@ -11,7 +11,7 @@ class ServerGameState : public GameState
         ServerGameState();
         static ServerGameState* instancePtr;
         EventHandler* eventHandler;
-        // ScriptRunner* scriptRunner;
+        std::shared_ptr<ScriptRunner> scriptRunner;
 
     public:
         static ServerGameState* getInstance();

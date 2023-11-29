@@ -1,4 +1,6 @@
-LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq -lv8
+LIBS=-lsfml-graphics -lsfml-window -lsfml-system -lzmq -lv8 -pthread
+
+FLAGS=-std=c++17
 
 INTELMAC_INCLUDE=-I/usr/local/include							# Intel mac
 APPLESILICON_INCLUDE=-I/opt/homebrew/include					# Apple Silicon
@@ -48,102 +50,102 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/item.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
+	   $(BIN)/v8helpers.o \
+	   $(BIN)/scriptManager.o \
+	   $(BIN)/scriptRunner.o \
 	   $(BIN)/collider.o \
 	   $(BIN)/gameState.o \
 	   $(BIN)/gameRunner.o \
 	   $(BIN)/clientGameState.o \
-	   $(BIN)/serverGameState.o \
-	   $(BIN)/v8helpers.o \
-	   $(BIN)/scriptManager.o \
-	   $(BIN)/scriptRunner.o
+	   $(BIN)/serverGameState.o
 
 # time
 $(BIN)/time.o: $(SRC)/Time/Timeline.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # event
 $(BIN)/event.o: $(SRC)/Events/Event.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # event handler
 $(BIN)/eventhandler.o: $(SRC)/Events/EventHandler.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # collider
 $(BIN)/collider.o: $(SRC)/Movement/Collider.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # movement
 $(BIN)/mover.o: $(SRC)/Movement/Mover.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # GraphicsObject
 $(BIN)/graphicsObject.o: $(SRC)/GraphicsObject/GraphicsObject.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # SpawnPoint
 $(BIN)/spawnPoint.o: $(SRC)/GraphicsObject/SpawnPoint.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # DeathZone
 $(BIN)/deathZone.o: $(SRC)/GraphicsObject/DeathZone.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # DeathZone
 $(BIN)/sideBoundary.o: $(SRC)/GraphicsObject/SideBoundary.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # character
 $(BIN)/character.o: $(SRC)/GraphicsObject/Character.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # platform
 $(BIN)/platform.o: $(SRC)/GraphicsObject/Platform.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # item
 $(BIN)/item.o: $(SRC)/GraphicsObject/Item.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 # networking game
 $(BIN)/gameState.o: $(SRC)/GameRunner/GameState.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/serverGameState.o: $(SRC)/GameRunner/ServerGameState.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/clientGameState.o: $(SRC)/GameRunner/ClientGameState.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/gameRunner.o: $(SRC)/GameRunner/GameRunner.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/server.o: $(SRC)/Network/Server.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/v8helpers.o: $(SRC)/Scripting/v8helpers.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/scriptManager.o: $(SRC)/Scripting/ScriptManager.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 $(BIN)/scriptRunner.o: $(SRC)/Scripting/ScriptRunner.cpp
-	g++ -c $< -o $@ $(INCLUDE)
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 gameServer: $(OBJ_FILES) $(BIN)/server.o
-	g++ $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS) $(INCLUDE)
+	g++ $(FLAGS) $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS) $(INCLUDE)
 
 $(BIN)/client.o: $(SRC)/Network/Client.cpp
-	g++ -c $< -o $@
+	g++ -c $< -o $@ $(FLAGS) $(INCLUDE)
 
 gameClient: $(OBJ_FILES) $(BIN)/client.o
-	g++ $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS) $(INCLUDE)
+	g++ $(FLAGS) $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS) $(INCLUDE)
 
 debugServer: $(OBJ_FILES) $(BIN)/server.o
-	g++ -g $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS)
+	g++ -g $(FLAGS) $(OBJ_FILES) $(BIN)/server.o -o gameServer $(LIBS) $(INCLUDE)
 
 debugClient: $(OBJ_FILES) $(BIN)/client.o
-	g++ -g $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS)
+	g++ -g $(FLAGS) $(OBJ_FILES) $(BIN)/client.o -o gameClient $(LIBS) $(INCLUDE)
 
 # debugging game
 # game -d: $(OBJS)

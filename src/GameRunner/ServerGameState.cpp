@@ -4,6 +4,7 @@
 #include "../Movement/Mover.hpp"
 #include "../Events/Event.h"
 #include "../Events/EventHandler.h"
+#include "../Scripting/ScriptRunner.h"
 #include <sstream>
 #include <iostream>
 
@@ -13,7 +14,7 @@ enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE, MODIFY };
 ServerGameState::ServerGameState()
 { 
     setupServerGameState();
-    // scriptRunner = ScriptRunner::getInstance();
+    scriptRunner = std::make_shared<ScriptRunner>();
 }
 
 ServerGameState* ServerGameState::getInstance()
@@ -86,7 +87,7 @@ void ServerGameState::input(std::string objId, std::string i)
     else if ( in == MODIFY )
     {
         // std::shared_ptr<ScriptRunner> sr = std::make_shared<ScriptRunner>(findObjById(2));
-        runOnObj(findObjById(2));
+        scriptRunner -> runOnObj(findObjById(2));
     }
     else if ( in == CLOSE )         // client window closed -> removes their character
     {

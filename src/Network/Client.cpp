@@ -161,10 +161,11 @@ int main ()
     reqSocket.connect("tcp://localhost:5555");
 
     zmq::socket_t subSocket(context, zmq::socket_type::sub);
-    subSocket.set(zmq::sockopt::conflate, 1);       // CONFLATE OPTION FOR SUB SOCKET
+    // subSocket.set(zmq::sockopt::conflate, 1);       // CONFLATE OPTION FOR SUB SOCKET
+    subSocket.setsockopt(ZMQ_CONFLATE, 1);
 
     subSocket.connect("tcp://localhost:5556");
-    subSocket.set(zmq::sockopt::subscribe, "");
+    subSocket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
         // send inital request
     zmq::message_t request(3);
@@ -203,7 +204,7 @@ int main ()
 
         if ( !data.empty() )
             game -> deserialize(data);
-
+        
         // move character
         gameState -> updateGameState();
         game -> drawGraphics();

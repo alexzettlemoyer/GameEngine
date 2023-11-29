@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include "../GameRunner/ServerGameState.h"
+#include "../Scripting/ScriptRunner.h"
 
 std::mutex repMutex;
 
@@ -126,7 +127,7 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
 
 int main() 
 {
-        //  Prepare our context and socket
+            //  Prepare our context and socket
     zmq::context_t context(2);
     zmq::socket_t repSocket(context, zmq::socket_type::rep);
     repSocket.bind("tcp://*:5555");

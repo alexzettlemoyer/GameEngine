@@ -139,17 +139,3 @@ void ScriptManager::getHandleFromScript(const v8::FunctionCallbackInfo<v8::Value
 	v8::Local<v8::Value> object = context->Global()->Get(context, args[0]->ToString(isolate)).ToLocalChecked();
 	args.GetReturnValue().Set(object);
 }
-
-// void ScriptManager::setObjectInContext(std::shared_ptr<GraphicsObject> obj, const std::string& objectName, const std::string& contextName) {
-//     ContextContainer& container = context_containers[contextName]; // Access the context container
-
-//     v8::Local<v8::String> propName = v8::String::NewFromUtf8(container.isolate, objectName.c_str());
-
-//     v8::Local<v8::Object> v8_obj = obj->exposeToV8(container.isolate, container.context);
-//     v8::Local<v8::Context> context = container.context;
-
-//     // Create a JS object with the C++ object
-//     v8::Local<v8::Object> global = context->Global();
-//     global->Set(context, propName, v8_obj);
-//     // global->Set(context, v8::String::NewFromUtf8(container.isolate, objectName.c_str()).ToLocalChecked(), v8_obj);
-// }
