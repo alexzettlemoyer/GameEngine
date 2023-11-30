@@ -127,8 +127,29 @@ void replySocket(zmq::socket_t& repSocket, std::unordered_map<std::string, int>&
     }
 }
 
-void setupScripting()
+int main() 
 {
+            //  Prepare our context and socket
+    zmq::context_t context(2);
+    zmq::socket_t repSocket(context, zmq::socket_type::rep);
+    repSocket.bind("tcp://*:5555");
+
+    zmq::socket_t pubSocket(context, zmq::socket_type::pub);
+    pubSocket.bind("tcp://*:5556");
+
+        // maps client connection number to client loop counter
+    std::unordered_map<std::string, int> connections;
+
+        // thread to handle server replies
+    std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
+
+        // thread to check if any clients disconnected
+    std::thread disconnectThread(handleDisconnects, std::ref(connections));
+
+    // std::shared_ptr<ScriptRunner> scriptRunner = std::make_shared<ScriptRunner>();
+    ServerGameState* game = ServerGameState::getInstance();
+    // setupScripting();
+
     std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
     v8::V8::InitializePlatform(platform.release());
     v8::V8::InitializeICU();
@@ -155,56 +176,30 @@ void setupScripting()
 		v8::Local<v8::Context> object_context = v8::Context::New(isolate, NULL, global);
 		scriptManager->addContext(isolate, object_context, "object_context");
         
-        scriptManager->addScript("modify_position", "src/Scripting/scripts/modify_position.js", "object_context");
-    
+        scriptManager->addScript("modify_position_right", "src/Scripting/scripts/modify_position_right.js", "object_context");
         ServerGameState::getInstance() -> findObjById(2) -> exposeToV8(isolate, object_context);
-        scriptManager->runOne("modify_position", false, "object_context");
-    }
-}
-
-int main() 
-{
-            //  Prepare our context and socket
-    zmq::context_t context(2);
-    zmq::socket_t repSocket(context, zmq::socket_type::rep);
-    repSocket.bind("tcp://*:5555");
-
-    zmq::socket_t pubSocket(context, zmq::socket_type::pub);
-    pubSocket.bind("tcp://*:5556");
-
-        // maps client connection number to client loop counter
-    std::unordered_map<std::string, int> connections;
-
-        // thread to handle server replies
-    std::thread repThread(replySocket, std::ref(repSocket), std::ref(connections));
-
-        // thread to check if any clients disconnected
-    std::thread disconnectThread(handleDisconnects, std::ref(connections));
-
-    // std::shared_ptr<ScriptRunner> scriptRunner = std::make_shared<ScriptRunner>();
-    ServerGameState* game = ServerGameState::getInstance();
-
-    setupScripting();
-    // std::shared_ptr<ScriptRunner> scriptRunner = std::make_shared<ScriptRunner>();
-    // scriptRunner -> addScriptManager( scriptManager );
-    // game -> addScriptRunner( scriptRunner );
-    // game -> addScriptRunner(scriptRunner);
-
-        // Publish loop to all clients
-    while(true)
-    {
-        if ( connections.size() > 0 )
+        
+            // Publish loop to all clients
+        while(true)
         {
-                // update the gameState each iteration
-            game -> updateGameState();
-            std::string data = game -> serialize();
+            if ( connections.size() > 0 )
+            {
+                    // update the gameState each iteration
+                game -> updateGameState();
 
-            zmq::message_t publishData(data.data(), data.size());
-            pubSocket.send(publishData, zmq::send_flags::none);
+                if (ServerGameState::getInstance() -> findObjById(2) != NULL)
+                    scriptManager->runOne("modify_position_right", false, "object_context");
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::string data = game -> serialize();
+
+                zmq::message_t publishData(data.data(), data.size());
+                pubSocket.send(publishData, zmq::send_flags::none);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         }
     }
+
     disconnectThread.join();
     repThread.join();
 

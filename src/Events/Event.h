@@ -7,9 +7,13 @@
 
 class Event
 {
+    private:
+        static void setEventTimeStamp(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+        static void getEventTimeStamp(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
+
     public:
         enum EventType { C_UP, C_DOWN, C_LEFT, C_RIGHT, C_DEATH, C_RESPAWN, 
-            C_SPAWN, COLLISION, PAUSE, TIC_CHANGE, CLIENT_DISCONNECT };
+            C_SPAWN, COLLISION, PAUSE, TIC_CHANGE, CLIENT_DISCONNECT, TRIPLE_UP };
         struct Variant
         {
             enum Type
@@ -51,6 +55,15 @@ class Event
         void addGraphicsObjectVariant(GraphicsObject* g);
         void addCollisionDirectionVariant(int collisionDir);
         void addMetaData(std::string data);
+
+        // scripting functions
+        v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
+
+        // static Event* EventFactory(std::string context_name="default");
+		static void ScriptedEventFactory(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void ScriptedAddCharacterVariant(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+
 };
 
 #endif

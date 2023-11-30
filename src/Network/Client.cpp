@@ -10,10 +10,20 @@
 #include "../Time/Timeline.h"
 #include "../Events/Event.h"
 #include "../Events/EventHandler.h"
+#include "../Scripting/ScriptManager.h"
+#include <v8/v8.h>
+#include <libplatform/libplatform.h>
 
 // 60 fps
-enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE, MODIFY };
+enum InputType { HALF, REAL, DOUBLE, PAUSE, CLOSE, TRIPLEUP };
 std::mutex reqMutex;
+v8::Isolate *isolate;
+std::shared_ptr<ScriptManager> scriptManager;
+
+bool upKeyPressed = false;
+int consecutiveUpKeyPresses = 0;
+sf::Clock triplePressClock;
+const sf::Time triplePressThreshold = sf::milliseconds(350);
 
 /**
  * request-reply socket thread function
@@ -81,6 +91,21 @@ std::list<InputType> handleInputToServer(sf::RenderWindow *window)
         }
         else if (localEvent.type == sf::Event::KeyPressed)
         {
+
+            if (localEvent.key.code == sf::Keyboard::Up) {
+                if (upKeyPressed && triplePressClock.getElapsedTime() <= triplePressThreshold) {
+                    consecutiveUpKeyPresses++;
+                    if (consecutiveUpKeyPresses == 3) {
+                        list.push_back(TRIPLEUP);
+                        consecutiveUpKeyPresses = 0; // Reset counter
+                    }
+                } else {
+                    upKeyPressed = true;
+                    triplePressClock.restart();
+                    consecutiveUpKeyPresses = 1; // First press of a potential sequence
+                }
+            }
+
             switch (localEvent.key.code)
             {
                 case sf::Keyboard::Key::P:
@@ -95,9 +120,6 @@ std::list<InputType> handleInputToServer(sf::RenderWindow *window)
                     break;
                 case sf::Keyboard::Key::Num3:
                     list.push_back(DOUBLE);
-                    break;
-                case sf::Keyboard::Key::M:
-                    list.push_back(MODIFY);
                     break;
             }
         }
@@ -195,28 +217,75 @@ int main ()
 
     ClientGameState *gameState = ClientGameState::getInstance();
 
-        // wait for server messages
-    while (game -> getWindow() -> isOpen())
-    {
-        zmq::message_t publishedMsg;
-        zmq::recv_result_t result = subSocket.recv(publishedMsg, zmq::recv_flags::none);
-        std::string data = std::string(static_cast<char*>(publishedMsg.data()), publishedMsg.size());
+    std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
+    v8::V8::InitializePlatform(platform.release());
+    v8::V8::InitializeICU();
+    v8::V8::Initialize();
+    v8::Isolate::CreateParams create_params;
+    create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    isolate = v8::Isolate::New(create_params);
 
-        if ( !data.empty() )
-            game -> deserialize(data);
-        
-        // move character
-        gameState -> updateGameState();
-        game -> drawGraphics();
+    { // anonymous scope for managing handle scope
+        v8::Isolate::Scope isolate_scope(isolate); // must enter the virtual machine to do stuff
+        v8::HandleScope handle_scope(isolate);
 
-            // handle input
-        if ( game -> getWindow() -> hasFocus())
+		// Best practice to isntall all global functions in the context ahead of time.
+        v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
+        // Bind the global 'print' function to the C++ Print callback.
+        global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, v8helpers::Print));
+		global->Set(isolate, "eventobjectfactory", v8::FunctionTemplate::New(isolate, Event::ScriptedEventFactory));
+        global->Set(isolate, "addcharactervariant", v8::FunctionTemplate::New(isolate, Event::ScriptedAddCharacterVariant));
+        global->Set(isolate, "eventhandler_raise", v8::FunctionTemplate::New(isolate, EventHandler::ScriptedRaiseEvent));
+
+        v8::Local<v8::Context> default_context =  v8::Context::New(isolate, NULL, global);
+		v8::Context::Scope default_context_scope(default_context); // enter the context
+
+        scriptManager = std::make_shared<ScriptManager>(isolate, default_context); 
+
+		// Create a new context
+		v8::Local<v8::Context> object_context = v8::Context::New(isolate, NULL, global);
+		scriptManager->addContext(isolate, object_context, "object_context");
+
+        scriptManager->addScript("raise_event", "src/Scripting/scripts/raise_event.js", "object_context");
+        t -> exposeToV8(isolate, object_context);
+        eventHandler -> exposeToV8(isolate, object_context);
+        // gameState -> getCharacter() -> exposeToV8(isolate, object_context);
+
+        // expose the character pointer to v8
+        v8::Local<v8::External> external = v8::External::New(isolate, gameState -> getCharacter().get());
+        v8::Local<v8::Value> exposedObject = external;
+        v8::Local<v8::String> propertyName = v8::String::NewFromUtf8(isolate, "character");
+        object_context->Global()->Set(object_context, propertyName, exposedObject);
+
+
+            // wait for server messages
+        while (game -> getWindow() -> isOpen())
         {
-            handleInput(eventHandler, t);
-            std::list inputList = handleInputToServer(game -> getWindow());
+            zmq::message_t publishedMsg;
+            zmq::recv_result_t result = subSocket.recv(publishedMsg, zmq::recv_flags::none);
+            std::string data = std::string(static_cast<char*>(publishedMsg.data()), publishedMsg.size());
+
+            if ( !data.empty() )
+                game -> deserialize(data);
+            
+            // move character
+            gameState -> updateGameState();
+            game -> drawGraphics();
+
+                // handle input
+            if ( game -> getWindow() -> hasFocus())
             {
-                std::lock_guard<std::mutex> lock(reqMutex);
-                events = inputList;
+                handleInput(eventHandler, t);
+                std::list inputList = handleInputToServer(game -> getWindow());
+                {
+                    std::lock_guard<std::mutex> lock(reqMutex);
+                    events = inputList;
+
+                    // check if there was a double up click
+                    auto it = std::find(events.begin(), events.end(), TRIPLEUP);       
+                    if (it != events.end())
+                        scriptManager -> runOne("raise_event", true, "object_context"); 
+                }
             }
         }
     }

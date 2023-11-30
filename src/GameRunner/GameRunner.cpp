@@ -22,6 +22,7 @@ GameRunner::GameRunner(int clientId)
     this -> characterId = clientId;
     window.setFramerateLimit(100);
     window.setView(view);
+    window.setKeyRepeatEnabled(false);
 
     //     // setup background
     // if (!backgroundTexture.loadFromFile(IMG_BACKGROUND))

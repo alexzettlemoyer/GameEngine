@@ -3,6 +3,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <v8/v8.h>
+#include "../Scripting/v8helpers.h"
 
 class Timeline
 {
@@ -14,6 +16,9 @@ class Timeline
         Timeline* anchor;
         std::chrono::time_point<std::chrono::system_clock> startTime;
         std::chrono::time_point<std::chrono::system_clock> lastTime;
+        
+        static void getTimelineTimeStamp(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
+        static void setTimelineTimeStamp(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
 
     public:
         Timeline();
@@ -29,6 +34,8 @@ class Timeline
         void editTicSize(float s);
         void updateDeltaTime();
         void setAnchor(Timeline* anchor);
+
+        v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
 };
 
 #endif

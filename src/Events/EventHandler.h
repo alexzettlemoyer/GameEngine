@@ -3,6 +3,7 @@
 
 #include "Event.h"
 #include <memory>
+#include <v8/v8.h>
 
 class EventHandler
 {
@@ -32,6 +33,9 @@ class EventHandler
         static EventHandler* getInstance(Timeline* t = NULL);
         void onEvent(std::shared_ptr<Event> e);
         void handleEvents();
+
+        v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
+        static void ScriptedRaiseEvent(const v8::FunctionCallbackInfo<v8::Value>& args);
 };
 
 #endif

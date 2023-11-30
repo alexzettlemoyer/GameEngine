@@ -14,6 +14,7 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     this -> setSize(size);
     this -> setPosition(position);
     originalPosition = position;
+
     ground = isGround;
 
     velocity.x = 0.f;
@@ -27,40 +28,46 @@ GraphicsObject::GraphicsObject(sf::Vector2f size, sf::Vector2f position, bool is
     guid = "gameobject" + std::to_string(id);
 }
 
-/**
- * IMPORTANT: Pay close attention to the definition of the std::vector in this
- * example implementation. The v8helpers::expostToV8 will assume you have
- * instantiated this exact type of vector and passed it in. If you don't the
- * helper function will not work. 
- */
 v8::Local<v8::Object> GraphicsObject::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
 {
-    if (!isolate || isolate->IsDead() || isolate->IsExecutionTerminating())
-        std::cout << "Isolate is inactive or terminated!" << std::endl;
-
-    if (context.IsEmpty())
-        std::cout << "Invalid or empty context!" << std::endl;
-
 	std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
-	v.push_back(v8helpers::ParamContainer("x", getGameObjectX, setGameObjectX));
-	v.push_back(v8helpers::ParamContainer("y", getGameObjectY, setGameObjectY));
-	v.push_back(v8helpers::ParamContainer("guid", getGameObjectGUID, setGameObjectGUID));
+    v.push_back(v8helpers::ParamContainer("ogX", getObjOriginalX, setObjOriginalX));
+	v.push_back(v8helpers::ParamContainer("x", getObjX, setObjX));
+    v.push_back(v8helpers::ParamContainer("ogY", getObjOriginalY, setObjOriginalY));
+	v.push_back(v8helpers::ParamContainer("y", getObjY, setObjY));
+	v.push_back(v8helpers::ParamContainer("guid", getObjGUID, setObjGUID));
 
 	return v8helpers::exposeToV8(guid, this, v, isolate, context, context_name);
 }
 
-/**
- * Implementations of static setter and getter functions
- *
- * IMPORTANT: These setter and getter functions will set and get values of v8
- * callback data structures. Note their return type is void regardless of
- * whether they are setter or getter. 
- *
- * Also keep in mind that the function signature must match this exactly in
- * order for v8 to accept these functions. 
- */ 
+void GraphicsObject::setObjOriginalX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+    v8::Isolate* isolate = info.GetIsolate();
 
-void GraphicsObject::setGameObjectX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    int32_t xValue = value->Int32Value(isolate->GetCurrentContext()).FromMaybe(0);
+    GraphicsObject* obj = static_cast<GraphicsObject*>(ptr);
+    sf::Vector2f currentOgPosition = obj->getOriginalPosition();
+    obj->setOriginalPosition(xValue, currentOgPosition.y);
+}
+
+void GraphicsObject::getObjOriginalX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+    v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    GraphicsObject* obj = static_cast<GraphicsObject*>(ptr);
+    sf::Vector2f currentOgPosition = obj->getOriginalPosition();
+
+	int x_val = int(currentOgPosition.x);
+	info.GetReturnValue().Set(x_val);
+}
+
+void GraphicsObject::setObjX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
 {
     v8::Isolate* isolate = info.GetIsolate();
 
@@ -74,7 +81,7 @@ void GraphicsObject::setGameObjectX(v8::Local<v8::String> property, v8::Local<v8
     obj->setPosition(xValue, currentPosition.y);
 }
 
-void GraphicsObject::getGameObjectX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+void GraphicsObject::getObjX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
 {
 	v8::Local<v8::Object> self = info.Holder();
 	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
@@ -87,7 +94,34 @@ void GraphicsObject::getGameObjectX(v8::Local<v8::String> property, const v8::Pr
 	info.GetReturnValue().Set(x_val);
 }
 
-void GraphicsObject::setGameObjectY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+void GraphicsObject::setObjOriginalY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+    v8::Isolate* isolate = info.GetIsolate();
+
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    int32_t yValue = value->Int32Value(isolate->GetCurrentContext()).FromMaybe(0);
+    GraphicsObject* obj = static_cast<GraphicsObject*>(ptr);
+    sf::Vector2f currentOgPosition = obj->getOriginalPosition();
+    obj->setOriginalPosition(currentOgPosition.x, yValue);
+}
+
+void GraphicsObject::getObjOriginalY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+    v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    GraphicsObject* obj = static_cast<GraphicsObject*>(ptr);
+    sf::Vector2f currentOgPosition = obj->getOriginalPosition();
+
+	int y_val = int(currentOgPosition.y);
+	info.GetReturnValue().Set(y_val);
+}
+
+void GraphicsObject::setObjY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
 {
     v8::Isolate* isolate = info.GetIsolate();
 
@@ -102,7 +136,7 @@ void GraphicsObject::setGameObjectY(v8::Local<v8::String> property, v8::Local<v8
     obj->setPosition(currentPosition.x, yValue);
 }
 
-void GraphicsObject::getGameObjectY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+void GraphicsObject::getObjY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
 {
 	v8::Local<v8::Object> self = info.Holder();
 	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
@@ -115,7 +149,7 @@ void GraphicsObject::getGameObjectY(v8::Local<v8::String> property, const v8::Pr
 	info.GetReturnValue().Set(y_val);
 }
 
-void GraphicsObject::setGameObjectGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+void GraphicsObject::setObjGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
 {
 	v8::Local<v8::Object> self = info.Holder();
 	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
@@ -124,7 +158,7 @@ void GraphicsObject::setGameObjectGUID(v8::Local<v8::String> property, v8::Local
 	static_cast<GraphicsObject*>(ptr)->guid = *utf8_str;
 }
 
-void GraphicsObject::getGameObjectGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+void GraphicsObject::getObjGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
 {
 	v8::Local<v8::Object> self = info.Holder();
 	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
@@ -165,6 +199,11 @@ sf::Vector2f GraphicsObject::getOriginalPosition()
 {
     std::lock_guard<std::mutex> lock(this->objMutex);
     return originalPosition;
+}
+
+void GraphicsObject::setOriginalPosition(float x, float y)
+{
+    originalPosition = sf::Vector2f(x, y);
 }
 
 sf::Vector2f GraphicsObject::getSize()

@@ -39,7 +39,8 @@ endif
 BIN=bin
 SRC=src
 
-OBJ_FILES = $(BIN)/time.o \
+OBJ_FILES = $(BIN)/v8helpers.o \
+	   $(BIN)/time.o \
 	   $(BIN)/event.o \
 	   $(BIN)/eventhandler.o \
 	   $(BIN)/mover.o \
@@ -50,7 +51,6 @@ OBJ_FILES = $(BIN)/time.o \
 	   $(BIN)/item.o \
 	   $(BIN)/platform.o \
 	   $(BIN)/character.o \
-	   $(BIN)/v8helpers.o \
 	   $(BIN)/scriptManager.o \
 	   $(BIN)/collider.o \
 	   $(BIN)/gameState.o \

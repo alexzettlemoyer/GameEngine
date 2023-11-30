@@ -158,6 +158,9 @@ void EventHandler::processEvent(std::shared_ptr<Event> e)
         case Event::COLLISION:
             handleCollision(e);
             break;
+        case Event::TRIPLE_UP:
+            std::cout << "TRIPLE UP WOOOOOOOO" << std::endl;
+            break;
         default:
             break;
     }
@@ -186,3 +189,42 @@ void EventHandler::handleEvents()
         queue.erase( i );
     }
 }
+
+v8::Local<v8::Object> EventHandler::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
+{
+    std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
+	return v8helpers::exposeToV8("eventhandler", this, v, isolate, context, context_name);
+}
+
+std::shared_ptr<Event> sharedPtrFromV8Obj(v8::Local<v8::Object> v8Object) {
+    v8::Local<v8::External> wrap2 = v8::Local<v8::External>::Cast(v8Object->GetInternalField(0));
+    Event* eventPtr = static_cast<Event*>(wrap2->Value());
+    return std::shared_ptr<Event>(eventPtr);
+}
+
+void EventHandler::ScriptedRaiseEvent(const v8::FunctionCallbackInfo<v8::Value>& args)
+{
+    v8::Isolate *isolate = args.GetIsolate();
+	v8::Local<v8::Context> context = isolate->GetCurrentContext();
+	v8::EscapableHandleScope handle_scope(args.GetIsolate());
+	v8::Context::Scope context_scope(context);
+
+    if (args.Length() != 2)
+    {
+        std::cout << "Failed to raise event" << std::endl;
+        return;
+    }
+
+    // get the event handler args[0]
+    v8::Local<v8::Object> eventHandlerObject = args[0]->ToObject(context).ToLocalChecked();
+    v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(eventHandlerObject->GetInternalField(0));
+    EventHandler* eventHandlerPtr = static_cast<EventHandler*>(wrap->Value());
+
+    // get the event args[1]
+    v8::Local<v8::Object> eventObject = args[1]->ToObject(context).ToLocalChecked();
+    std::shared_ptr<Event> shared_event_ptr = sharedPtrFromV8Obj(eventObject);
+
+    // raise the event!
+    eventHandlerPtr -> onEvent(shared_event_ptr);
+}
+
