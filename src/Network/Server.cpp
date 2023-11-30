@@ -148,7 +148,6 @@ int main()
 
     // std::shared_ptr<ScriptRunner> scriptRunner = std::make_shared<ScriptRunner>();
     ServerGameState* game = ServerGameState::getInstance();
-    // setupScripting();
 
     std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
     v8::V8::InitializePlatform(platform.release());
@@ -164,7 +163,6 @@ int main()
 
 		// Best practice to isntall all global functions in the context ahead of time.
         v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
-        // Bind the global 'print' function to the C++ Print callback.
         global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, v8helpers::Print));
 
         v8::Local<v8::Context> default_context =  v8::Context::New(isolate, NULL, global);

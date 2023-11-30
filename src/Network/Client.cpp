@@ -246,17 +246,19 @@ int main ()
 		v8::Local<v8::Context> object_context = v8::Context::New(isolate, NULL, global);
 		scriptManager->addContext(isolate, object_context, "object_context");
 
-        scriptManager->addScript("raise_event", "src/Scripting/scripts/raise_event.js", "object_context");
+        scriptManager -> addScript("raise_triple_up_event", "src/Scripting/scripts/raise_triple_up_event.js", "object_context");
+        scriptManager -> addScript("handle_triple_up_event", "src/Scripting/scripts/handle_triple_up_event.js", "object_context");
+        
         t -> exposeToV8(isolate, object_context);
+        eventHandler -> addScriptManager(scriptManager);
         eventHandler -> exposeToV8(isolate, object_context);
-        // gameState -> getCharacter() -> exposeToV8(isolate, object_context);
+        gameState -> getCharacter() -> exposeToV8(isolate, object_context);
 
         // expose the character pointer to v8
         v8::Local<v8::External> external = v8::External::New(isolate, gameState -> getCharacter().get());
         v8::Local<v8::Value> exposedObject = external;
-        v8::Local<v8::String> propertyName = v8::String::NewFromUtf8(isolate, "character");
-        object_context->Global()->Set(object_context, propertyName, exposedObject);
-
+        v8::Local<v8::String> propertyName = v8::String::NewFromUtf8(isolate, "characterPtr");
+        auto setResult = object_context->Global()->Set(object_context, propertyName, exposedObject);
 
             // wait for server messages
         while (game -> getWindow() -> isOpen())
@@ -284,16 +286,22 @@ int main ()
                     // check if there was a double up click
                     auto it = std::find(events.begin(), events.end(), TRIPLEUP);       
                     if (it != events.end())
-                        scriptManager -> runOne("raise_event", true, "object_context"); 
+                        scriptManager -> runOne("raise_triple_up_event", true, "object_context"); 
                 }
             }
         }
     }
+
     reqThread.join();
 
     delete game;
     delete gameState;
     delete eventHandler;
     delete t;
+
+    isolate->Dispose();
+    v8::V8::Dispose();
+    v8::V8::ShutdownPlatform();
+
     return 0;
 }

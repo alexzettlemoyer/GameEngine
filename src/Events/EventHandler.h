@@ -4,6 +4,7 @@
 #include "Event.h"
 #include <memory>
 #include <v8/v8.h>
+#include "../Scripting/ScriptManager.h"
 
 class EventHandler
 {
@@ -12,6 +13,7 @@ class EventHandler
         static EventHandler* instancePtr;
         std::map<float, std::shared_ptr<Event>> queue;
         Timeline* timeline;
+        std::shared_ptr<ScriptManager> scriptManager;
 
         std::mutex eventMutex;
 
@@ -21,6 +23,7 @@ class EventHandler
         void handleCharacterInput(Event::EventType type, std::shared_ptr<Event> e);
         void handleCharacterDeath(std::shared_ptr<Event> e);
         void handleCharacterRespawn(std::shared_ptr<Event> e);
+        void handleTripleUp(std::shared_ptr<Event> e);
 
         // functions used on the server side
         void handleCharacterSpawn(std::shared_ptr<Event> e);
@@ -36,6 +39,7 @@ class EventHandler
 
         v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
         static void ScriptedRaiseEvent(const v8::FunctionCallbackInfo<v8::Value>& args);
+        void addScriptManager(std::shared_ptr<ScriptManager> sm);
 };
 
 #endif

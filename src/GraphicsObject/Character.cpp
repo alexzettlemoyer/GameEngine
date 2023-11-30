@@ -14,10 +14,7 @@ static const std::string IMG_CHARACTER = "images/girl.png";
 static const sf::Vector2f SIZE_CHARACTER = sf::Vector2f(116.f, 256.f);
 static sf::Vector2u wSize = sf::Vector2u(1000, 800);
 
-static const float displacement = .15f;          // .085f
-static const float acceleration = -2500.f;      // -1600.f
-static const float GRAVITY = 700.f;             // 300.f
-
+static const float displacement = .15f;         // .085f
 static const float FRICTION = 3.2f;
 
 sf::Vector2f initialPosition;
@@ -34,6 +31,9 @@ Character::Character(sf::Vector2f position, int idNum, std::shared_ptr<Timeline>
     this -> collisionTypeY = CHAR;
     this -> spawnPoint = spawnPoint;
     this -> respawned = false;
+
+    this -> GRAVITY = 700.f;
+    this -> acceleration = -2500.f;
 }
 
 sf::Vector2f Character::getVelocity()
@@ -193,3 +193,87 @@ bool Character::checkBounds()
 
     return false;
 }
+
+void Character::setGravity(float newGravity)
+{
+    std::lock_guard<std::mutex> lock(this->objMutex);
+    this -> GRAVITY = newGravity;
+}
+
+float Character::getGravity()
+{
+    return GRAVITY;
+}
+
+void Character::setAcceleration(float newAcceleration)
+{
+    std::lock_guard<std::mutex> lock(this->objMutex);
+    this -> acceleration = newAcceleration;
+}
+
+float Character::getAcceleration()
+{
+    return acceleration;
+}
+
+v8::Local<v8::Object> Character::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
+{
+    std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
+    v.push_back(v8helpers::ParamContainer("gravity", getCharGravity, setCharGravity));
+    v.push_back(v8helpers::ParamContainer("acceleration", getCharAcceleration, setCharAcceleration));
+
+	return v8helpers::exposeToV8("character", this, v, isolate, context, context_name);
+}
+
+void Character::setCharGravity(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+    v8::Isolate* isolate = info.GetIsolate();
+
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    float new_gravity_value = value->NumberValue(isolate->GetCurrentContext()).FromMaybe(0);
+    Character* obj = static_cast<Character*>(ptr);
+
+    obj->setGravity(new_gravity_value);
+}
+
+void Character::getCharGravity(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+    v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    Character* obj = static_cast<Character*>(ptr);
+    float current_gravity_value = obj->getGravity();
+
+	info.GetReturnValue().Set(current_gravity_value);
+}
+
+void Character::setCharAcceleration(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+    v8::Isolate* isolate = info.GetIsolate();
+
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    float new_acceleration_value = value->NumberValue(isolate->GetCurrentContext()).FromMaybe(0);
+    Character* obj = static_cast<Character*>(ptr);
+
+    obj->setAcceleration(new_acceleration_value);
+}
+
+void Character::getCharAcceleration(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+    v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+
+    Character* obj = static_cast<Character*>(ptr);
+    float current_acceleration_value = obj->getAcceleration();
+
+	info.GetReturnValue().Set(current_acceleration_value);
+}
+

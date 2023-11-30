@@ -73,6 +73,16 @@ void EventHandler::handleCharacterRespawn(std::shared_ptr<Event> e)
     charRef -> respawn();
 }
 
+void EventHandler::handleTripleUp(std::shared_ptr<Event> e)
+{
+    if (scriptManager == nullptr)
+    {
+        std::cout << "Error: No script manager to run script." << std::endl;
+        return;
+    }
+    scriptManager -> runOne("handle_triple_up_event", true, "object_context");
+}
+
 void EventHandler::handleCharacterSpawn(std::shared_ptr<Event> e)
 {
     Event::Variant characterIdVariant = e -> parameters[ Event::Variant::TYPE_CHAR_ID ];
@@ -159,7 +169,7 @@ void EventHandler::processEvent(std::shared_ptr<Event> e)
             handleCollision(e);
             break;
         case Event::TRIPLE_UP:
-            std::cout << "TRIPLE UP WOOOOOOOO" << std::endl;
+            handleTripleUp(e);
             break;
         default:
             break;
@@ -188,6 +198,11 @@ void EventHandler::handleEvents()
         std::lock_guard<std::mutex> lock(eventMutex);
         queue.erase( i );
     }
+}
+
+void EventHandler::addScriptManager(std::shared_ptr<ScriptManager> sm)
+{
+    scriptManager = sm;
 }
 
 v8::Local<v8::Object> EventHandler::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)

@@ -71,25 +71,19 @@ class GraphicsObject : public sf::RectangleShape
         std::shared_ptr<Timeline> timeline;
         MovementFunction movementFunction = nullptr;
 
-        /**
-		 * NOTE: These "Accessors" have to be **static**
-		 *
-		 * You will need to implement a setter and getter for every class
-		 * member variable you want accessible to javascript.
-		 */
 		static void setObjX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
         static void setObjOriginalX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-		static void getObjX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
-        static void getObjOriginalX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void getObjX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); 
+        static void getObjOriginalX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
 
 		static void setObjY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
         static void setObjOriginalY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
 
-		static void getObjY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
-		static void getObjOriginalY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void getObjY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); 
+		static void getObjOriginalY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); 
 
 		static void setObjGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-		static void getObjGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void getObjGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); 
 };
 
 #endif

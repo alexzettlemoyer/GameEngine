@@ -10,9 +10,7 @@ function move(x, y) {
     gameobject2.ogY = tOgY + y;
 }
 
-print("\nRunning script modify_position.js on " + gameobject2.guid);
-print("Starting position for:\t" + gameobject2.x + ", " + gameobject2.y);
-print("Original position:\t" + gameobject2.ogX + ", " + gameobject2.ogY + "\n\tUpdating...");
+print("Running script modify_position.js on " + gameobject2.guid + ". Updating...")
 move(1, 0);
-print("Ending position for:\t" + gameobject2.x + ", " + gameobject2.y);
-print("Original position:\t" + gameobject2.ogX + ", " + gameobject2.ogY + "\n\tDone... \n");
+print("Done.\n")
+

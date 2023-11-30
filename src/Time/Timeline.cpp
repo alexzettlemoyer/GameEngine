@@ -103,7 +103,6 @@ void Timeline::getTimelineTimeStamp(v8::Local<v8::String> property, const v8::Pr
 	info.GetReturnValue().Set(time_stamp);
 }
 
-
 void Timeline::setTimelineTimeStamp(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
 { // no timestamp setter function
 }
