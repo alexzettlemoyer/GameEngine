@@ -184,8 +184,8 @@ int main()
             {
                     // update the gameState each iteration
                 game -> updateGameState();
-
-                if (ServerGameState::getInstance() -> findObjById(2) != NULL)
+                
+                if (ServerGameState::getInstance() -> findObjById(2) != NULL && ServerGameState::getInstance() -> findObjById(2) -> getPosition().x < 3150.f)
                     scriptManager->runOne("modify_position_right", false, "object_context");
 
                 std::string data = game -> serialize();
