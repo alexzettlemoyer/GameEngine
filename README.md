@@ -25,3 +25,7 @@ this game is being developed on
 * SFML version `2.5.1`
 * Lib ZEROmq `4.3.4`
 
+
+## SECOND GAME:
+* navigate to the tetris folder to see the second game
+* a README.md file in that directory explains compilation and usage

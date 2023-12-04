@@ -18,6 +18,8 @@ class ClientGameState : public GameState
         std::list<std::shared_ptr<Piece>> currentPieces;
         std::shared_ptr<Piece> currentPiece;
 
+        Timeline* timeline;
+
         std::shared_ptr<std::vector<std::vector<std::shared_ptr<sf::RectangleShape>>>> grid;
 
         float elapsedTime;
@@ -32,10 +34,10 @@ class ClientGameState : public GameState
         static void setPlaying(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
         static void getPlaying(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
         static void setGameStart(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-        static void setTimeStep(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-        static void getTimeStep(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
-        static void setLinesCompleted(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-        static void getLinesCompleted(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
+        // static void setTimeStep(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+        // static void getTimeStep(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
+        // static void setLinesCompleted(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+        // static void getLinesCompleted(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
 
     public:
         static ClientGameState* getInstance(int id = 0);
@@ -50,10 +52,10 @@ class ClientGameState : public GameState
         sf::Vector2f getCharacterPosition();
         std::shared_ptr<Character> getCharacter();
 
+        void addTimeline(Timeline* t);
         void addScriptManager(std::shared_ptr<ScriptManager> sm);
 
         std::shared_ptr<std::vector<std::vector<std::shared_ptr<sf::RectangleShape>>>> getGrid();
-
         std::list<std::shared_ptr<Piece>> getCurrentPieces();
         std::shared_ptr<Piece> getCurrentPiece();
 
@@ -70,7 +72,6 @@ class ClientGameState : public GameState
         static const int ROW_COUNT = 16;
 
         std::queue<std::string> newPieces;
-
         v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
 
 };

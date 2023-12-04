@@ -45,10 +45,8 @@ class Piece
 
         static void setPieceRotation(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
         static void getPieceRotation(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
-
         static void getPieceX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
         static void setPieceX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-
         static void getPieceY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info);
         static void setPieceY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
 };

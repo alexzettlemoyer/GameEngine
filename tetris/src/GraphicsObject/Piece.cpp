@@ -46,17 +46,10 @@ Piece::Piece(char type, int x, int y)
     previousY = y;
 
     grounded = false;
-    // this -> place(x, y);
-
-    // int startingCorner = types[type] * 18;
-    // texture = std::make_shared<sf::Texture>();
-    // if (!loadTexture(*texture, TILES.c_str(), sf::IntRect(startingCorner, 0, 17, 17)))
-    //     { }
     
     for (int i = 0; i < 4; i++)
     {
         std::shared_ptr<sf::RectangleShape> currentBlock = std::make_shared<sf::RectangleShape>();
-        // currentBlock -> setTexture(texture.get());
         currentBlock -> setSize(BLOCK_SIZE);
         currentBlock -> setFillColor(colorMap[type]);
         currentBlock -> setOutlineColor(sf::Color::Black);
@@ -123,17 +116,11 @@ bool Piece::isValidMove(int x, int y, unsigned short piecePattern)
 
             // if the move is out of grid bounds
             if (gridX < 0 || gridX >= ClientGameState::COLS || gridY >= ClientGameState::ROW_COUNT)
-            {
-                std::cout << "out of bounds" << std::endl;
                 return false;
-            }
 
             // if the move would overlap with another piece
             if ((*grid)[gridY][gridX] != nullptr )
-            {
-                std::cout << "occupied" << std::endl;
                 return false;
-            }
         }
     }
     return true;

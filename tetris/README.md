@@ -12,16 +12,14 @@
 
 ## USAGE:
 
-* player movement is input using the arrow keys and space bar to jump
+* at any point, press "START" to start a new game
+* piece movement is input using the arrow keys
 * pressing key `P` pauses all movement
-* pressing key `1` sets game speed to 0.5
-* pressing key `2` sets game speed to 1.0 (default)
-* pressing key `3` sets game speed to 2.0
 
 
 ## VERSIONS:
 this game is being developed on
-* Ubuntu Virtual Machine `22.04.3 LTS (GNU/Linux 5.15.0-83-generic aarch64)`
+* Ubuntu Virtual Machine `20.04.3 LTS (GNU/Linux 5.15.0-83-generic aarch64)`
 * SFML version `2.5.1`
 * Lib ZEROmq `4.3.4`
 

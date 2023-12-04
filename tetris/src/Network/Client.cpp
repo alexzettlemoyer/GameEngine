@@ -201,6 +201,7 @@ int main ()
     std::thread reqThread(requestSocket, std::ref(reqSocket), clientId, std::ref(events));
 
     ClientGameState *gameState = ClientGameState::getInstance();
+    // gameState -> addTimeline(t);
 
     std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
     v8::V8::InitializePlatform(platform.release());
@@ -247,16 +248,13 @@ int main ()
         scriptManager -> addScript("handle_game_start_event", "src/Scripting/scripts/handle_game_start_event.js", "object_context");
         scriptManager -> addScript("handle_pause_event", "src/Scripting/scripts/handle_pause_event.js", "object_context");
 
-        scriptManager -> addScript("new_level", "src/Scripting/scripts/new_level.js", "object_context");
+        // scriptManager -> addScript("new_level", "src/Scripting/scripts/new_level.js", "object_context");
 
-        
         t -> exposeToV8(isolate, object_context);
         eventHandler -> addScriptManager(scriptManager);
         eventHandler -> exposeToV8(isolate, object_context);
         gameState -> addScriptManager(scriptManager);
         gameState -> exposeToV8(isolate, object_context);
-
-        // scriptManager -> runOne("handle_new_piece_event", false, "object_context");
 
             // wait for server messages
         while (game -> getWindow() -> isOpen())
@@ -279,7 +277,6 @@ int main ()
                 // handle input
             if ( game -> getWindow() -> hasFocus())
             {
-                // handleInput(eventHandler, t, scriptManager);
                 std::list inputList = handleInputToServer(game -> getWindow(), eventHandler, t, scriptManager);
                 {
                     std::lock_guard<std::mutex> lock(reqMutex);

@@ -21,7 +21,6 @@ class GameRunner
         
         sf::Font font;
         sf::Text lineNumber;
-        // sf::Text pause;
         sf::Text start;
 
         sf::RectangleShape gridBounds;

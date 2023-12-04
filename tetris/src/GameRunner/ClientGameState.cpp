@@ -25,12 +25,15 @@ ClientGameState* ClientGameState::getInstance(int id)
 void ClientGameState::setupClientGameState(int id)
 {
     std::lock_guard<std::mutex> lock(stateMutex);
-
-    dt = 0.01;
     elapsedTime = 0;
 
     lineCount = 0;
     playing = false;
+}
+
+void ClientGameState::addTimeline(Timeline* t)
+{
+    this -> timeline = t;
 }
 
 void ClientGameState::addScriptManager(std::shared_ptr<ScriptManager> sm)
@@ -72,8 +75,6 @@ void ClientGameState::updateGameState()
             scriptManager -> runOne("raise_down_event", false, "object_context");
             elapsedTime = 0;
         }
-
-        STEP = 0.1f - (lineCount / 500.f);
     }
 }
 
@@ -233,19 +234,12 @@ std::string ClientGameState::getNextPiece()
     return value;
 }
 
-// void ClientGameState::setStep(float newTimeStep)
-// {
-//     this -> STEP = newTimeStep;
-// }
-
 v8::Local<v8::Object> ClientGameState::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
 {
     std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
     v.push_back(v8helpers::ParamContainer("newpiece", getNewPiece, setNewPiece));
     v.push_back(v8helpers::ParamContainer("playing", getPlaying, setPlaying));
     v.push_back(v8helpers::ParamContainer("start", getPlaying, setGameStart));
-    v.push_back(v8helpers::ParamContainer("lines_completed", getLinesCompleted, setLinesCompleted));
-    v.push_back(v8helpers::ParamContainer("time_step", getTimeStep, setTimeStep));
 
 	return v8helpers::exposeToV8("game_state", this, v, isolate, context, context_name);
 }
@@ -261,7 +255,6 @@ void ClientGameState::setNewPiece(v8::Local<v8::String> property, v8::Local<v8::
     v8::String::Utf8Value utf8Value(isolate, newPieceString);
     std::string newPieceStr = *utf8Value;
 
-    // ClientGameState* obj = static_cast<ClientGameState*>(ptr);
     ClientGameState::getInstance() -> newPiece(newPieceStr);
 }
 
@@ -287,7 +280,6 @@ void ClientGameState::setPlaying(v8::Local<v8::String> property, v8::Local<v8::V
 	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
 	void* ptr = wrap->Value();
 
-    // bool newPlayingValue = value->BooleanValue(isolate);
     v8::Maybe<bool> maybeBool = value->BooleanValue(isolate->GetCurrentContext());
     bool newPlayingValue = maybeBool.FromJust();
 
@@ -302,7 +294,6 @@ void ClientGameState::setGameStart(v8::Local<v8::String> property, v8::Local<v8:
 	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
 	void* ptr = wrap->Value();
 
-    // bool newPlayingValue = value->BooleanValue(isolate);
     v8::Maybe<bool> maybeBool = value->BooleanValue(isolate->GetCurrentContext());
     bool newPlayingValue = maybeBool.FromJust();
 
@@ -319,44 +310,4 @@ void ClientGameState::getPlaying(v8::Local<v8::String> property, const v8::Prope
 
     bool isPlaying = ClientGameState::getInstance() -> playing;
 	info.GetReturnValue().Set(isPlaying);
-}
-
-void ClientGameState::setTimeStep(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
-{
-    v8::Isolate* isolate = info.GetIsolate();
-
-	v8::Local<v8::Object> self = info.Holder();
-	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-	void* ptr = wrap->Value();
-
-    float newStep = static_cast<float>(value->NumberValue(isolate->GetCurrentContext()).FromMaybe(0));
-
-    ClientGameState::getInstance() -> STEP = newStep;
-}
-
-void ClientGameState::getTimeStep(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
-{
-    v8::Isolate* isolate = info.GetIsolate();
-
-    v8::Local<v8::Object> self = info.Holder();
-	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-	void* ptr = wrap->Value();
-
-    float currentTimeStep = ClientGameState::getInstance() -> STEP;
-	info.GetReturnValue().Set(currentTimeStep);
-}
-
-void ClientGameState::setLinesCompleted(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
-{ }
-
-void ClientGameState::getLinesCompleted(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
-{
-    v8::Isolate* isolate = info.GetIsolate();
-
-    v8::Local<v8::Object> self = info.Holder();
-	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-	void* ptr = wrap->Value();
-
-    float currentLineCount = ClientGameState::getInstance() -> STEP;
-	info.GetReturnValue().Set(currentLineCount);
 }
