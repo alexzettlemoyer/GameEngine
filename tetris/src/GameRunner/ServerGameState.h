@@ -2,7 +2,7 @@
 #define SERVER_GAME_STATE_H
 
 #include "GameState.h"
-#include "../Events/Eventhandler.h"
+#include "../Events/EventHandler.h"
 
 class ServerGameState : public GameState
 {
