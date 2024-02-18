@@ -1,5 +1,13 @@
 # CSC481: Game Engine Foundations
 
+## REQUREMENTS:
+
+* This project requires various libraries, follow the instructions below to install
+
+gcc: `sudo apt install gcc`
+v8: `sudo apt-get install libv8-dev`
+zmq: `sudo apt-get install libzmq3-dev`
+
 ## COMPILE & RUN INSTRUCTIONS: 
 
 ** Game **
